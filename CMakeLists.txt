@@ -6,16 +6,24 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # ─── Compiler Flags ───────────────────────────────────────────────────────────
-add_compile_options(
-    -Wall -Wextra -Werror
-    -Wpedantic
-    -Wno-unused-parameter
-)
+if(MSVC)
+    # Visual Studio: /W4 = high warnings, /WX = treat warnings as errors
+    add_compile_options(/W4 /WX /permissive- /wd4100 /utf-8)
+    # MSVC requires explicit /std:c++20
+    add_compile_options(/std:c++20)
+else()
+    # GCC / Clang
+    add_compile_options(
+        -Wall -Wextra -Werror
+        -Wpedantic
+        -Wno-unused-parameter
+    )
 
-# Sanitizers for Debug builds
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_options(-fsanitize=address,undefined)
-    add_link_options(-fsanitize=address,undefined)
+    # Sanitizers only available on GCC/Clang — silently ignored on MSVC
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_compile_options(-fsanitize=address,undefined)
+        add_link_options(-fsanitize=address,undefined)
+    endif()
 endif()
 
 # ─── Dependencies ─────────────────────────────────────────────────────────────
@@ -40,6 +48,7 @@ target_link_libraries(srfm_lorentz PUBLIC Eigen3::Eigen fmt::fmt)
 add_library(srfm_manifold
     src/manifold/market_manifold.cpp
     src/manifold/spacetime_interval.cpp
+    src/manifold/normalizer.cpp
 )
 target_include_directories(srfm_manifold PUBLIC include)
 target_link_libraries(srfm_manifold PUBLIC srfm_lorentz Eigen3::Eigen)
@@ -94,13 +103,13 @@ endmacro()
 
 # AGT-01 tests
 add_srfm_test(test_lorentz
-    "tests/lorentz/test_lorentz_transform.cpp;tests/lorentz/test_beta_calculator.cpp"
+    "tests/lorentz/test_lorentz_transform.cpp;tests/lorentz/test_beta_calculator.cpp;tests/lorentz/test_online_beta.cpp"
     srfm_lorentz)
 target_include_directories(test_lorentz PRIVATE src/lorentz)
 
 # AGT-02 tests (manifold — implemented by AGT-06)
 add_srfm_test(test_manifold
-    "tests/manifold/test_market_manifold.cpp;tests/manifold/test_spacetime_interval.cpp"
+    "tests/manifold/test_market_manifold.cpp;tests/manifold/test_spacetime_interval.cpp;tests/manifold/test_normalizer.cpp"
     srfm_manifold)
 
 # AGT-03 tests (momentum — implemented by AGT-06)
@@ -116,7 +125,7 @@ add_srfm_test(test_tensor
 
 # AGT-05 tests
 add_srfm_test(test_backtest
-    "tests/backtest/test_backtester.cpp;tests/backtest/test_performance_metrics.cpp;tests/backtest/test_metrics_precision.cpp"
+    "tests/backtest/test_backtester.cpp;tests/backtest/test_performance_metrics.cpp;tests/backtest/test_metrics_precision.cpp;tests/backtest/test_gamma_sizing.cpp"
     srfm_backtest)
 target_include_directories(test_backtest PRIVATE src/lorentz)
 

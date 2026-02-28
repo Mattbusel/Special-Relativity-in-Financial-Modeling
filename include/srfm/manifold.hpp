@@ -32,6 +32,11 @@
 #include <optional>
 #include <string>
 
+// Forward declaration — avoids circular include with normalizer.hpp.
+namespace srfm {
+class CoordinateNormalizer;
+}  // namespace srfm
+
 namespace srfm::manifold {
 
 // ─── SpacetimeEvent ───────────────────────────────────────────────────────────
@@ -126,6 +131,27 @@ public:
     [[nodiscard]] static bool
     is_causal(const SpacetimeEvent& a,
               const SpacetimeEvent& b) noexcept;
+
+    /// Normalize `curr_raw` via `normalizer`, then classify the interval
+    /// between `prev_normalized` and the resulting normalized event.
+    ///
+    /// This is the canonical pipeline entry point. Every SpacetimeEvent is
+    /// normalized before SpacetimeInterval::compute is called, preventing
+    /// raw coordinate scale differences (price ~100, volume ~1e6) from
+    /// dominating the interval computation.
+    ///
+    /// # Arguments
+    /// * `normalizer`       — Rolling z-score normalizer (updated in place)
+    /// * `prev_normalized`  — Previous event, already normalized
+    /// * `curr_raw`         — Current event with raw market coordinates
+    ///
+    /// # Returns
+    /// Interval type of the normalized trajectory, or `nullopt` if any
+    /// coordinate is non-finite after normalization.
+    [[nodiscard]] static std::optional<IntervalType>
+    process(srfm::CoordinateNormalizer& normalizer,
+            const SpacetimeEvent& prev_normalized,
+            const SpacetimeEvent& curr_raw) noexcept;
 };
 
 }  // namespace srfm::manifold

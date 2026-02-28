@@ -85,8 +85,20 @@ struct PerformanceMetrics {
 
 /// Side-by-side comparison of raw vs relativistic strategy metrics.
 struct BacktestComparison {
-    PerformanceMetrics raw;          ///< Metrics from unmodified signals
-    PerformanceMetrics relativistic; ///< Metrics from γ-corrected signals
+    PerformanceMetrics raw;          ///< Metrics from unmodified (unit-position) signals
+    PerformanceMetrics relativistic; ///< Metrics from γ-scaled position signals
+
+    // ── γ diagnostics ─────────────────────────────────────────────────────────
+
+    /// Mean Lorentz factor γ across all bars.
+    double mean_gamma          = 1.0;
+    /// Maximum γ multiplier actually applied (capped at BacktestConfig::max_gamma).
+    double max_gamma_applied   = 1.0;
+    /// IR_γ_relativistic / IR_γ_raw.  Values > 1 indicate relativistic lift.
+    /// Set to 0.0 when raw IR_γ is zero (undefined ratio).
+    double relativistic_lift   = 0.0;
+
+    // ── Lift accessors ────────────────────────────────────────────────────────
 
     double sharpe_lift()    const noexcept; ///< rel.sharpe − raw.sharpe
     double sortino_lift()   const noexcept; ///< rel.sortino − raw.sortino
@@ -102,6 +114,7 @@ struct BacktestConfig {
     double risk_free_rate     = constants::DEFAULT_RISK_FREE_RATE;
     double annualisation      = constants::ANNUALISATION_FACTOR;
     double effective_mass     = 1.0;  ///< m_eff in p_rel = γ m_eff signal
+    double max_gamma          = 3.0;  ///< Cap on γ position multiplier (≥ 1.0)
     bool   verbose            = false;
 };
 

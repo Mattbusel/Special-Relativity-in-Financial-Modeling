@@ -131,6 +131,73 @@ BetaCalculator::fromRollingWindow(std::span<const double> prices,
     return fromPriceVelocity(*vel, max_velocity);
 }
 
+// ─── fromPriceVelocityOnline ──────────────────────────────────────────────────
+
+std::optional<std::vector<BetaVelocity>>
+BetaCalculator::fromPriceVelocityOnline(std::span<const double> prices,
+                                          double time_delta) noexcept {
+    if (prices.size() < 2) {
+        return std::nullopt;
+    }
+    if (time_delta <= 0.0) {
+        return std::nullopt;
+    }
+
+    // Guard: all prices must be finite before we begin.
+    for (double p : prices) {
+        if (!std::isfinite(p)) {
+            return std::nullopt;
+        }
+    }
+
+    const std::size_t n = prices.size();
+    std::vector<BetaVelocity> result;
+    result.reserve(n);
+
+    double running_max = 0.0;  // running maximum of absolute instantaneous velocity
+
+    for (std::size_t i = 0; i < n; ++i) {
+        // Instantaneous velocity at bar i using one-sided or central differences.
+        // We use only prices[0..i] (i.e., no look-ahead).
+        double v{};
+        if (i == 0) {
+            // Forward difference (only one future point available — still causal
+            // because we treat this as the velocity between bar 0 and bar 1,
+            // which the strategy knows at bar 1).  At bar 0 we can only estimate
+            // from a single lag: use backward difference from bar 1 retroactively.
+            // By convention, adopt the forward difference here since bar 1 is the
+            // next observation we receive:
+            v = std::abs((prices[1] - prices[0]) / time_delta);
+        } else if (i == 1) {
+            // With two points we can only use backward difference.
+            v = std::abs((prices[1] - prices[0]) / time_delta);
+        } else {
+            // Central difference at bar i using prices[i-1] and prices[i].
+            // (prices[i+1] would be look-ahead, so we use backward difference.)
+            v = std::abs((prices[i] - prices[i - 1]) / time_delta);
+        }
+
+        // Update running max — monotonically non-decreasing.
+        if (v > running_max) {
+            running_max = v;
+        }
+
+        // Compute β_i using only the running_max up to bar i.
+        BetaVelocity beta{};
+        if (running_max < 1e-15) {
+            // No velocity observed yet — Newtonian / stationary market.
+            beta = BetaVelocity{0.0};
+        } else {
+            const double raw_beta = v / running_max;
+            beta = ratio_to_beta(raw_beta);
+        }
+
+        result.push_back(beta);
+    }
+
+    return result;
+}
+
 // ─── Classification ───────────────────────────────────────────────────────────
 
 bool BetaCalculator::isNewtonian(BetaVelocity beta) noexcept {

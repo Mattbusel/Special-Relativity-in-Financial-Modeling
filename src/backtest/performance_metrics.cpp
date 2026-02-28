@@ -238,11 +238,14 @@ std::string BacktestComparison::to_string() const {
         "│ Sortino Ratio    │   {:9.4f}  │   {:9.4f}  │ {:+.4f}│\n"
         "│ Max Drawdown     │   {:9.4f}  │   {:9.4f}  │ {:+.4f}│\n"
         "│ γ-Weighted IR    │   {:9.4f}  │   {:9.4f}  │ {:+.4f}│\n"
-        "└──────────────────┴──────────────┴──────────────┴────────┘\n",
+        "├──────────────────┴──────────────┴──────────────┴────────┤\n"
+        "│ Mean γ: {:.4f}   Max γ applied: {:.4f}   IR lift: {:.4f}x │\n"
+        "└──────────────────────────────────────────────────────────┘\n",
         raw.sharpe_ratio,  relativistic.sharpe_ratio,  sharpe_lift(),
         raw.sortino_ratio, relativistic.sortino_ratio, sortino_lift(),
         raw.max_drawdown,  relativistic.max_drawdown,  drawdown_delta(),
-        raw.gamma_weighted_ir, relativistic.gamma_weighted_ir, ir_lift());
+        raw.gamma_weighted_ir, relativistic.gamma_weighted_ir, ir_lift(),
+        mean_gamma, max_gamma_applied, relativistic_lift);
 }
 
 }  // namespace srfm::backtest

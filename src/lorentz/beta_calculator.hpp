@@ -65,6 +65,13 @@ public:
     /// # Returns
     /// - `Some(β)` clamped to [0, BETA_MAX_SAFE) if max_velocity > 0
     /// - `None`    if max_velocity ≤ 0 or price_velocity is non-finite
+    ///
+    /// # Look-Ahead Warning
+    /// If `max_velocity` was computed over the full price series (e.g. the global
+    /// maximum velocity), then bar 1's β is normalised by a quantity that includes
+    /// information from bar N — a form of look-ahead bias.  This is acceptable for
+    /// offline research / backtesting where the full series is known.  For streaming
+    /// or walk-forward applications, use fromPriceVelocityOnline instead.
     [[nodiscard]] static std::optional<BetaVelocity>
     fromPriceVelocity(double price_velocity, double max_velocity) noexcept;
 
@@ -102,6 +109,39 @@ public:
                       std::size_t             window,
                       double                  max_velocity,
                       double                  time_delta) noexcept;
+
+    /// Compute a β series online — no look-ahead bias.
+    ///
+    /// For bar i, β_i is normalised by the maximum instantaneous velocity
+    /// observed from bar 0 to bar i only. This means future bars have no
+    /// influence on earlier β values — causal, streaming-safe.
+    ///
+    /// Contrast with fromPriceVelocity which uses a caller-supplied
+    /// `max_velocity` that may have been computed over the full series
+    /// (look-ahead bias).
+    ///
+    /// # Algorithm
+    /// For each bar i:
+    ///   1. Estimate velocity v_i via finite difference at point i using
+    ///      only prices[0..i].
+    ///   2. running_max_i = max(running_max_{i-1}, v_i)
+    ///   3. β_i = v_i / running_max_i   (or 0 when running_max = 0)
+    ///
+    /// # Arguments
+    /// * `prices`     — Full price series (at least 2 elements)
+    /// * `time_delta` — Constant time step between observations (must be > 0)
+    ///
+    /// # Returns
+    /// - `Some(vector<BetaVelocity>)` of length prices.size() — one β per bar
+    /// - `None` if prices.size() < 2, time_delta ≤ 0, or any price is non-finite
+    ///
+    /// # Properties
+    /// - Monotonically non-decreasing running_max
+    /// - β at bar i identical whether or not future bars exist in the series
+    /// - Online and offline methods agree when max velocity occurs at bar 0
+    [[nodiscard]] static std::optional<std::vector<BetaVelocity>>
+    fromPriceVelocityOnline(std::span<const double> prices,
+                             double                  time_delta) noexcept;
 
     // ── Velocity Estimation ───────────────────────────────────────────────────
 

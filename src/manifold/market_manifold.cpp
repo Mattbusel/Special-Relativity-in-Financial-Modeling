@@ -2,6 +2,7 @@
 /// @brief MarketManifold — high-level financial spacetime manifold (AGT-06 stub).
 
 #include "srfm/manifold.hpp"
+#include "srfm/normalizer.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -65,6 +66,21 @@ MarketManifold::is_causal(const SpacetimeEvent& a,
     // Timelike and lightlike trajectories are both causal.
     return (*result == IntervalType::Timelike ||
             *result == IntervalType::Lightlike);
+}
+
+// ─── MarketManifold::process ──────────────────────────────────────────────────
+
+std::optional<IntervalType>
+MarketManifold::process(srfm::CoordinateNormalizer& normalizer,
+                         const SpacetimeEvent& prev_normalized,
+                         const SpacetimeEvent& curr_raw) noexcept {
+    // Normalize the incoming raw event using the rolling window.
+    // This updates the normalizer's internal state with curr_raw's coordinates.
+    const SpacetimeEvent curr_norm = normalizer.normalize(curr_raw);
+
+    // Compute interval on the normalized coordinate pair.
+    // With z-scored coordinates each spatial axis contributes equally to ds².
+    return classify(prev_normalized, curr_norm);
 }
 
 }  // namespace srfm::manifold

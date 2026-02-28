@@ -62,12 +62,11 @@ Classifies market regime per bar:
 **Momentum-Velocity Signal Processor**
 Applies relativistic momentum correction to raw signals:
 
-<<<<<<< HEAD
 ```
 p_rel = γ · m_eff · v_market
 ```
 
-Where `m_eff` is an effective market mass derived from ADV (average daily volume). In the Newtonian limit this reduces to classical momentum. γ is computed once per batch — N−1 sqrt calls saved at processing frequency.
+Where `m_eff` is an effective market mass derived from ADV (average daily volume). In the Newtonian limit this reduces to classical momentum.
 
 **Tensor Calculus & Covariance Engine**
 Models the multi-asset financial manifold as a 4×4 metric tensor g_μν backed by Eigen3. Computes all 64 Christoffel symbols Γ^λ_μν via O(h²) central finite differences — the rate of change of asset correlations. Solves the geodesic equation via RK4:
@@ -100,17 +99,37 @@ Open http://localhost:5173 — drag the β slider to see γ update in real time.
 
 ---
 
-## Usage
+## Building
 
-### Build
+### Linux / WSL2 (recommended)
 
 ```bash
-mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j$(nproc)
+sudo apt install cmake ninja-build gcc-12 libgtest-dev
+vcpkg install eigen3 fmt nlohmann-json
+cmake -S . -B build \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+cmake --build build -j$(nproc)
+ctest --test-dir build --output-on-failure
 ```
 
-Dependencies: Eigen3, Google Test, {fmt}, nlohmann/json
+### Windows (Visual Studio 2022)
+
+Open a **Visual Studio Developer PowerShell** (`x64 Native Tools`):
+
+```powershell
+vcpkg install eigen3:x64-windows fmt:x64-windows nlohmann-json:x64-windows gtest:x64-windows
+cmake -S . -B build -G "Visual Studio 17 2022" `
+      -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+cmake --build build --config Release
+ctest --test-dir build -C Release --output-on-failure
+```
+
+Dependencies: Eigen3, Google Test, {fmt}, nlohmann/json (all provided via `vcpkg.json`).
+
+---
+
+## Usage
 
 ### Run Backtest
 
