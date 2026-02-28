@@ -33,10 +33,10 @@ add_library(srfm_lorentz
     src/lorentz/lorentz_transform.cpp
     src/lorentz/beta_calculator.cpp
 )
-target_include_directories(srfm_lorentz PUBLIC include)
+target_include_directories(srfm_lorentz PUBLIC include src/lorentz)
 target_link_libraries(srfm_lorentz PUBLIC Eigen3::Eigen fmt::fmt)
 
-# AGT-02: Spacetime Market Manifold
+# AGT-02: Spacetime Market Manifold (implemented by AGT-06)
 add_library(srfm_manifold
     src/manifold/market_manifold.cpp
     src/manifold/spacetime_interval.cpp
@@ -44,13 +44,13 @@ add_library(srfm_manifold
 target_include_directories(srfm_manifold PUBLIC include)
 target_link_libraries(srfm_manifold PUBLIC srfm_lorentz Eigen3::Eigen)
 
-# AGT-03: Momentum-Velocity Signal Processor
+# AGT-03: Momentum-Velocity Signal Processor (implemented by AGT-06)
 add_library(srfm_momentum
     src/momentum/momentum_processor.cpp
     src/momentum/relativistic_signal.cpp
 )
-target_include_directories(srfm_momentum PUBLIC include)
-target_link_libraries(srfm_momentum PUBLIC srfm_manifold)
+target_include_directories(srfm_momentum PUBLIC include src/lorentz)
+target_link_libraries(srfm_momentum PUBLIC srfm_lorentz)
 
 # AGT-04: Tensor Calculus & Covariance Engine
 add_library(srfm_tensor
@@ -59,7 +59,7 @@ add_library(srfm_tensor
     src/tensor/geodesic.cpp
 )
 target_include_directories(srfm_tensor PUBLIC include)
-target_link_libraries(srfm_tensor PUBLIC srfm_manifold Eigen3::Eigen)
+target_link_libraries(srfm_tensor PUBLIC Eigen3::Eigen)
 
 # AGT-05: Relativistic Backtester
 add_library(srfm_backtest
@@ -67,14 +67,14 @@ add_library(srfm_backtest
     src/backtest/performance_metrics.cpp
 )
 target_include_directories(srfm_backtest PUBLIC include)
-target_link_libraries(srfm_backtest PUBLIC srfm_momentum srfm_tensor)
+target_link_libraries(srfm_backtest PUBLIC srfm_lorentz srfm_tensor fmt::fmt)
 
 # AGT-06: Core / Integration
 add_library(srfm_core
     src/core/engine.cpp
     src/core/data_loader.cpp
 )
-target_include_directories(srfm_core PUBLIC include)
+target_include_directories(srfm_core PUBLIC include src/lorentz)
 target_link_libraries(srfm_core PUBLIC
     srfm_lorentz srfm_manifold srfm_momentum srfm_tensor srfm_backtest
 )
@@ -96,16 +96,18 @@ endmacro()
 add_srfm_test(test_lorentz
     "tests/lorentz/test_lorentz_transform.cpp;tests/lorentz/test_beta_calculator.cpp"
     srfm_lorentz)
+target_include_directories(test_lorentz PRIVATE src/lorentz)
 
-# AGT-02 tests
+# AGT-02 tests (manifold — implemented by AGT-06)
 add_srfm_test(test_manifold
     "tests/manifold/test_market_manifold.cpp;tests/manifold/test_spacetime_interval.cpp"
     srfm_manifold)
 
-# AGT-03 tests
+# AGT-03 tests (momentum — implemented by AGT-06)
 add_srfm_test(test_momentum
     "tests/momentum/test_momentum_processor.cpp;tests/momentum/test_relativistic_signal.cpp"
     srfm_momentum)
+target_include_directories(test_momentum PRIVATE src/lorentz)
 
 # AGT-04 tests
 add_srfm_test(test_tensor
@@ -116,8 +118,10 @@ add_srfm_test(test_tensor
 add_srfm_test(test_backtest
     "tests/backtest/test_backtester.cpp;tests/backtest/test_performance_metrics.cpp;tests/backtest/test_metrics_precision.cpp"
     srfm_backtest)
+target_include_directories(test_backtest PRIVATE src/lorentz)
 
 # AGT-06 integration tests
 add_srfm_test(test_integration
     "tests/integration/test_full_pipeline.cpp"
     srfm_core)
+target_include_directories(test_integration PRIVATE src/lorentz)
