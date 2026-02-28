@@ -1,0 +1,24 @@
+# LOCKS.md — Live Lock Registry
+
+| Agent  | File                                     | Timestamp            | Status |
+|--------|------------------------------------------|----------------------|--------|
+| AGT-04 | include/srfm/types.hpp                   | 2026-02-28T00:00:00Z | RELEASED |
+| AGT-04 | include/srfm/constants.hpp               | 2026-02-28T00:00:00Z | RELEASED |
+| AGT-04 | include/srfm/tensor.hpp                  | 2026-02-28T00:00:00Z | RELEASED |
+| AGT-04 | src/tensor/metric_tensor.cpp             | 2026-02-28T00:00:00Z | RELEASED |
+| AGT-04 | src/tensor/christoffel.cpp               | 2026-02-28T00:00:00Z | RELEASED |
+| AGT-04 | src/tensor/geodesic.cpp                  | 2026-02-28T00:00:00Z | RELEASED |
+| AGT-04 | tests/tensor/test_metric_tensor.cpp      | 2026-02-28T00:00:00Z | RELEASED |
+| AGT-04 | tests/tensor/test_christoffel.cpp        | 2026-02-28T00:00:00Z | RELEASED |
+| AGT-04 | tests/tensor/test_geodesic.cpp           | 2026-02-28T00:00:00Z | RELEASED |
+| AGT-01 | src/lorentz/lorentz_transform.hpp        | 2026-02-28T01:00:00Z | LOCKED |
+| AGT-01 | src/lorentz/beta_calculator.hpp          | 2026-02-28T01:00:00Z | LOCKED |
+| AGT-01 | src/lorentz/lorentz_transform.cpp        | 2026-02-28T01:00:00Z | LOCKED |
+| AGT-01 | src/lorentz/beta_calculator.cpp          | 2026-02-28T01:00:00Z | LOCKED |
+| AGT-01 | tests/lorentz/test_lorentz_transform.cpp | 2026-02-28T01:00:00Z | LOCKED |
+| AGT-01 | tests/lorentz/test_beta_calculator.cpp   | 2026-02-28T01:00:00Z | LOCKED |
+| AGT-05 | include/srfm/backtest.hpp                | 2026-02-28T00:00:00Z | LOCKED |
+| AGT-05 | src/backtest/backtester.cpp              | 2026-02-28T00:00:00Z | LOCKED |
+| AGT-05 | src/backtest/performance_metrics.cpp     | 2026-02-28T00:00:00Z | LOCKED |
+| AGT-05 | tests/backtest/test_backtester.cpp       | 2026-02-28T00:00:00Z | LOCKED |
+| AGT-05 | tests/backtest/test_performance_metrics.cpp | 2026-02-28T00:00:00Z | LOCKED |

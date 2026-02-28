@@ -114,7 +114,7 @@ add_srfm_test(test_tensor
 
 # AGT-05 tests
 add_srfm_test(test_backtest
-    "tests/backtest/test_backtester.cpp;tests/backtest/test_performance_metrics.cpp"
+    "tests/backtest/test_backtester.cpp;tests/backtest/test_performance_metrics.cpp;tests/backtest/test_metrics_precision.cpp"
     srfm_backtest)
 
 # AGT-06 integration tests
