@@ -40,3 +40,10 @@
 | AGT-06 | tests/momentum/test_relativistic_signal.cpp  | 2026-02-28T02:00:00Z | RELEASED |
 | AGT-06 | tests/integration/test_full_pipeline.cpp     | 2026-02-28T02:00:00Z | RELEASED |
 | AGT-06 | CMakeLists.txt                               | 2026-02-28T02:00:00Z | RELEASED |
+| AGT-07 | viz/package.json                             | 2026-02-28T03:00:00Z | RELEASED |
+| AGT-07 | viz/index.html                               | 2026-02-28T03:00:00Z | RELEASED |
+| AGT-07 | viz/src/main.jsx                             | 2026-02-28T03:00:00Z | RELEASED |
+| AGT-07 | viz/src/App.jsx                              | 2026-02-28T03:00:00Z | RELEASED |
+| AGT-07 | viz/src/index.css                            | 2026-02-28T03:00:00Z | RELEASED |
+| AGT-07 | docs/DASHBOARD.md                            | 2026-02-28T03:00:00Z | RELEASED |
+| AGT-07 | README.md                                    | 2026-02-28T03:00:00Z | RELEASED |

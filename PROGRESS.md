@@ -270,3 +270,33 @@ Added `MIN_RETURN_SERIES_LENGTH = 30`, `DEFAULT_RISK_FREE_RATE = 0.0`,
 ### New Public APIs: SpacetimeEvent, IntervalType, SpacetimeInterval, MarketManifold, MomentumSignal, RelativisticMomentum, MomentumProcessor, OHLCV, EngineConfig, PipelineBar, Engine, DataLoader (all fully documented)
 
 ---
+
+## AGT-07 | 2026-02-28 | Interactive Dashboard — COMPLETE
+
+**Module:** `viz/`, `docs/`
+
+### Deliverables
+
+| File | Role |
+|------|------|
+| `viz/package.json`    | Vite + React project; scripts: dev (port 5173), build, preview |
+| `viz/vite.config.js`  | Vite config with @vitejs/plugin-react |
+| `viz/index.html`      | HTML entry point; title: "SRFM — Special Relativity in Financial Modeling" |
+| `viz/src/main.jsx`    | Vite entry — mounts `<App />` into `#root` with StrictMode |
+| `viz/src/App.jsx`     | Exact copy of `srfm-viz.jsx` — component logic untouched |
+| `viz/src/index.css`   | Minimal reset: `* { margin:0; padding:0; box-sizing:border-box }` + `body { background:#030a12 }` |
+| `docs/DASHBOARD.md`   | Full doc: panel descriptions, run instructions, build, screenshot guide, tech table |
+| `README.md`           | Added "Dashboard" section after Architecture with one-liner run command |
+
+### How to run
+
+```bash
+cd viz && npm install && npm run dev
+# → http://localhost:5173
+```
+
+### Panics Introduced: 0
+### New Files: 7 (viz scaffold + docs)
+### Component logic modified: none (App.jsx is verbatim srfm-viz.jsx)
+
+---

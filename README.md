@@ -62,6 +62,7 @@ Classifies market regime per bar:
 **Momentum-Velocity Signal Processor**
 Applies relativistic momentum correction to raw signals:
 
+<<<<<<< HEAD
 ```
 p_rel = γ · m_eff · v_market
 ```
@@ -82,6 +83,20 @@ Feeds all signals through Lorentz corrections before strategy evaluation. Report
 
 **Integration Engine + CLI**
 Single `Engine` class wires the full pipeline. `DataLoader` handles CSV ingestion with per-row validation — malformed rows skipped, never crash. CLI exposes two modes.
+
+---
+
+## Dashboard
+
+Interactive visualization of all core transforms.
+
+```bash
+cd viz && npm install && npm run dev
+```
+
+Open http://localhost:5173 — drag the β slider to see γ update in real time. Live price stream classifies each bar as TIMELIKE, SPACELIKE, or LIGHTLIKE.
+
+[screenshot or gif here]
 
 ---
 
