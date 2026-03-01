@@ -194,6 +194,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Project>{AD240FB4-46A2-3B3F-AE23-43CC05920820}</Project>
       <Name>srfm_core</Name>
     </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_geodesic_signal.vcxproj">
+      <Project>{A9473209-EF8B-3CB4-BBC2-E96833DBAEA7}</Project>
+      <Name>srfm_geodesic_signal</Name>
+    </ProjectReference>
     <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_lorentz.vcxproj">
       <Project>{49B49476-71AE-3312-BAD6-81DC1529CCAA}</Project>
       <Name>srfm_lorentz</Name>

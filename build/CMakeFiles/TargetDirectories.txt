@@ -11,6 +11,7 @@ C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/test_
 C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/test_tensor.dir
 C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/test_backtest.dir
 C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/test_integration.dir
+C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/srfm_geodesic_signal.dir
 C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/regime_validator.dir
 C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/backtest_runner.dir
 C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/RUN_TESTS.dir

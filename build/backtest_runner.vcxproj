@@ -142,7 +142,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>Debug\srfm_core.lib;Debug\srfm_lorentz.lib;Debug\srfm_manifold.lib;Debug\srfm_momentum.lib;Debug\srfm_tensor.lib;Debug\srfm_backtest.lib;Debug\srfm_lorentz.lib;Debug\srfm_tensor.lib;vcpkg_installed\x64-windows\debug\lib\fmtd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Debug\srfm_geodesic_signal.lib;Debug\srfm_core.lib;Debug\srfm_lorentz.lib;Debug\srfm_manifold.lib;Debug\srfm_momentum.lib;Debug\srfm_tensor.lib;Debug\srfm_backtest.lib;Debug\srfm_lorentz.lib;Debug\srfm_tensor.lib;vcpkg_installed\x64-windows\debug\lib\fmtd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
@@ -216,7 +216,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>Release\srfm_core.lib;Release\srfm_lorentz.lib;Release\srfm_manifold.lib;Release\srfm_momentum.lib;Release\srfm_tensor.lib;Release\srfm_backtest.lib;Release\srfm_lorentz.lib;Release\srfm_tensor.lib;vcpkg_installed\x64-windows\lib\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Release\srfm_geodesic_signal.lib;Release\srfm_core.lib;Release\srfm_lorentz.lib;Release\srfm_manifold.lib;Release\srfm_momentum.lib;Release\srfm_tensor.lib;Release\srfm_backtest.lib;Release\srfm_lorentz.lib;Release\srfm_tensor.lib;vcpkg_installed\x64-windows\lib\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
@@ -290,7 +290,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>MinSizeRel\srfm_core.lib;MinSizeRel\srfm_lorentz.lib;MinSizeRel\srfm_manifold.lib;MinSizeRel\srfm_momentum.lib;MinSizeRel\srfm_tensor.lib;MinSizeRel\srfm_backtest.lib;MinSizeRel\srfm_lorentz.lib;MinSizeRel\srfm_tensor.lib;vcpkg_installed\x64-windows\lib\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>MinSizeRel\srfm_geodesic_signal.lib;MinSizeRel\srfm_core.lib;MinSizeRel\srfm_lorentz.lib;MinSizeRel\srfm_manifold.lib;MinSizeRel\srfm_momentum.lib;MinSizeRel\srfm_tensor.lib;MinSizeRel\srfm_backtest.lib;MinSizeRel\srfm_lorentz.lib;MinSizeRel\srfm_tensor.lib;vcpkg_installed\x64-windows\lib\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
@@ -364,7 +364,7 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>RelWithDebInfo\srfm_core.lib;RelWithDebInfo\srfm_lorentz.lib;RelWithDebInfo\srfm_manifold.lib;RelWithDebInfo\srfm_momentum.lib;RelWithDebInfo\srfm_tensor.lib;RelWithDebInfo\srfm_backtest.lib;RelWithDebInfo\srfm_lorentz.lib;RelWithDebInfo\srfm_tensor.lib;vcpkg_installed\x64-windows\lib\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>RelWithDebInfo\srfm_geodesic_signal.lib;RelWithDebInfo\srfm_core.lib;RelWithDebInfo\srfm_lorentz.lib;RelWithDebInfo\srfm_manifold.lib;RelWithDebInfo\srfm_momentum.lib;RelWithDebInfo\srfm_tensor.lib;RelWithDebInfo\srfm_backtest.lib;RelWithDebInfo\srfm_lorentz.lib;RelWithDebInfo\srfm_tensor.lib;vcpkg_installed\x64-windows\lib\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
@@ -456,6 +456,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_core.vcxproj">
       <Project>{AD240FB4-46A2-3B3F-AE23-43CC05920820}</Project>
       <Name>srfm_core</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_geodesic_signal.vcxproj">
+      <Project>{A9473209-EF8B-3CB4-BBC2-E96833DBAEA7}</Project>
+      <Name>srfm_geodesic_signal</Name>
     </ProjectReference>
     <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_lorentz.vcxproj">
       <Project>{49B49476-71AE-3312-BAD6-81DC1529CCAA}</Project>

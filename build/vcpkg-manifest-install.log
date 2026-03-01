@@ -63,4 +63,4 @@ rapidcheck provides pkg-config modules:
   # gmock headers for rapidcheck
   rapidcheck_gtest
 
-All requested installations completed successfully in: 501 us
+All requested installations completed successfully in: 475 us
