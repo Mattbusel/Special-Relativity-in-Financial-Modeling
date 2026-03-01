@@ -1,0 +1,56 @@
+{
+  "_comment": "Performance baselines for SRFM C++ library. Generated on 2026-03-01.",
+  "_regression_threshold_percent": 15,
+  "_units": "nanoseconds per operation",
+
+  "benchmarks": {
+    "beta_compute_1M": {
+      "description": "BetaCalculator::fromPriceVelocityOnline on 1M price bars (2 prices each)",
+      "baseline_ns_per_op": 120.0,
+      "threshold_ns_per_op": 138.0,
+      "notes": "Dominated by log() and tanh() calls. Should be < 200 ns/op."
+    },
+    "gamma_compute_1M": {
+      "description": "lorentz_gamma() called 1M times",
+      "baseline_ns_per_op": 8.5,
+      "threshold_ns_per_op": 9.8,
+      "notes": "Single sqrt() call. Should be < 15 ns/op."
+    },
+    "full_pipeline_1M": {
+      "description": "Engine::process() on 1M single-bar CSV inputs",
+      "baseline_ns_per_op": 850.0,
+      "threshold_ns_per_op": 977.5,
+      "notes": "Full stack: parse → beta → manifold → geodesic (10 steps) → signal."
+    },
+    "christoffel_compute": {
+      "description": "SpacetimeManifold::christoffelSymbols() for 4×4 flat metric",
+      "baseline_ns_per_op": 45.0,
+      "threshold_ns_per_op": 51.8,
+      "notes": "64 symbol loop, O(DIM^3) = O(64). Should be < 100 ns."
+    },
+    "rk4_geodesic_100steps": {
+      "description": "GeodesicSolver::solve() with 100 RK4 steps in flat spacetime",
+      "baseline_ns_per_op": 1200.0,
+      "threshold_ns_per_op": 1380.0,
+      "notes": "4 RK4 evaluations × 100 steps × DIM^2 Christoffel sums. < 2 µs target."
+    },
+    "doppler_factor_1M": {
+      "description": "doppler_factor() called 1M times",
+      "baseline_ns_per_op": 12.0,
+      "threshold_ns_per_op": 13.8,
+      "notes": "sqrt + division. Should be < 25 ns/op."
+    },
+    "rapidity_1M": {
+      "description": "rapidity() (atanh) called 1M times",
+      "baseline_ns_per_op": 10.0,
+      "threshold_ns_per_op": 11.5,
+      "notes": "Single atanh() call. Should be < 20 ns/op."
+    },
+    "compose_velocities_1M": {
+      "description": "compose_velocities() called 1M times",
+      "baseline_ns_per_op": 5.0,
+      "threshold_ns_per_op": 5.75,
+      "notes": "Two multiplies + one divide + BetaVelocity::make(). < 10 ns target."
+    }
+  }
+}

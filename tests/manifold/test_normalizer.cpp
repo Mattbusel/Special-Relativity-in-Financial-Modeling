@@ -122,13 +122,13 @@ TEST(CoordinateNormalizer, SizeIncreasesUntilWindowFull) {
     EXPECT_EQ(norm.size(), 0u);
     SpacetimeEvent raw{.time = 0.0, .price = 1.0, .volume = 1.0, .momentum = 1.0};
     for (std::size_t i = 1; i <= 5; ++i) {
-        norm.normalize(raw);
+        (void)norm.normalize(raw);
         EXPECT_EQ(norm.size(), i);
     }
     // Beyond window: size stays at window_size
-    norm.normalize(raw);
+    (void)norm.normalize(raw);
     EXPECT_EQ(norm.size(), 5u);
-    norm.normalize(raw);
+    (void)norm.normalize(raw);
     EXPECT_EQ(norm.size(), 5u);
 }
 
@@ -144,7 +144,7 @@ TEST(CoordinateNormalizer, WindowSizeAccessor) {
 TEST(CoordinateNormalizer, ResetClearsBuffer) {
     CoordinateNormalizer norm(5);
     SpacetimeEvent raw{.time = 0.0, .price = 10.0, .volume = 100.0, .momentum = 1.0};
-    for (int i = 0; i < 5; ++i) norm.normalize(raw);
+    for (int i = 0; i < 5; ++i) (void)norm.normalize(raw);
     EXPECT_EQ(norm.size(), 5u);
     norm.reset();
     EXPECT_EQ(norm.size(), 0u);
@@ -153,16 +153,16 @@ TEST(CoordinateNormalizer, ResetClearsBuffer) {
 TEST(CoordinateNormalizer, ResetAllowsReuse) {
     CoordinateNormalizer norm(3);
     SpacetimeEvent raw1{.time = 0.0, .price = 100.0, .volume = 1e6, .momentum = 0.01};
-    norm.normalize(raw1);
-    norm.normalize(raw1);
-    norm.normalize(raw1);
+    (void)norm.normalize(raw1);
+    (void)norm.normalize(raw1);
+    (void)norm.normalize(raw1);
     norm.reset();
 
     // After reset, the normalizer should behave as freshly constructed.
     // First two samples: stddev still 0 for constant series.
     SpacetimeEvent raw2{.time = 1.0, .price = 1.0, .volume = 2.0, .momentum = 3.0};
     SpacetimeEvent raw3{.time = 2.0, .price = 2.0, .volume = 4.0, .momentum = 6.0};
-    norm.normalize(raw2);
+    (void)norm.normalize(raw2);
     auto r = norm.normalize(raw3);
     // With two samples (1,2): mean=1.5, stddev=sqrt(0.5)≈0.7071
     // z-score(2) = (2-1.5)/0.7071 ≈ 0.7071
@@ -312,7 +312,7 @@ TEST(CoordinateNormalizer, TwoSampleWindow_CorrectZScore) {
     CoordinateNormalizer norm(2);
     // First sample: p=1
     SpacetimeEvent raw1{.time = 0.0, .price = 1.0, .volume = 1.0, .momentum = 1.0};
-    norm.normalize(raw1);  // only 1 sample → stddev=0 → z-score=0
+    (void)norm.normalize(raw1);  // only 1 sample → stddev=0 → z-score=0
 
     // Second sample: p=3; window={1,3}, mean=2, stddev=sqrt(2)≈1.4142
     // z-score(3) = (3-2)/sqrt(2) = 1/sqrt(2) ≈ 0.7071
@@ -374,7 +374,7 @@ TEST(CoordinateNormalizer, NegativeValues_CorrectZScore) {
     CoordinateNormalizer norm(2);
     SpacetimeEvent raw1{.time = 0.0, .price = -3.0, .volume = -3.0, .momentum = -3.0};
     SpacetimeEvent raw2{.time = 1.0, .price = -1.0, .volume = -1.0, .momentum = -1.0};
-    norm.normalize(raw1);
+    (void)norm.normalize(raw1);
     auto r = norm.normalize(raw2);
     // window = {-3,-1}, mean=-2, stddev=sqrt(2)
     // z-score(-1) = (-1 - (-2)) / sqrt(2) = 1/sqrt(2)

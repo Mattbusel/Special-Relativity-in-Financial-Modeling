@@ -1,10 +1,11 @@
 {
-  "name": "srfm",
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "srfm-cpp",
   "version": "0.1.0",
+  "description": "Special Relativity in Financial Modelling — C++ library",
   "dependencies": [
-    "eigen3",
-    "gtest",
-    "fmt",
-    "nlohmann-json"
-  ]
+    "rapidcheck"
+  ],
+  "builtin-baseline": "29f10019c26142cc4689b53b8c91da519db09e5c",
+  "overrides": []
 }

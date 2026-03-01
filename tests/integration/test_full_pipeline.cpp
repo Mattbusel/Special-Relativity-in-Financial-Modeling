@@ -452,7 +452,7 @@ TEST(EndToEnd, MetricTensorFromReturnsIsSPD) {
     Eigen::Matrix3d cov = Eigen::Matrix3d::Identity() * vol * vol;
     const double c_sq   = constants::SPEED_OF_INFORMATION * constants::SPEED_OF_INFORMATION;
 
-    auto mt = MetricTensor::make_from_covariance(cov, c_sq);
+    auto mt = MetricTensor::make_from_covariance(c_sq, cov);
     SpacetimePoint x = SpacetimePoint::Zero();
 
     auto g    = mt.evaluate(x);

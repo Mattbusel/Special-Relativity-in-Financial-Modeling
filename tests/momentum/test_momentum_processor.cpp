@@ -11,6 +11,7 @@
 
 using namespace srfm::momentum;
 using namespace srfm::constants;
+using srfm::BetaVelocity;
 
 // ─── process: basic ───────────────────────────────────────────────────────────
 

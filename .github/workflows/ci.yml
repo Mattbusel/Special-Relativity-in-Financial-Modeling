@@ -1,0 +1,210 @@
+name: CI — SRFM C++ Hardening Suite
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'test/**'
+      - 'fuzz/**'
+      - 'bench/**'
+      - 'CMakeLists.txt'
+      - 'vcpkg.json'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches: [main]
+
+env:
+  VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+  VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-cache
+
+jobs:
+  # ── Build and test matrix ───────────────────────────────────────────────────
+  build-and-test:
+    name: Build & Test (${{ matrix.os }}, ${{ matrix.compiler }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            compiler: gcc-12
+            cc: gcc-12
+            cxx: g++-12
+          - os: ubuntu-22.04
+            compiler: clang-17
+            cc: clang-17
+            cxx: clang++-17
+          - os: ubuntu-24.04
+            compiler: gcc-12
+            cc: gcc-12
+            cxx: g++-12
+          - os: ubuntu-24.04
+            compiler: clang-17
+            cc: clang-17
+            cxx: clang++-17
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── Compiler installation ────────────────────────────────────────────────
+      - name: Install GCC 12
+        if: matrix.compiler == 'gcc-12'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y gcc-12 g++-12
+
+      - name: Install Clang 17
+        if: matrix.compiler == 'clang-17'
+        run: |
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
+          echo "deb http://apt.llvm.org/${{ matrix.os == 'ubuntu-22.04' && 'jammy' || 'noble' }} llvm-toolchain-${{ matrix.os == 'ubuntu-22.04' && 'jammy' || 'noble' }}-17 main" \
+            | sudo tee /etc/apt/sources.list.d/llvm17.list
+          sudo apt-get update -qq
+          sudo apt-get install -y clang-17 clang++-17
+
+      # ── vcpkg setup ──────────────────────────────────────────────────────────
+      - name: Cache vcpkg binary cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+          key: vcpkg-${{ matrix.os }}-${{ matrix.compiler }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-${{ matrix.os }}-${{ matrix.compiler }}-
+            vcpkg-${{ matrix.os }}-
+
+      - name: Bootstrap vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git "${VCPKG_ROOT}" --depth=1
+          "${VCPKG_ROOT}/bootstrap-vcpkg.sh" -disableMetrics
+          mkdir -p "${VCPKG_DEFAULT_BINARY_CACHE}"
+
+      - name: Install vcpkg dependencies (RapidCheck)
+        run: |
+          "${VCPKG_ROOT}/vcpkg" install --triplet x64-linux
+
+      # ── Configure and build ──────────────────────────────────────────────────
+      - name: Configure CMake
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: |
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+            -DVCPKG_TARGET_TRIPLET=x64-linux \
+            -DSRFM_FUZZ=OFF
+
+      - name: Build
+        run: cmake --build build --parallel 4
+
+      # ── Run tests ────────────────────────────────────────────────────────────
+      - name: Run CTest
+        run: |
+          cd build
+          RC_PARAMS="max_success=10000" ctest --output-on-failure --parallel 4
+
+      # ── ASAN run (Clang only for cleaner output) ─────────────────────────────
+      - name: Configure ASAN build
+        if: startsWith(matrix.compiler, 'clang')
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: |
+          cmake -B build-asan \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+            -DVCPKG_TARGET_TRIPLET=x64-linux \
+            -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined" \
+            -DSRFM_FUZZ=OFF
+
+      - name: Build ASAN
+        if: startsWith(matrix.compiler, 'clang')
+        run: cmake --build build-asan --parallel 4
+
+      - name: Run ASAN tests
+        if: startsWith(matrix.compiler, 'clang')
+        run: |
+          cd build-asan
+          ASAN_OPTIONS="abort_on_error=1:detect_leaks=1" \
+          UBSAN_OPTIONS="abort_on_error=1:print_stacktrace=1" \
+          RC_PARAMS="max_success=1000" \
+          ctest --output-on-failure --parallel 4
+
+      # ── TSAN run ─────────────────────────────────────────────────────────────
+      - name: Configure TSAN build
+        if: startsWith(matrix.compiler, 'clang')
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: |
+          cmake -B build-tsan \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+            -DVCPKG_TARGET_TRIPLET=x64-linux \
+            -DCMAKE_CXX_FLAGS="-fsanitize=thread -fno-omit-frame-pointer" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=thread" \
+            -DSRFM_FUZZ=OFF
+
+      - name: Build TSAN
+        if: startsWith(matrix.compiler, 'clang')
+        run: cmake --build build-tsan --parallel 4
+
+      - name: Run TSAN tests
+        if: startsWith(matrix.compiler, 'clang')
+        run: |
+          cd build-tsan
+          TSAN_OPTIONS="abort_on_error=1" \
+          RC_PARAMS="max_success=500" \
+          ctest --output-on-failure --parallel 1
+
+  # ── Performance regression ──────────────────────────────────────────────────
+  perf-regression:
+    name: Performance Regression (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: build-and-test
+    strategy:
+      matrix:
+        os: [ubuntu-24.04]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache vcpkg
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+          key: vcpkg-perf-${{ matrix.os }}-${{ hashFiles('vcpkg.json') }}
+
+      - name: Bootstrap vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git "${VCPKG_ROOT}" --depth=1
+          "${VCPKG_ROOT}/bootstrap-vcpkg.sh" -disableMetrics
+          mkdir -p "${VCPKG_DEFAULT_BINARY_CACHE}"
+
+      - name: Install vcpkg deps
+        run: "${VCPKG_ROOT}/vcpkg" install --triplet x64-linux
+
+      - name: Configure release build
+        run: |
+          cmake -B build-perf \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+            -DVCPKG_TARGET_TRIPLET=x64-linux
+
+      - name: Build
+        run: cmake --build build-perf --parallel 4
+
+      - name: Run performance regression suite
+        run: |
+          bash bench/regression/run_regression.sh build-perf \
+            bench/regression/baselines.json
+
+      - name: Upload regression report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: perf-regression-report
+          path: bench/regression/report.json
