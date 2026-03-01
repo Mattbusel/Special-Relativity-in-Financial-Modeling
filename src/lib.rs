@@ -14,6 +14,7 @@ use thiserror::Error;
 
 pub mod config;
 pub mod coordination;
+pub mod momentum;
 #[cfg(feature = "distributed")]
 pub mod distributed;
 pub mod enhanced;
