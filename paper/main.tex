@@ -1,0 +1,109 @@
+%% main.tex — Special-Relativistic Finance Manifold
+%% arXiv submission: q-fin.CP (Computational Finance)
+%%
+%% Compilation:
+%%   pdflatex -interaction=nonstopmode main.tex
+%%   bibtex main
+%%   pdflatex -interaction=nonstopmode main.tex
+%%   pdflatex -interaction=nonstopmode main.tex
+%%
+%% Or: make pdf (using the provided Makefile)
+
+\documentclass[11pt, letterpaper]{article}
+
+%% ── Custom package ──────────────────────────────────────────────────────────
+\usepackage{srfm}
+
+%% ── Page geometry ───────────────────────────────────────────────────────────
+\usepackage[
+  top=1in, bottom=1in,
+  left=1.25in, right=1.25in,
+  headheight=14pt,
+]{geometry}
+
+%% ── Headers ─────────────────────────────────────────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textsc{srfm} — Special-Relativistic Finance Manifold}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+
+%% ── Additional packages ──────────────────────────────────────────────────────
+\usepackage{authblk}
+\usepackage{datetime2}
+\usepackage{parskip}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+%%  TITLE / AUTHORS
+%% ─────────────────────────────────────────────────────────────────────────────
+
+\title{%
+  \textbf{Special-Relativistic Finance Manifold}\\
+  \large A First Working Implementation of Lorentz-Covariant\\
+  Price Dynamics on \ohlcv{} Data
+}
+
+\author[1]{Matthew Charles Busel}
+\affil[1]{%
+  Independent Researcher \\
+  \texttt{arXiv:2026.XXXXX [q-fin.CP]}
+}
+\date{March 2026}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+%%  DOCUMENT
+%% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+%% ── Abstract ────────────────────────────────────────────────────────────────
+\input{sections/01_abstract}
+
+\vspace{0.5em}
+\noindent
+\textbf{Keywords:} econophysics, special relativity, Lorentz factor, spacetime
+interval, covariance manifold, Christoffel symbols, geodesic deviation,
+computational finance, C++20, \ohlcv{} bars
+
+\noindent
+\textbf{MSC Classes:} 91G80, 53B20, 83A05
+
+\noindent
+\textbf{JEL Codes:} C63, G14, G17
+
+\tableofcontents
+\clearpage
+
+%% ── Body sections ────────────────────────────────────────────────────────────
+\input{sections/02_introduction}
+\clearpage
+
+\input{sections/03_related_work}
+\clearpage
+
+\input{sections/04_framework}
+\clearpage
+
+\input{sections/05_implementation}
+\clearpage
+
+\input{sections/06_empirical}
+\clearpage
+
+\input{sections/07_open_questions}
+\clearpage
+
+\input{sections/08_conclusion}
+\clearpage
+
+%% ── Bibliography ─────────────────────────────────────────────────────────────
+\bibliographystyle{plain}
+\bibliography{bibliography}
+
+\end{document}
