@@ -1,6 +1,6 @@
 # Special Relativity in Financial Modeling
 
-**C++20 · 2,113 production LOC · 3,192 test LOC · 1.511:1 test ratio · 0 panics · 0 compiler warnings**
+**C++20 · 6,058 production LOC · 7,977 test LOC · 1.317:1 test ratio · 0 panics · 0 compiler warnings**
 
 A research-grade C++ library applying the mathematical machinery of special relativity to financial signal processing. Lorentz transforms, spacetime interval classification, relativistic momentum correction, and geodesic price paths — built as a rigorous quantitative framework, not a metaphor.
 
@@ -290,13 +290,13 @@ Governs how nearby geodesics diverge. ‖J‖ is used as a regime-change signal:
 
 | Module | Production LOC | Test LOC | Ratio |
 |--------|---------------|----------|-------|
-| Lorentz + Beta | 297 | 670 | 2.26:1 |
-| Manifold | 174 | 574 | 3.30:1 |
-| Momentum | 149 | 353 | 2.37:1 |
-| Tensor / Geodesic | 241 | 547 | 2.27:1 |
-| Backtest | 397 | 687 | 1.73:1 |
-| Integration | 755 | 652 | — (integration-level) |
-| **Global** | **2,113** | **3,192** | **1.511:1** |
+| Lorentz + Beta | 530 | 777 | 1.47:1 |
+| Manifold | 385 | 467 | 1.21:1 |
+| Momentum | 63 | 252 | 4.00:1 |
+| Tensor / Geodesic | 456 | 1,121 | 2.46:1 |
+| Backtest | 412 | 757 | 1.84:1 |
+| Stream + SIMD + Integration | 1,730 | 4,603 | 2.66:1 |
+| **Global** | **6,058** | **7,977** | **1.317:1** |
 
 All tests pass. Zero panics. Zero compiler warnings under `-Wall -Wextra -Werror`.
 
