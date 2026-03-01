@@ -1,0 +1,64 @@
+\contentsline {section}{\numberline {1}Introduction}{4}{section.1}%
+\contentsline {subsection}{\numberline {1.1}The Flat-Time Assumption in Classical Finance}{4}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Prior Work and Its Limits}{4}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Contributions}{4}{subsection.1.3}%
+\contentsline {paragraph}{C1 — Operational $\beta _{\mathrm {p}}/\gamma _{\mathrm {p}}$ framework.}{5}{section*.2}%
+\contentsline {paragraph}{C2 — Spacetime interval regime classifier.}{5}{section*.3}%
+\contentsline {paragraph}{C3 — Christoffel symbols on the covariance manifold.}{5}{section*.4}%
+\contentsline {paragraph}{C4 — Geodesic deviation signal.}{5}{section*.5}%
+\contentsline {paragraph}{C5 — Empirical Q1 validation.}{5}{section*.6}%
+\contentsline {subsection}{\numberline {1.4}Paper Organisation}{5}{subsection.1.4}%
+\contentsline {section}{\numberline {2}Related Work}{6}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Wissner-Gross \& Freer (2010): Relativistic Statistical Arbitrage}{6}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Kakushadze (2017): Volatility Smile as Relativistic Effect}{6}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Romero \& Zubieta-Martinez (2016): Relativistic Quantum Finance}{6}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Carvalho \& Gaspar (2021): Relativistic Option Pricing}{7}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Comparison Matrix}{7}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Information Geometry and SPD Manifolds}{7}{subsection.2.6}%
+\contentsline {subsection}{\numberline {2.7}Positioning Relative to the Broader Econophysics Programme}{8}{subsection.2.7}%
+\contentsline {section}{\numberline {3}Mathematical Framework}{9}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Price Kinematics in Special Relativity}{9}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Dimensionless Price Velocity}{9}{subsubsection.3.1.1}%
+\contentsline {paragraph}{Newtonian limit.}{9}{section*.8}%
+\contentsline {subsubsection}{\numberline {3.1.2}The Lorentz Factor}{9}{subsubsection.3.1.2}%
+\contentsline {paragraph}{L'Hôpital regularisation at the speed limit.}{9}{section*.9}%
+\contentsline {paragraph}{Newtonian limit.}{9}{section*.10}%
+\contentsline {subsubsection}{\numberline {3.1.3}Time Dilation}{10}{subsubsection.3.1.3}%
+\contentsline {subsubsection}{\numberline {3.1.4}Rapidity}{10}{subsubsection.3.1.4}%
+\contentsline {subsubsection}{\numberline {3.1.5}Doppler Reciprocity}{10}{subsubsection.3.1.5}%
+\contentsline {subsection}{\numberline {3.2}Spacetime Interval and Regime Classification}{11}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}The Minkowski Metric in Price Space}{11}{subsubsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.2.2}Causal Classification}{11}{subsubsection.3.2.2}%
+\contentsline {paragraph}{Newtonian limit.}{11}{section*.11}%
+\contentsline {subsection}{\numberline {3.3}The Covariance Manifold and Its Geometry}{11}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Rolling Feature Covariance}{11}{subsubsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {3.3.2}The Affine-Invariant Metric}{11}{subsubsection.3.3.2}%
+\contentsline {subsubsection}{\numberline {3.3.3}Christoffel Symbols on $\mathcal {P}_n$}{12}{subsubsection.3.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.4}The Geodesic Equation}{12}{subsubsection.3.3.4}%
+\contentsline {subsubsection}{\numberline {3.3.5}Geodesic Deviation Equation}{13}{subsubsection.3.3.5}%
+\contentsline {subsubsection}{\numberline {3.3.6}Relativistic Momentum}{13}{subsubsection.3.3.6}%
+\contentsline {subsection}{\numberline {3.4}Summary of Defined Quantities}{13}{subsection.3.4}%
+\contentsline {section}{\numberline {4}C++20 Implementation}{14}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Design Philosophy}{14}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Module Architecture}{14}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Key Implementation Details}{14}{subsection.4.3}%
+\contentsline {subsubsection}{\numberline {4.3.1}BetaCalculator::fromPriceVelocityOnline}{14}{subsubsection.4.3.1}%
+\contentsline {subsubsection}{\numberline {4.3.2}LorentzTransform::gamma}{15}{subsubsection.4.3.2}%
+\contentsline {subsubsection}{\numberline {4.3.3}GeodesicSolver::rk4\_step}{16}{subsubsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.4}Test Architecture}{17}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}Performance Characteristics}{17}{subsection.4.5}%
+\contentsline {section}{\numberline {5}Empirical Results}{18}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Data and Preprocessing}{18}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Q1: Spacetime Interval Regime Separation}{18}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Q2: Geodesic Deviation Backtest}{18}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Robustness Checks}{19}{subsection.5.4}%
+\contentsline {paragraph}{Sensitivity to $c_{\mathrm {mkt}}$ calibration.}{20}{section*.21}%
+\contentsline {paragraph}{Out-of-sample stability.}{20}{section*.22}%
+\contentsline {paragraph}{Cross-sectional consistency.}{20}{section*.23}%
+\contentsline {section}{\numberline {6}Open Questions}{22}{section.6}%
+\contentsline {section}{\numberline {7}Conclusion}{24}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Summary of Contributions}{24}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Closing the Gap in the Literature}{24}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Limitations and Future Work}{24}{subsection.7.3}%
+\contentsline {paragraph}{Future directions.}{25}{section*.24}%
+\contentsline {subsection}{\numberline {7.4}On the Epistemology of Financial Geometry}{25}{subsection.7.4}%

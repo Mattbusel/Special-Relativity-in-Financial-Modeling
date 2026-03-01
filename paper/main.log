@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.1)  1 MAR 2026 16:46
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.3.1)  1 MAR 2026 16:50
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1308,119 +1308,45 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <7> on input line 18.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <5> on input line 18.
-
-
-LaTeX Warning: Citation `AGT07results' on page 1 undefined on input line 27.
-
 )
 Package microtype Info: Character `029' is missing
 (microtype)             in font `T1/lmr/m/sc/10.95'.
 (microtype)             Ignoring protrusion settings for this character.
- (main.toc)
-\tf@toc=\write5
-\openout5 = `main.toc'.
-
+ (main.toc
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10.95> on input line 2.
  [1
 
 {C:/Users/Matthew/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Ma
 tthew/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}{C:/Users/Matt
 hew/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Users/Ma
-tthew/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}] (sections/02
-_introduction.tex
+tthew/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}] [2{C:/Users/
+Matthew/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}])
+\tf@toc=\write5
+\openout5 = `main.toc'.
 
-LaTeX Warning: Citation `Black1973' on page 2 undefined on input line 8.
+ [3] (sections/02_introduction.tex [4
 
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 9.
-
-LaTeX Warning: Citation `WissnerGross2010' on page 2 undefined on input line 18
-.
-
-
-LaTeX Warning: Citation `Engle1982' on page 2 undefined on input line 20.
-
-[2
-
-{C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.en
-c}]
-
-LaTeX Warning: Citation `AGT07results' on page 3 undefined on input line 83.
-
-
-LaTeX Warning: Citation `AGT07results' on page 3 undefined on input line 105.
-
-
-LaTeX Warning: Reference `sec:openquestions' on page 3 undefined on input line 
-113.
-
-
-LaTeX Warning: Reference `sec:conclusion' on page 3 undefined on input line 114
-.
-
-) [3] (sections/03_related_work.tex
-
-LaTeX Warning: Citation `WissnerGross2010' on page 4 undefined on input line 7.
-
-
-
-LaTeX Warning: Citation `Kakushadze2017' on page 4 undefined on input line 29.
-
-
-LaTeX Warning: Citation `Romero2016' on page 4 undefined on input line 52.
-
-[4
+])
+[5] (sections/03_related_work.tex [6
 
 {C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.en
 c}]
-
-LaTeX Warning: Citation `Carvalho2021' on page 5 undefined on input line 74.
-
-
 Overfull \hbox (45.9369pt too wide) in paragraph at lines 110--131
  [][] 
  []
 
+[7]) [8] (sections/04_framework.tex [9
 
-LaTeX Warning: Citation `Amari1998' on page 5 undefined on input line 137.
-
-
-LaTeX Warning: Citation `Pennec2006' on page 5 undefined on input line 137.
-
-
-LaTeX Warning: Citation `Nielsen2020' on page 5 undefined on input line 137.
-
-[5]
-
-LaTeX Warning: Citation `Mantegna1999' on page 6 undefined on input line 147.
-
-
-LaTeX Warning: Citation `Bouchaud2003' on page 6 undefined on input line 147.
-
-
-LaTeX Warning: Citation `Amari1998' on page 6 undefined on input line 148.
-
-) [6] (sections/04_framework.tex
-
-LaTeX Warning: Reference `sec:openquestions' on page 7 undefined on input line 
-24.
-
-[7
-
-]
-
-LaTeX Warning: Citation `Jackson1999' on page 8 undefined on input line 113.
-
-[8]
+] [10]
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1
 69.
- (C:\Users\Matthew\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
+
+(C:\Users\Matthew\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-
-LaTeX Warning: Citation `Pennec2006' on page 9 undefined on input line 209.
-
-[9{C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc
-}]
+[11{C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.en
+c}]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 225.
@@ -1433,15 +1359,12 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 225.
 
-
-LaTeX Warning: Citation `Pennec2006' on page 10 undefined on input line 271.
-
-[10]
+[12]
 
 LaTeX Font Warning: Font shape `T1/lmr/bx/sc' undefined
 (Font)              using `T1/lmr/bx/n' instead on input line 357.
 
-) [11] (sections/05_implementation.tex
+) [13] (sections/05_implementation.tex
 Overfull \hbox (73.4826pt too wide) in paragraph at lines 24--30
 \T1/lmr/m/n/10.95 (-20) struc-tor. The only way to ob-tain a valid \T1/lmtt/m/n
 /10.95 LorentzFactor \T1/lmr/m/n/10.95 (-20) is through \T1/lmtt/m/n/10.95 Lore
@@ -1455,138 +1378,100 @@ Overfull \hbox (342.41982pt too wide) in paragraph at lines 86--91
 
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
 nput line 102.
-[12
+[14
 
 ]
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <9> not available
 (Font)              Font shape `T1/lmtt/b/n' tried instead on input line 108.
- [13] [14]) [15] (sections/06_empirical.tex
-
-LaTeX Warning: Citation `AGT07results' on page 16 undefined on input line 8.
-
-
-LaTeX Warning: Reference `sec:openquestions' on page 16 undefined on input line
- 20.
-
-
-LaTeX Warning: Citation `AGT07results' on page 16 undefined on input line 43.
-
-<figures/q1_regime_distributions.pdf, id=467, 557.4639pt x 383.47768pt>
+ [15] [16]) [17] (sections/06_empirical.tex
+<figures/q1_regime_distributions.pdf, id=588, 557.4639pt x 383.47768pt>
 File: figures/q1_regime_distributions.pdf Graphic file (type pdf)
 <use figures/q1_regime_distributions.pdf>
 Package pdftex.def Info: figures/q1_regime_distributions.pdf  used on input lin
 e 73.
 (pdftex.def)             Requested size: 368.57965pt x 253.55244pt.
-<figures/q1_variance_ratio_heatmap.pdf, id=468, 566.98985pt x 349.79474pt>
+<figures/q1_variance_ratio_heatmap.pdf, id=589, 566.98985pt x 349.79474pt>
 File: figures/q1_variance_ratio_heatmap.pdf Graphic file (type pdf)
 <use figures/q1_variance_ratio_heatmap.pdf>
 Package pdftex.def Info: figures/q1_variance_ratio_heatmap.pdf  used on input l
 ine 87.
 (pdftex.def)             Requested size: 368.57965pt x 227.3959pt.
-[16
+ [18
 
 ]
-
-LaTeX Warning: Citation `AGT07results' on page 17 undefined on input line 123.
-
-
-LaTeX Warning: Citation `AGT07results' on page 17 undefined on input line 131.
-
-
-LaTeX Warning: Citation `AGT07results' on page 17 undefined on input line 131.
-
-
-LaTeX Warning: Citation `AGT07results' on page 17 undefined on input line 138.
-
-
-LaTeX Warning: Citation `AGT07results' on page 17 undefined on input line 138.
-
-
-LaTeX Warning: Citation `AGT07results' on page 17 undefined on input line 138.
-
-
-LaTeX Warning: Citation `AGT07results' on page 17 undefined on input line 140.
-
-
-LaTeX Warning: Citation `AGT07results' on page 17 undefined on input line 140.
-
-
-LaTeX Warning: Citation `AGT07results' on page 17 undefined on input line 143.
-
-<figures/q2_cumulative_pnl.pdf, id=478, 643.98717pt x 436.84831pt>
+<figures/q2_cumulative_pnl.pdf, id=608, 643.98717pt x 436.84831pt>
 File: figures/q2_cumulative_pnl.pdf Graphic file (type pdf)
 <use figures/q2_cumulative_pnl.pdf>
 Package pdftex.def Info: figures/q2_cumulative_pnl.pdf  used on input line 150.
 
 (pdftex.def)             Requested size: 368.57965pt x 250.02599pt.
-<figures/q2_geodesic_deviation_timeseries.pdf, id=479, 666.72212pt x 405.41086p
+<figures/q2_geodesic_deviation_timeseries.pdf, id=609, 666.72212pt x 405.41086p
 t>
 File: figures/q2_geodesic_deviation_timeseries.pdf Graphic file (type pdf)
 <use figures/q2_geodesic_deviation_timeseries.pdf>
 Package pdftex.def Info: figures/q2_geodesic_deviation_timeseries.pdf  used on 
 input line 163.
 (pdftex.def)             Requested size: 368.57965pt x 224.12108pt.
+ [19 <./figures/q1_regime_distributions.pdf>]) [20 <./figures/q1_variance_ratio
+_heatmap.pdf>] [21 <./figures/q2_cumulative_pnl.pdf> <./figures/q2_geodesic_dev
+iation_timeseries.pdf>]
+(sections/07_open_questions.tex [22
 
-LaTeX Warning: Citation `AGT07results' on page 17 undefined on input line 171.
+]) [23] (sections/08_conclusion.tex [24
+
+])
+[25] (main.bbl [26
+
+]) [27] (main.aux)
+ ***********
+LaTeX2e <2025-11-01>
+L3 programming layer <2025-12-24>
+ ***********
 
 
-LaTeX Warning: Citation `AGT07results' on page 17 undefined on input line 171.
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
-
-LaTeX Warning: Citation `AGT07results' on page 17 undefined on input line 171.
-
-
-LaTeX Warning: Citation `AGT07results' on page 17 undefined on input line 171.
-
-
-LaTeX Warning: Citation `AGT07results' on page 17 undefined on input line 177.
-
-[17 <./figures/q1_regime_distributions.pdf>]
-
-LaTeX Warning: Citation `AGT07results' on page 18 undefined on input line 187.
-
-! Missing $ inserted.
-<inserted text> 
-                $
-l.190 ...ty) is significant at \ = 6.0 \\times 10^
-                                                  {-16}\$
-? x
- 
+Package rerunfilecheck Info: File `main.out' has not changed.
+(rerunfilecheck)             Checksum: 5C064F75AD8F418BE498E4ADE6540837;10535.
+ ) 
 Here is how much of TeX's memory you used:
- 43378 strings out of 467871
- 963503 string characters out of 5417409
- 1681775 words of memory out of 5000000
- 70978 multiletter control sequences out of 15000+600000
- 771483 words of font info for 302 fonts, out of 8000000 for 9000
+ 43556 strings out of 467871
+ 966340 string characters out of 5417409
+ 1683824 words of memory out of 5000000
+ 71030 multiletter control sequences out of 15000+600000
+ 773942 words of font info for 327 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  99i,13n,120p,1003b,2289s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
-cmmib10.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/type1/public/
-lm/lmbx10.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/type1/publi
-c/lm/lmbx12.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/type1/pub
-lic/lm/lmcsc10.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/type1/
-public/lm/lmex10.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/type
-1/public/lm/lmmi10.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/ty
-pe1/public/lm/lmmi6.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/t
-ype1/public/lm/lmmi8.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/
-type1/public/lm/lmr10.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts
-/type1/public/lm/lmr12.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/font
-s/type1/public/lm/lmr6.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/font
-s/type1/public/lm/lmr7.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/font
-s/type1/public/lm/lmr8.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/font
-s/type1/public/lm/lmri10.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fo
-nts/type1/public/lm/lmsy10.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/
-fonts/type1/public/lm/lmsy8.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX
-/fonts/type1/public/lm/lmtk10.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKT
-eX/fonts/type1/public/lm/lmtt10.pfb><C:/Users/Matthew/AppData/Local/Programs/Mi
-KTeX/fonts/type1/public/lm/lmtt12.pfb><C:/Users/Matthew/AppData/Local/Programs/
-MiKTeX/fonts/type1/public/lm/lmtt9.pfb><C:/Users/Matthew/AppData/Local/Programs
-/MiKTeX/fonts/type1/public/lm/lmtti10.pfb><C:/Users/Matthew/AppData/Local/Progr
-ams/MiKTeX/fonts/type1/public/amsfonts/symbols/msam10.pfb><C:/Users/Matthew/App
-Data/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on main.pdf (17 pages, 647410 bytes).
+<C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/c
+m/cmbx10.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/type1/public
+/amsfonts/cm/cmmib10.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fonts/
+type1/public/lm/lmbx10.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/font
+s/type1/public/lm/lmbx12.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX/fo
+nts/type1/public/lm/lmcsc10.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKTeX
+/fonts/type1/public/lm/lmex10.pfb><C:/Users/Matthew/AppData/Local/Programs/MiKT
+eX/fonts/type1/public/lm/lmmi10.pfb><C:/Users/Matthew/AppData/Local/Programs/Mi
+KTeX/fonts/type1/public/lm/lmmi6.pfb><C:/Users/Matthew/AppData/Local/Programs/M
+iKTeX/fonts/type1/public/lm/lmmi7.pfb><C:/Users/Matthew/AppData/Local/Programs/
+MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Users/Matthew/AppData/Local/Programs
+/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/Matthew/AppData/Local/Program
+s/MiKTeX/fonts/type1/public/lm/lmr12.pfb><C:/Users/Matthew/AppData/Local/Progra
+ms/MiKTeX/fonts/type1/public/lm/lmr6.pfb><C:/Users/Matthew/AppData/Local/Progra
+ms/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:/Users/Matthew/AppData/Local/Progra
+ms/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/Matthew/AppData/Local/Progra
+ms/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:/Users/Matthew/AppData/Local/Prog
+rams/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C:/Users/Matthew/AppData/Local/Pr
+ograms/MiKTeX/fonts/type1/public/lm/lmsy8.pfb><C:/Users/Matthew/AppData/Local/P
+rograms/MiKTeX/fonts/type1/public/lm/lmtk10.pfb><C:/Users/Matthew/AppData/Local
+/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb><C:/Users/Matthew/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/lm/lmtt12.pfb><C:/Users/Matthew/AppData/L
+ocal/Programs/MiKTeX/fonts/type1/public/lm/lmtt9.pfb><C:/Users/Matthew/AppData/
+Local/Programs/MiKTeX/fonts/type1/public/lm/lmtti10.pfb><C:/Users/Matthew/AppDa
+ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msam10.pfb><C:/Use
+rs/Matthew/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/ms
+bm10.pfb>
+Output written on main.pdf (27 pages, 832037 bytes).
 PDF statistics:
- 726 PDF objects out of 1000 (max. 8388607)
- 239 named destinations out of 1000 (max. 500000)
- 84861 words of extra memory for PDF output out of 89155 (max. 10000000)
+ 1195 PDF objects out of 1200 (max. 8388607)
+ 304 named destinations out of 1000 (max. 500000)
+ 84921 words of extra memory for PDF output out of 89155 (max. 10000000)
 
