@@ -4,7 +4,10 @@
   "version": "0.1.0",
   "description": "Special Relativity in Financial Modelling — C++ library",
   "dependencies": [
-    "rapidcheck"
+    "rapidcheck",
+    "eigen3",
+    "fmt",
+    "gtest"
   ],
   "builtin-baseline": "29f10019c26142cc4689b53b8c91da519db09e5c",
   "overrides": []

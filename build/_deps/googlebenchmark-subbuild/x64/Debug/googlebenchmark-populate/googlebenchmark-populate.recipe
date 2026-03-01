@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ProjectOutputs>
+    <ProjectOutput>
+      <FullPath>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googlebenchmark-subbuild\x64\Debug\ZERO_CHECK</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googlebenchmark-subbuild\x64\Debug\googlebenchmark-populate</FullPath>
+    </ProjectOutput>
+  </ProjectOutputs>
+  <ContentFiles />
+  <SatelliteDlls />
+  <NonRecipeFileRefs />
+</Project>

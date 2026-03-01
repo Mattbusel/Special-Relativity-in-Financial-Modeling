@@ -1,0 +1,10 @@
+prefix=${pcfiledir}/../..
+Name: rapidcheck_doctest
+Description: doctest headers for rapidcheck
+Version: 
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Libs: 
+Requires: rapidcheck
+Cflags: "-I${includedir}"

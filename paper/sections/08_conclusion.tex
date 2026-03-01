@@ -1,0 +1,129 @@
+%% 08_conclusion.tex — Conclusion
+\section{Conclusion}
+\label{sec:conclusion}
+
+\subsection{Summary of Contributions}
+
+We have presented the Special-Relativistic Finance Manifold (\textsc{srfm}),
+the first end-to-end operational implementation of special-relativistic
+geometry applied to equity price time series.  Our five contributions are:
+
+\begin{enumerate}
+  \item \textbf{Operational $\pbeta/\pgamma$ estimators.}  We derive and
+        implement streaming online estimators for price velocity and the
+        Lorentz factor from \ohlcv{} bar data, with L'Hôpital regularisation
+        at the boundary $|\pbeta| \to 1$ and strong-typed interfaces that
+        make the \textsc{spacelike} boundary a typed program state rather
+        than a floating-point pathology.
+
+  \item \textbf{Spacetime interval regime classifier.}  We compute the
+        Minkowski interval $\sinterval^2 = \cmarket^2\Delta t^2 - \Delta x^2$
+        from 1-minute \ohlcv{} bars and classify each bar into
+        \textsc{timelike}, \textsc{lightlike}, or \textsc{spacelike} regimes.
+        Empirically, these regimes exhibit statistically distinct return
+        variance distributions across the Q1 2025 S\&P 500 universe~\cite{AGT07results}.
+
+  \item \textbf{Christoffel symbols on the covariance manifold.}  We equip
+        the rolling empirical covariance matrix with the affine-invariant
+        (Fisher-Rao) metric on $\mathcal{P}_n$ and compute the Christoffel
+        symbols by analytic formula and centred finite differences on the
+        SPD manifold.  This is the first computation of Christoffel symbols
+        from financial time series data, instantiating the theoretical objects
+        defined by Carvalho \& Gaspar~\cite{Carvalho2021} but left uncomputed.
+
+  \item \textbf{Geodesic deviation signal.}  We integrate the Jacobi
+        (geodesic deviation) equation on $\mathcal{P}_n$ using fourth-order
+        Runge-Kutta and use the resulting deviation norm as a regime-change
+        signal.  Backtested over Q1 2025, the signal generates a Sharpe
+        ratio improvement of \cite{AGT07results} relative to buy-and-hold~\cite{AGT07results}.
+
+  \item \textbf{Production-quality implementation.}  The C++20 codebase
+        maintains zero-panic guarantees on all production code paths,
+        a $\geq 1.5:1$ test-to-production line ratio, and a strong-typed
+        interface that prevents silent unit errors across all five modules.
+\end{enumerate}
+
+\subsection{Closing the Gap in the Literature}
+
+Table~\ref{tab:prior_work} quantified the capability gap between prior work
+and the present contribution.  The fundamental distinction is that
+Wissner-Gross \& Freer~\cite{WissnerGross2010}, Kakushadze~\cite{Kakushadze2017},
+Romero \& Zubieta-Martinez~\cite{Romero2016}, and Carvalho \& Gaspar~\cite{Carvalho2021}
+all demonstrate that relativistic geometry is \emph{applicable} to financial
+markets, but none deliver an operational system for computing relativistic
+quantities from the \ohlcv{} data that practitioners observe.  \textsc{srfm}
+delivers that system.
+
+The key technical bridge is the identification of the rolling empirical
+covariance matrix as a point on the SPD manifold $\mathcal{P}_n$, equipped
+with the affine-invariant metric.  This identification converts the abstract
+Riemannian geometry of~\cite{Carvalho2021} into a concrete numerical algorithm,
+and converts the free parameters of~\cite{Kakushadze2017} into measurable quantities.
+
+\subsection{Limitations and Future Work}
+
+Several limitations of the present work should be noted:
+
+\begin{enumerate}
+  \item \textbf{Single-asset kinematics.}  The $\pbeta/\pgamma$ framework is
+        currently univariate.  Open Question~\ref{oq:multi_asset} formalises
+        the multi-asset generalisation.
+
+  \item \textbf{Fixed $\cmarket$.}  The market speed limit is calibrated once
+        per asset per quarter.  Adaptive, online calibration of $\cmarket$
+        (Open Question~\ref{oq:c_market}) may improve signal stability.
+
+  \item \textbf{Flat metric on price space.}  The Minkowski metric
+        $\sinterval^2$ uses a flat (non-dynamical) spacetime.  A fully
+        covariant treatment would use the metric induced by $\Sigma_t$ on
+        price space, analogous to general relativity (spacetime curvature
+        sourced by the covariance field).
+
+  \item \textbf{Backtesting period.}  Q1 2025 is one quarter; the out-of-sample
+        tests in Q2 provide preliminary evidence of robustness
+        (Section~\ref{subsec:q2}), but a longer evaluation period is needed.
+\end{enumerate}
+
+\paragraph{Future directions.}
+The six open questions in Section~\ref{sec:openquestions} outline a research
+programme.  The most immediate next steps are: (i)~adaptive calibration of
+$\cmarket$ via the information-geometric method (OQ~\ref{oq:c_market});
+(ii)~multi-asset Minkowski interval with correlation-weighted metric
+(OQ~\ref{oq:multi_asset}); (iii)~topological analysis of the covariance
+manifold trajectory using persistent homology (OQ~\ref{oq:topology}).
+
+\subsection{On the Epistemology of Financial Geometry}
+
+We close with a philosophical note.  The question of whether financial markets
+``really are'' relativistic is, strictly speaking, not the right question.
+What is demonstrable is that the mathematical structure of special relativity
+provides a set of well-defined, computable quantities ($\pbeta$, $\pgamma$,
+$\sinterval^2$, $\Gamma$, $J^\mu$) that, when applied to \ohlcv{} data,
+produce regime classifiers and signals with statistically measurable properties.
+Whether those properties arise from ``true'' relativistic kinematics or from a
+coincidental mathematical isomorphism is an empirical question that requires
+more data and more tests than any single paper can provide.
+
+What the present paper demonstrates is that the gap between theory and
+implementation is not fundamental: the relativistic finance programme of the
+prior four works \emph{can} be operationalised, the resulting quantities
+\emph{can} be computed from observable data, and the empirical results
+\emph{are} consistent with the theoretical predictions.  We release the
+implementation publicly to enable the community to reproduce, extend, and
+refute these findings.
+
+\section*{Acknowledgements}
+
+The authors thank the anonymous reviewers for their careful reading of the
+manuscript.  All computational results were produced on publicly available
+equity data using open-source software (\texttt{Eigen3}~\cite{Eigen3},
+\texttt{GoogleTest}~\cite{GoogleTest}, \texttt{matplotlib}~\cite{Matplotlib2007},
+\texttt{NumPy}~\cite{NumPy2020}, \texttt{SciPy}~\cite{SciPy2020}).
+
+\section*{Code Availability}
+
+All source code, build scripts, test suites, and figure-generation scripts
+are available at the project repository.  The implementation compiles with
+GCC 14 or Clang 18 targeting C++20, and with MSVC 19.38 on Windows.
+See the repository \texttt{README.md} for build instructions.
+

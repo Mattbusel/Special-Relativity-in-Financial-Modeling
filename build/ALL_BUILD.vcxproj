@@ -1,0 +1,241 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ResolveNugetPackages>false</ResolveNugetPackages>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EBEE9262-16CF-3F67-B4F7-C79544FD5A2D}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Matthew/Special-Relativity-in-Financial-Modeling -BC:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build --check-stamp-file C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindGTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\GoogleTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\eigen3\Eigen3Config.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\eigen3\Eigen3ConfigVersion.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\eigen3\Eigen3Targets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config-version.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfig.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\vcpkg.json;C:\Users\Matthew\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Matthew/Special-Relativity-in-Financial-Modeling -BC:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build --check-stamp-file C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindGTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\GoogleTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\eigen3\Eigen3Config.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\eigen3\Eigen3ConfigVersion.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\eigen3\Eigen3Targets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config-version.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfig.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\vcpkg.json;C:\Users\Matthew\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Matthew/Special-Relativity-in-Financial-Modeling -BC:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build --check-stamp-file C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindGTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\GoogleTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\eigen3\Eigen3Config.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\eigen3\Eigen3ConfigVersion.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\eigen3\Eigen3Targets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config-version.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfig.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\vcpkg.json;C:\Users\Matthew\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Matthew/Special-Relativity-in-Financial-Modeling -BC:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build --check-stamp-file C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindGTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\GoogleTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\eigen3\Eigen3Config.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\eigen3\Eigen3ConfigVersion.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\eigen3\Eigen3Targets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config-version.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfig.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\vcpkg.json;C:\Users\Matthew\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\ZERO_CHECK.vcxproj">
+      <Project>{7AD8BC28-1479-37DF-B3AE-C72EE372E8F8}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\backtest_runner.vcxproj">
+      <Project>{E7E852CA-2E97-3306-9932-C512445ECDC2}</Project>
+      <Name>backtest_runner</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\regime_validator.vcxproj">
+      <Project>{C6562D76-ED82-3D20-9B81-3FF11D647CAF}</Project>
+      <Name>regime_validator</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm.vcxproj">
+      <Project>{66D6CCF0-6B95-3E90-BA13-DF399DD6B9C0}</Project>
+      <Name>srfm</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_backtest.vcxproj">
+      <Project>{1C30C56D-87CB-30EC-B84B-67241FD71564}</Project>
+      <Name>srfm_backtest</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_core.vcxproj">
+      <Project>{AD240FB4-46A2-3B3F-AE23-43CC05920820}</Project>
+      <Name>srfm_core</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_lorentz.vcxproj">
+      <Project>{49B49476-71AE-3312-BAD6-81DC1529CCAA}</Project>
+      <Name>srfm_lorentz</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_manifold.vcxproj">
+      <Project>{9C872F0A-F9D4-3F01-91DF-562FE3A1D400}</Project>
+      <Name>srfm_manifold</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_momentum.vcxproj">
+      <Project>{00BA4E27-4BFA-3D1C-B076-3ED46A7851B2}</Project>
+      <Name>srfm_momentum</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_tensor.vcxproj">
+      <Project>{D221E0C8-FA1D-35BC-B8D8-5809C9429910}</Project>
+      <Name>srfm_tensor</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\test_backtest.vcxproj">
+      <Project>{D52E52BD-7301-3FBC-ADD4-9A0CB166A8B0}</Project>
+      <Name>test_backtest</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\test_integration.vcxproj">
+      <Project>{CBE56455-AF44-3845-AE94-34A9ABD774E9}</Project>
+      <Name>test_integration</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\test_lorentz.vcxproj">
+      <Project>{4F482600-F5AC-3235-97FB-6CCF3A993E33}</Project>
+      <Name>test_lorentz</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\test_manifold.vcxproj">
+      <Project>{54B0F7E7-2794-32B2-8493-98C0DEB12A39}</Project>
+      <Name>test_manifold</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\test_momentum.vcxproj">
+      <Project>{3C98015C-28E6-316F-9CDF-6D808095B933}</Project>
+      <Name>test_momentum</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\test_tensor.vcxproj">
+      <Project>{4214D2EC-7F00-30D9-BA42-9FFCFAD5C856}</Project>
+      <Name>test_tensor</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

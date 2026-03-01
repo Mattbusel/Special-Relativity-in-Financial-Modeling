@@ -1,0 +1,163 @@
+% srfm.sty — Special-Relativistic Finance Manifold
+% Custom style for arXiv submission
+% Dark-theme figures, monospace code blocks, econophysics aesthetics
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{srfm}[2026/03/01 SRFM Custom Style]
+
+%% ── Core packages ──────────────────────────────────────────────────────────
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{amsthm}
+\RequirePackage{mathtools}
+\RequirePackage{bm}           % bold math
+\RequirePackage{physics}      % \dd, \grad, etc.
+\RequirePackage{tensor}       % tensor index notation
+
+%% ── Typography ─────────────────────────────────────────────────────────────
+\RequirePackage[T1]{fontenc}
+\RequirePackage{lmodern}
+\RequirePackage{microtype}
+\RequirePackage{setspace}
+
+%% ── Figures & graphics ─────────────────────────────────────────────────────
+\RequirePackage{graphicx}
+\RequirePackage{subcaption}
+\RequirePackage{float}
+\RequirePackage{tikz}
+\RequirePackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric, calc, decorations.pathreplacing}
+
+%% ── Tables ──────────────────────────────────────────────────────────────────
+\RequirePackage{booktabs}
+\RequirePackage{multirow}
+\RequirePackage{array}
+\RequirePackage{tabularx}
+\RequirePackage{longtable}
+
+%% ── Code listings ───────────────────────────────────────────────────────────
+\RequirePackage{listings}
+\RequirePackage{xcolor}
+
+%% ── Dark-theme colour palette ───────────────────────────────────────────────
+\definecolor{srfm@bg}{HTML}{0D1117}         % GitHub dark background
+\definecolor{srfm@surface}{HTML}{161B22}    % surface
+\definecolor{srfm@border}{HTML}{30363D}     % border
+\definecolor{srfm@text}{HTML}{C9D1D9}       % primary text
+\definecolor{srfm@muted}{HTML}{8B949E}      % muted
+\definecolor{srfm@accent}{HTML}{58A6FF}     % blue accent
+\definecolor{srfm@green}{HTML}{3FB950}      % success/positive
+\definecolor{srfm@red}{HTML}{F85149}        % error/negative
+\definecolor{srfm@yellow}{HTML}{D29922}     % warning
+\definecolor{srfm@purple}{HTML}{BC8CFF}     % purple
+\definecolor{srfm@orange}{HTML}{E3B341}     % orange
+
+%% ── C++20 listing style ─────────────────────────────────────────────────────
+\lstdefinestyle{cpp20}{
+  language=C++,
+  basicstyle=\ttfamily\footnotesize\color{srfm@text},
+  backgroundcolor=\color{srfm@surface},
+  commentstyle=\color{srfm@muted}\itshape,
+  keywordstyle=\color{srfm@purple}\bfseries,
+  stringstyle=\color{srfm@green},
+  numberstyle=\tiny\color{srfm@muted},
+  numbers=left,
+  numbersep=8pt,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=4,
+  frame=single,
+  rulecolor=\color{srfm@border},
+  framesep=4pt,
+  xleftmargin=12pt,
+  xrightmargin=4pt,
+  showstringspaces=false,
+  morekeywords={concept, requires, constexpr, consteval, constinit,
+                co_await, co_yield, co_return, modules, import, export,
+                std, optional, variant, span, string_view},
+  literate={->}{{\textcolor{srfm@accent}{->}}}{2}
+           {::}{{\textcolor{srfm@accent}{::}}}{2},
+}
+\lstset{style=cpp20}
+
+%% ── Theorem environments ────────────────────────────────────────────────────
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{openquestion}[theorem]{Open Question}
+
+%% ── Custom math operators ───────────────────────────────────────────────────
+\DeclareMathOperator{\diag}{diag}
+%\tr provided by physics package
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\arctanh}{arctanh}
+\DeclareMathOperator{\Vol}{Vol}
+
+%% ── Relativistic finance notation ──────────────────────────────────────────
+% Price velocity (β)
+\newcommand{\pbeta}{\beta_{\mathrm{p}}}
+% Lorentz factor (γ)
+\newcommand{\pgamma}{\gamma_{\mathrm{p}}}
+% Market speed of light
+\newcommand{\cmarket}{c_{\mathrm{mkt}}}
+% Spacetime interval
+\newcommand{\sinterval}{\Delta s}
+% Proper time
+\newcommand{\tproper}{\tau}
+% Rapidity
+\newcommand{\rapidity}{\phi}
+% Market metric tensor
+\newcommand{\mmetric}{g_{\mu\nu}}
+% Christoffel symbol
+\newcommand{\chris}[3]{\Gamma^{#1}_{#2 #3}}
+% Geodesic deviation vector
+\newcommand{\geovec}{J^{\mu}}
+% Riemann tensor component
+\newcommand{\Riem}[4]{R^{#1}{}_{#2 #3 #4}}
+% OHLCV shorthand
+\newcommand{\ohlcv}{\textsc{ohlcv}}
+
+%% ── Figure caption style ────────────────────────────────────────────────────
+\RequirePackage[labelfont=bf, font=small, labelsep=period]{caption}
+
+%% ── Hyperref (load last) ────────────────────────────────────────────────────
+\RequirePackage[
+  colorlinks=true,
+  linkcolor=srfm@accent,
+  citecolor=srfm@green,
+  urlcolor=srfm@accent,
+  pdftitle={Special-Relativistic Finance Manifold: A Working Implementation},
+  pdfauthor={SRFM Research Group},
+]{hyperref}
+
+\endinput
+
+\newcommand{\Riem}[2]{R^{#1}{}_{#2}}
+
+\newcommand{\geovec}{\dot{U}}
+
+
+
+\newcommand{\Dvec}[1]{\dot{#1}}
+
+
+
+\newcommand{\tproper}{\tau}
+
+\providecommand{\dtproper}{\mathrm{d}\tau}
+
+\providecommand{\tproper}{\tau}
+
+\providecommand{\dtproper}{\mathrm{d}\tau}
+
+\providecommand{\tproper}{\tau}

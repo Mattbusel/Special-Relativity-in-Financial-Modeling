@@ -1,0 +1,12 @@
+prefix=C:/Program Files/srfm_cpp
+exec_prefix=${prefix}
+libdir=C:/Program Files/srfm_cpp/lib
+includedir=C:/Program Files/srfm_cpp/include
+
+Name: benchmark
+Description: Google microbenchmark framework
+Version: 1.8.3
+
+Libs: -L${libdir} -lbenchmark
+Libs.private: -lpthread
+Cflags: -I${includedir}

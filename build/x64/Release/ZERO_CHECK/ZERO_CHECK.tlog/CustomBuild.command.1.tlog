@@ -1,0 +1,10 @@
+^C:\USERS\MATTHEW\SPECIAL-RELATIVITY-IN-FINANCIAL-MODELING\BUILD\CMAKEFILES\C261239177CFB1A9178BD83B4C6B7DF6\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Matthew/Special-Relativity-in-Financial-Modeling -BC:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/SpecialRelativityFinance.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

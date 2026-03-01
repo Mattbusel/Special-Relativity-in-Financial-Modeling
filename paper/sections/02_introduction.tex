@@ -1,0 +1,120 @@
+%% 02_introduction.tex — Introduction
+\section{Introduction}
+\label{sec:introduction}
+
+\subsection{The Flat-Time Assumption in Classical Finance}
+
+Standard financial mathematics inherits, largely without scrutiny, a Galilean
+spacetime structure.  The Black-Scholes framework~\cite{Black1973} posits a
+universal, shared clock: all assets evolve against the same parameter $t$,
+price paths are Markovian with respect to that clock, and the volatility
+$\sigma$ is a scalar field on $\mathbb{R}_+ \times \mathbb{R}$ independent of
+observer velocity.  This is the finance equivalent of Newtonian absolute time.
+
+The assumption is load-bearing.  It underlies the no-arbitrage condition,
+risk-neutral pricing, and the Feynman-Ka\v{c} representation of derivative
+prices.  Yet it fails in precisely the regimes that matter most: high-frequency
+microstructure, where latency asymmetries create effective time dilation
+between participants~\cite{WissnerGross2010}; cross-asset dynamics, where
+information propagates at finite speed through correlation networks; and
+volatility clustering~\cite{Engle1982}, where the local ``pace'' of price
+evolution differs systematically from the clock on the wall.
+
+A market participant whose quote-update latency is $\Delta t_1$ and whose
+counterparty latency is $\Delta t_2 \neq \Delta t_1$ cannot, in general, agree
+on whether two events are simultaneous.  This is not a failure of technology;
+it is a structural feature of any system in which signal propagation is
+bounded.
+
+\subsection{Prior Work and Its Limits}
+
+The econophysics literature has taken four significant steps toward
+formalizing this intuition, which we review in detail in
+Section~\ref{sec:related}.  In brief:
+
+\begin{enumerate}
+  \item \textbf{Wissner-Gross \& Freer} (2010) showed that optimal
+        arbitrage nodes between exchange pairs lie on the light-cone of a
+        relativistic spacetime defined by signal propagation speed.  Their
+        result is geometric and location-theoretic; it does not operate on
+        price time series.
+
+  \item \textbf{Kakushadze} (2017) applied Lorentz boosts to the
+        volatility smile, deriving a covariant Black-Scholes equation.  The
+        framework is elegant but requires $\beta$ as an exogenous parameter;
+        no method is given for computing it from \ohlcv{} data.
+
+  \item \textbf{Romero \& Zubieta-Martinez} (2016) replaced the
+        Schrödinger equation underlying quantum finance with the Dirac
+        equation, yielding a relativistic option pricing formula.  The work
+        is purely theoretical with no empirical component.
+
+  \item \textbf{Carvalho \& Gaspar} (2021) defined a Riemannian metric on
+        price space and derived covariant stochastic differential equations.
+        They identify the metric tensor and its role in geodesic pricing, but
+        do not compute Christoffel symbols or geodesic solutions from data.
+\end{enumerate}
+
+\noindent
+The gap is uniform: prior work establishes that relativistic geometry
+\emph{applies} to financial markets but delivers no operational system for
+computing relativistic quantities from the \ohlcv{} bars that practitioners
+actually observe.  We fill that gap.
+
+\subsection{Contributions}
+
+This paper makes five distinct contributions:
+
+\paragraph{C1 — Operational $\pbeta/\pgamma$ framework.}
+We define price velocity $\pbeta$ as a dimensionless ratio of bar-to-bar
+price displacement to a calibrated market speed limit $\cmarket$, derive the
+Lorentz factor $\pgamma$ from it, and implement both as online (streaming)
+estimators over rolling \ohlcv{} windows.  The estimators handle the boundary
+case $|\pbeta| \to 1$ via L'Hôpital regularisation without requiring
+exception handling or IEEE754 infinity propagation.
+
+\paragraph{C2 — Spacetime interval regime classifier.}
+We compute the Minkowski spacetime interval
+$\sinterval^2 = c^2 \Delta t^2 - \Delta x^2$ on a discretised
+price-time grid, partitioning bars into \textsc{timelike}
+($\sinterval^2 > 0$), \textsc{lightlike} ($\sinterval^2 = 0$), and
+\textsc{spacelike} ($\sinterval^2 < 0$) regimes.  We show empirically
+that the conditional return distribution differs significantly across
+regimes~\cite{AGT07results}.
+
+\paragraph{C3 — Christoffel symbols on the covariance manifold.}
+We treat the rolling empirical covariance matrix of price features as a point
+on the symmetric positive-definite (SPD) manifold $\mathcal{P}_n$, equipped
+with the Fisher-Rao metric.  We derive and implement the Christoffel symbols
+$\chris{\lambda}{\mu}{\nu}$ analytically from the metric and its first
+derivatives, computed numerically via finite differences on the SPD manifold.
+
+\paragraph{C4 — Geodesic deviation signal.}
+We solve the geodesic deviation equation
+$\frac{D^2 \geovec}{d\tproper^2} + R^{\mu}{}_{\nu\rho\sigma} U^{\nu} \dot{U}^{\rho} U^{\sigma} = 0$
+for nearby covariance trajectories, and use the norm of the deviation vector
+$\|\geovec\|$ as a regime-change signal.  Large geodesic deviation indicates
+that the market's covariance structure is diverging from its geodesic path---a
+precursor to volatility regime shifts.
+
+\paragraph{C5 — Empirical Q1 validation.}
+We apply the \textsc{srfm} framework to a universe of US equity \ohlcv{} bars
+spanning Q1 2025 and report: (i)~the variance ratio between \textsc{timelike}
+and \textsc{spacelike} return distributions; (ii)~backtested Sharpe ratio
+improvement from conditioning on geodesic deviation percentile; (iii)~Kolmogorov-Smirnov
+statistics for regime separation~\cite{AGT07results}.
+
+\subsection{Paper Organisation}
+
+Section~\ref{sec:related} surveys prior work and presents a comparison matrix.
+Section~\ref{sec:framework} develops the full mathematical framework with
+derivations.  Section~\ref{sec:implementation} describes the C++20 architecture.
+Section~\ref{sec:empirical} presents empirical results.
+Section~\ref{sec:openquestions} formalises six open problems.
+Section~\ref{sec:conclusion} concludes.
+
+All source code, test suites, and figure-generation scripts are available in
+the accompanying repository.  The implementation enforces a $\geq 1.5:1$
+test-to-production line ratio and zero-panic guarantees on all production code
+paths.
+

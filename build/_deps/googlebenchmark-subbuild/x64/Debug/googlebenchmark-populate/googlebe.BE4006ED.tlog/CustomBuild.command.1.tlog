@@ -1,0 +1,150 @@
+^C:\USERS\MATTHEW\SPECIAL-RELATIVITY-IN-FINANCIAL-MODELING\BUILD\_DEPS\GOOGLEBENCHMARK-SUBBUILD\CMAKEFILES\E138617453B71D58E90DFFC1FD194F71\GOOGLEBENCHMARK-POPULATE-MKDIR.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -Dcfgdir=/Debug -P C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild/googlebenchmark-populate-prefix/tmp/googlebenchmark-populate-mkdirs.cmake
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild/googlebenchmark-populate-prefix/src/googlebenchmark-populate-stamp/Debug/googlebenchmark-populate-mkdir
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\MATTHEW\SPECIAL-RELATIVITY-IN-FINANCIAL-MODELING\BUILD\_DEPS\GOOGLEBENCHMARK-SUBBUILD\CMAKEFILES\E138617453B71D58E90DFFC1FD194F71\GOOGLEBENCHMARK-POPULATE-DOWNLOAD.RULE
+setlocal
+cd C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild/googlebenchmark-populate-prefix/tmp/googlebenchmark-populate-gitclone.cmake
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild/googlebenchmark-populate-prefix/src/googlebenchmark-populate-stamp/Debug/googlebenchmark-populate-download
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\MATTHEW\SPECIAL-RELATIVITY-IN-FINANCIAL-MODELING\BUILD\_DEPS\GOOGLEBENCHMARK-SUBBUILD\CMAKEFILES\E138617453B71D58E90DFFC1FD194F71\GOOGLEBENCHMARK-POPULATE-UPDATE.RULE
+setlocal
+cd C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googlebenchmark-src
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -Dcan_fetch=YES -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE -P C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild/googlebenchmark-populate-prefix/tmp/googlebenchmark-populate-gitupdate.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\MATTHEW\SPECIAL-RELATIVITY-IN-FINANCIAL-MODELING\BUILD\_DEPS\GOOGLEBENCHMARK-SUBBUILD\CMAKEFILES\E138617453B71D58E90DFFC1FD194F71\GOOGLEBENCHMARK-POPULATE-PATCH.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild/googlebenchmark-populate-prefix/src/googlebenchmark-populate-stamp/Debug/googlebenchmark-populate-patch
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\MATTHEW\SPECIAL-RELATIVITY-IN-FINANCIAL-MODELING\BUILD\_DEPS\GOOGLEBENCHMARK-SUBBUILD\CMAKEFILES\E138617453B71D58E90DFFC1FD194F71\GOOGLEBENCHMARK-POPULATE-CONFIGURE.RULE
+setlocal
+cd C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googlebenchmark-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild/googlebenchmark-populate-prefix/src/googlebenchmark-populate-stamp/Debug/googlebenchmark-populate-configure
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\MATTHEW\SPECIAL-RELATIVITY-IN-FINANCIAL-MODELING\BUILD\_DEPS\GOOGLEBENCHMARK-SUBBUILD\CMAKEFILES\E138617453B71D58E90DFFC1FD194F71\GOOGLEBENCHMARK-POPULATE-BUILD.RULE
+setlocal
+cd C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googlebenchmark-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild/googlebenchmark-populate-prefix/src/googlebenchmark-populate-stamp/Debug/googlebenchmark-populate-build
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\MATTHEW\SPECIAL-RELATIVITY-IN-FINANCIAL-MODELING\BUILD\_DEPS\GOOGLEBENCHMARK-SUBBUILD\CMAKEFILES\E138617453B71D58E90DFFC1FD194F71\GOOGLEBENCHMARK-POPULATE-INSTALL.RULE
+setlocal
+cd C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googlebenchmark-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild/googlebenchmark-populate-prefix/src/googlebenchmark-populate-stamp/Debug/googlebenchmark-populate-install
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\MATTHEW\SPECIAL-RELATIVITY-IN-FINANCIAL-MODELING\BUILD\_DEPS\GOOGLEBENCHMARK-SUBBUILD\CMAKEFILES\E138617453B71D58E90DFFC1FD194F71\GOOGLEBENCHMARK-POPULATE-TEST.RULE
+setlocal
+cd C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googlebenchmark-build
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild/googlebenchmark-populate-prefix/src/googlebenchmark-populate-stamp/Debug/googlebenchmark-populate-test
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\MATTHEW\SPECIAL-RELATIVITY-IN-FINANCIAL-MODELING\BUILD\_DEPS\GOOGLEBENCHMARK-SUBBUILD\CMAKEFILES\EE9740ED46500C5CF80E6BF05FF89D79\GOOGLEBENCHMARK-POPULATE-COMPLETE.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild/CMakeFiles/Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild/CMakeFiles/Debug/googlebenchmark-populate-complete
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild/googlebenchmark-populate-prefix/src/googlebenchmark-populate-stamp/Debug/googlebenchmark-populate-done
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\MATTHEW\SPECIAL-RELATIVITY-IN-FINANCIAL-MODELING\BUILD\_DEPS\GOOGLEBENCHMARK-SUBBUILD\CMAKEFILES\B15168B83D6C7F846D4A277C0915DFAF\GOOGLEBENCHMARK-POPULATE.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\MATTHEW\SPECIAL-RELATIVITY-IN-FINANCIAL-MODELING\BUILD\_DEPS\GOOGLEBENCHMARK-SUBBUILD\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild -BC:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild --check-stamp-file C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googlebenchmark-subbuild/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

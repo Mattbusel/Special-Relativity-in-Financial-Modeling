@@ -1,0 +1,470 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E3D212B3-B9F8-37EC-8FDA-170505E2DEA7}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <VcpkgEnabled>false</VcpkgEnabled>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>test_simd</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="do_not_import_user.props" Condition="exists('do_not_import_user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">test_simd.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">test_simd</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">test_simd.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">test_simd</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">test_simd.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">test_simd</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">test_simd.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">test_simd</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\src;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/vcpkg_installed/x64-windows/include"</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ConformanceMode>true</ConformanceMode>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\src;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\src;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/Users/Matthew/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/Debug/test_simd.exe -installedDir C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/vcpkg_installed/x64-windows/debug/bin -OutVariable out
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>Debug\srfm_simd_dispatch.lib;vcpkg_installed\x64-windows\debug\lib\manual-link\gtest_main.lib;Debug\srfm_simd_scalar.lib;Debug\srfm_simd_avx2.lib;Debug\srfm_simd_avx512.lib;Debug\srfm_momentum.lib;vcpkg_installed\x64-windows\debug\lib\gtest.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <DataExecutionPrevention></DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
+      <ImportLibrary>C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/Debug/test_simd.lib</ImportLibrary>
+      <LinkErrorReporting></LinkErrorReporting>
+      <ProgramDataBaseFile>C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/Debug/test_simd.pdb</ProgramDataBaseFile>
+      <RandomizedBaseAddress></RandomizedBaseAddress>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\src;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/vcpkg_installed/x64-windows/include"</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ConformanceMode>true</ConformanceMode>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\src;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\src;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/Users/Matthew/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/Release/test_simd.exe -installedDir C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/vcpkg_installed/x64-windows/bin -OutVariable out
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>Release\srfm_simd_dispatch.lib;vcpkg_installed\x64-windows\lib\manual-link\gtest_main.lib;Release\srfm_simd_scalar.lib;Release\srfm_simd_avx2.lib;Release\srfm_simd_avx512.lib;Release\srfm_momentum.lib;vcpkg_installed\x64-windows\lib\gtest.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <DataExecutionPrevention></DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
+      <ImportLibrary>C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/Release/test_simd.lib</ImportLibrary>
+      <LinkErrorReporting></LinkErrorReporting>
+      <ProgramDataBaseFile>C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/Release/test_simd.pdb</ProgramDataBaseFile>
+      <RandomizedBaseAddress></RandomizedBaseAddress>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\src;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/vcpkg_installed/x64-windows/include"</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ConformanceMode>true</ConformanceMode>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\src;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\src;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/Users/Matthew/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/MinSizeRel/test_simd.exe -installedDir C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/vcpkg_installed/x64-windows/bin -OutVariable out
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>MinSizeRel\srfm_simd_dispatch.lib;vcpkg_installed\x64-windows\lib\manual-link\gtest_main.lib;MinSizeRel\srfm_simd_scalar.lib;MinSizeRel\srfm_simd_avx2.lib;MinSizeRel\srfm_simd_avx512.lib;MinSizeRel\srfm_momentum.lib;vcpkg_installed\x64-windows\lib\gtest.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <DataExecutionPrevention></DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
+      <ImportLibrary>C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/MinSizeRel/test_simd.lib</ImportLibrary>
+      <LinkErrorReporting></LinkErrorReporting>
+      <ProgramDataBaseFile>C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/MinSizeRel/test_simd.pdb</ProgramDataBaseFile>
+      <RandomizedBaseAddress></RandomizedBaseAddress>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\src;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/vcpkg_installed/x64-windows/include"</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ConformanceMode>true</ConformanceMode>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\src;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\src;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\include;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/Users/Matthew/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/RelWithDebInfo/test_simd.exe -installedDir C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/vcpkg_installed/x64-windows/bin -OutVariable out
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalDependencies>RelWithDebInfo\srfm_simd_dispatch.lib;vcpkg_installed\x64-windows\lib\manual-link\gtest_main.lib;RelWithDebInfo\srfm_simd_scalar.lib;RelWithDebInfo\srfm_simd_avx2.lib;RelWithDebInfo\srfm_simd_avx512.lib;RelWithDebInfo\srfm_momentum.lib;vcpkg_installed\x64-windows\lib\gtest.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <DataExecutionPrevention></DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
+      <ImportLibrary>C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/RelWithDebInfo/test_simd.lib</ImportLibrary>
+      <LinkErrorReporting></LinkErrorReporting>
+      <ProgramDataBaseFile>C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/RelWithDebInfo/test_simd.pdb</ProgramDataBaseFile>
+      <RandomizedBaseAddress></RandomizedBaseAddress>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Matthew/Special-Relativity-in-Financial-Modeling -BC:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build --check-stamp-file C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindGTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\GoogleTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config-version.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfig.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\rapidcheck\rapidcheckConfig-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\rapidcheck\rapidcheckConfig-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\rapidcheck\rapidcheckConfig.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\vcpkg.json;C:\Users\Matthew\vcpkg\buildtrees\eigen3\x64-windows-rel\Eigen3Config.cmake;C:\Users\Matthew\vcpkg\buildtrees\eigen3\x64-windows-rel\Eigen3ConfigVersion.cmake;C:\Users\Matthew\vcpkg\buildtrees\eigen3\x64-windows-rel\Eigen3Targets.cmake;C:\Users\Matthew\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Matthew/Special-Relativity-in-Financial-Modeling -BC:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build --check-stamp-file C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindGTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\GoogleTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config-version.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfig.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\rapidcheck\rapidcheckConfig-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\rapidcheck\rapidcheckConfig-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\rapidcheck\rapidcheckConfig.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\vcpkg.json;C:\Users\Matthew\vcpkg\buildtrees\eigen3\x64-windows-rel\Eigen3Config.cmake;C:\Users\Matthew\vcpkg\buildtrees\eigen3\x64-windows-rel\Eigen3ConfigVersion.cmake;C:\Users\Matthew\vcpkg\buildtrees\eigen3\x64-windows-rel\Eigen3Targets.cmake;C:\Users\Matthew\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Matthew/Special-Relativity-in-Financial-Modeling -BC:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build --check-stamp-file C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindGTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\GoogleTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config-version.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfig.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\rapidcheck\rapidcheckConfig-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\rapidcheck\rapidcheckConfig-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\rapidcheck\rapidcheckConfig.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\vcpkg.json;C:\Users\Matthew\vcpkg\buildtrees\eigen3\x64-windows-rel\Eigen3Config.cmake;C:\Users\Matthew\vcpkg\buildtrees\eigen3\x64-windows-rel\Eigen3ConfigVersion.cmake;C:\Users\Matthew\vcpkg\buildtrees\eigen3\x64-windows-rel\Eigen3Targets.cmake;C:\Users\Matthew\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Matthew/Special-Relativity-in-Financial-Modeling -BC:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build --check-stamp-file C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindGTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\GoogleTest.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config-version.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-config.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\fmt\fmt-targets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfig.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\gtest\GTestTargets.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\rapidcheck\rapidcheckConfig-debug.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\rapidcheck\rapidcheckConfig-release.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\vcpkg_installed\x64-windows\share\rapidcheck\rapidcheckConfig.cmake;C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\vcpkg.json;C:\Users\Matthew\vcpkg\buildtrees\eigen3\x64-windows-rel\Eigen3Config.cmake;C:\Users\Matthew\vcpkg\buildtrees\eigen3\x64-windows-rel\Eigen3ConfigVersion.cmake;C:\Users\Matthew\vcpkg\buildtrees\eigen3\x64-windows-rel\Eigen3Targets.cmake;C:\Users\Matthew\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\tests\simd\test_simd.cpp" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\ZERO_CHECK.vcxproj">
+      <Project>{7AD8BC28-1479-37DF-B3AE-C72EE372E8F8}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_momentum.vcxproj">
+      <Project>{00BA4E27-4BFA-3D1C-B076-3ED46A7851B2}</Project>
+      <Name>srfm_momentum</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_simd_avx2.vcxproj">
+      <Project>{349EB0DD-1D17-3236-8FCB-1EDE3B6CF391}</Project>
+      <Name>srfm_simd_avx2</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_simd_avx512.vcxproj">
+      <Project>{218E0020-08A8-302F-B75F-430E684F7B5B}</Project>
+      <Name>srfm_simd_avx512</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_simd_dispatch.vcxproj">
+      <Project>{C8BAAE6E-F132-3E11-9CE3-9D4A044D8AC8}</Project>
+      <Name>srfm_simd_dispatch</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\srfm_simd_scalar.vcxproj">
+      <Project>{CA45BF96-A042-3E35-AF74-295D74DD85C7}</Project>
+      <Name>srfm_simd_scalar</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

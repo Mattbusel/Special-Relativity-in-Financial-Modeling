@@ -1,0 +1,373 @@
+%% 04_framework.tex — Mathematical Framework
+\section{Mathematical Framework}
+\label{sec:framework}
+
+We develop the framework in order of increasing geometric depth: from the
+kinematic level (price velocity, Lorentz factor) to the spacetime level
+(spacetime interval, causal classification) to the manifold level (metric
+tensor, Christoffel symbols, geodesics, geodesic deviation).
+
+\subsection{Price Kinematics in Special Relativity}
+\label{subsec:kinematics}
+
+\subsubsection{Dimensionless Price Velocity}
+
+Let $P_t$ denote the mid-price of an asset at bar time $t$, and let $\Delta t$
+denote the bar duration.  Define the \emph{log-price displacement} over a
+rolling window of $n$ bars as
+\begin{equation}
+  \Delta x_t = \log P_t - \log P_{t-n\Delta t}.
+  \label{eq:log_displacement}
+\end{equation}
+The \emph{market speed limit} $\cmarket > 0$ is a calibrated constant with
+units of $[\text{log-price} / \text{bar}]$.  Its calibration is discussed
+in Section~\ref{sec:openquestions}, Open Question~3.  The dimensionless
+\emph{price velocity} is then
+\begin{equation}
+  \boxed{
+    {\pbeta}_t = \frac{\Delta x_t / (n \Delta t)}{\cmarket}
+             = \frac{\overline{r}_t}{\cmarket},
+  }
+  \label{eq:beta_def}
+\end{equation}
+where $\overline{r}_t$ is the mean per-bar log-return over the window.  By
+construction, ${\pbeta}_t \in (-\infty, +\infty)$; the physical regime is
+$|{\pbeta}_t| < 1$ (\textsc{timelike}), and we discuss the \textsc{spacelike}
+regime $|{\pbeta}_t| > 1$ in Section~\ref{subsec:interval}.
+
+\paragraph{Newtonian limit.}  As $\cmarket \to \infty$ (or equivalently,
+$|\overline{r}_t| \ll \cmarket$), we have ${\pbeta}_t \to 0$ and all relativistic
+corrections vanish.  Standard finance corresponds to this limit: it assumes
+prices move arbitrarily fast relative to any effective speed limit.
+
+\subsubsection{The Lorentz Factor}
+
+Given ${\pbeta}_t \in (-1, +1)$, define the \emph{Lorentz factor}
+\begin{equation}
+  \boxed{
+    {\pgamma}_t = \frac{1}{\sqrt{1 - {\pbeta}_t^2}}.
+  }
+  \label{eq:gamma_def}
+\end{equation}
+Properties: ${\pgamma}_t \geq 1$, with ${\pgamma}_t = 1$ iff ${\pbeta}_t = 0$
+(asset at rest), and ${\pgamma}_t \to \infty$ as $|{\pbeta}_t| \to 1$.
+
+\paragraph{L'Hôpital regularisation at the speed limit.}
+For numerical stability near $|\pbeta| = 1$, we express
+\begin{equation}
+  \pgamma = \left(1 - \pbeta^2\right)^{-1/2}
+          = \left(1 - \pbeta\right)^{-1/2} \left(1 + \pbeta\right)^{-1/2}.
+  \label{eq:gamma_factored}
+\end{equation}
+This factorisation allows computation via $\mathrm{hypot}$-stable arithmetic,
+avoiding catastrophic cancellation in $(1 - \pbeta^2)$ when $|\pbeta|$ is close
+to 1.
+
+\paragraph{Newtonian limit.}  By Taylor expansion at $\beta \to 0$:
+\begin{equation}
+  \pgamma = 1 + \tfrac{1}{2}\pbeta^2 + \tfrac{3}{8}\pbeta^4 + \mathcal{O}(\pbeta^6).
+  \label{eq:gamma_taylor}
+\end{equation}
+The leading correction to unity is the classical kinetic energy term.
+
+\subsubsection{Time Dilation}
+
+In special relativity, a clock moving with velocity $\pbeta$ runs slow by a
+factor of $\pgamma$ relative to a stationary clock.  In the finance analogy,
+the \emph{proper time} (or \emph{intrinsic bar time}) of an asset with price
+velocity $\pbeta$ is
+\begin{equation}
+  d\tproper = \frac{dt}{{\pgamma}_t} = dt \sqrt{1 - {\pbeta}_t^2}.
+  \label{eq:time_dilation}
+\end{equation}
+An asset with rapidly evolving prices (large $|\pbeta|$) experiences fewer
+``effective bars'' per wall-clock bar.  This has implications for variance
+scaling: the return variance per proper-time bar is $\pgamma^2$ times the
+return variance per wall-clock bar.
+
+\subsubsection{Rapidity}
+
+The \emph{rapidity} is the additive counterpart to the multiplicative Lorentz
+factor:
+\begin{equation}
+  \rapidity = \arctanh(\pbeta) = \frac{1}{2} \log\left(\frac{1 + \pbeta}{1 - \pbeta}\right).
+  \label{eq:rapidity_def}
+\end{equation}
+Rapidity is preferable to velocity for numerical computation because it is
+unbounded and linear under successive boosts.
+
+\begin{proposition}[Rapidity Additivity]
+  \label{prop:rapidity_additive}
+  Let two inertial frames have price velocities ${\pbeta}_1$ and ${\pbeta}_2$
+  relative to a common reference frame, with rapidities $\rapidity_1 =
+  \arctanh({\pbeta}_1)$ and $\rapidity_2 = \arctanh({\pbeta}_2)$.  The price
+  velocity of the second frame relative to the first is
+  \begin{equation}
+    {\pbeta}_{12} = \frac{{\pbeta}_1 + {\pbeta}_2}{1 + {\pbeta}_1 {\pbeta}_2},
+    \label{eq:velocity_composition}
+  \end{equation}
+  with corresponding rapidity $\rapidity_{12} = \rapidity_1 + \rapidity_2$.
+\end{proposition}
+
+\begin{proof}
+  Apply the Lorentz velocity addition formula~\cite{Jackson1999}, then
+  \begin{align*}
+    \rapidity_{12}
+    &= \arctanh\!\left(\frac{{\pbeta}_1 + {\pbeta}_2}{1 + {\pbeta}_1 {\pbeta}_2}\right) \\
+    &= \arctanh({\pbeta}_1) + \arctanh({\pbeta}_2)
+    = \rapidity_1 + \rapidity_2,
+  \end{align*}
+  where the last step uses the addition formula $\arctanh(x) + \arctanh(y) =
+  \arctanh\!\bigl(\tfrac{x+y}{1+xy}\bigr)$ valid for $|x|, |y| < 1$.
+\end{proof}
+
+\subsubsection{Doppler Reciprocity}
+
+Consider an asset emitting ``price ticks'' at proper-time frequency $f_0$.
+An observer with relative price velocity $\pbeta$ measures frequency
+\begin{equation}
+  f_{\mathrm{obs}} = f_0 \sqrt{\frac{1 - \pbeta}{1 + \pbeta}}
+  \label{eq:doppler}
+\end{equation}
+for a receding source ($\pbeta > 0$) and
+$f_0 \sqrt{(1+\pbeta)/(1-\pbeta)}$ for an approaching source.  Reciprocity
+holds: the frequency ratio for $\pbeta$ and $-\pbeta$ multiply to unity.
+
+\begin{proposition}[Doppler Reciprocity]
+  \label{prop:doppler_reciprocity}
+  $f(\pbeta) \cdot f(-\pbeta) = f_0^2$ for all $|\pbeta| < 1$.
+\end{proposition}
+\begin{proof}
+  $f(\pbeta) \cdot f(-\pbeta)
+  = f_0 \sqrt{\tfrac{1-\pbeta}{1+\pbeta}} \cdot f_0 \sqrt{\tfrac{1+\pbeta}{1-\pbeta}}
+  = f_0^2$.
+\end{proof}
+
+\subsection{Spacetime Interval and Regime Classification}
+\label{subsec:interval}
+
+\subsubsection{The Minkowski Metric in Price Space}
+
+Define a two-dimensional price-time event as $(c_{\mathrm{mkt}} \, \Delta t,\; \Delta x)$
+where $\Delta x$ is the log-price displacement and $\Delta t$ is the elapsed
+bar time.  The \emph{Minkowski spacetime interval} is
+\begin{equation}
+  \boxed{
+    \sinterval^2 = \cmarket^2 \, \Delta t^2 - \Delta x^2.
+  }
+  \label{eq:interval}
+\end{equation}
+This is Lorentz-invariant: all inertial observers (assets with different
+$\pbeta$) agree on $\sinterval^2$.
+
+\subsubsection{Causal Classification}
+
+\begin{definition}[Market Regime]
+  \label{def:regime}
+  A bar is classified as:
+  \begin{itemize}
+    \item \textsc{timelike} if $\sinterval^2 > 0$ (equivalently $|\pbeta| < 1$):
+          information propagates causally; price change is ``slower than light.''
+    \item \textsc{lightlike} if $\sinterval^2 = 0$ (equivalently $|\pbeta| = 1$):
+          the bar lies on the light cone; the asset moves at $\cmarket$ exactly.
+    \item \textsc{spacelike} if $\sinterval^2 < 0$ (equivalently $|\pbeta| > 1$):
+          price change exceeds $\cmarket$; no causal ordering is possible between
+          the bar's endpoints.
+  \end{itemize}
+\end{definition}
+
+The interpretation of \textsc{spacelike} bars is that they represent
+\emph{information shocks}---events in which the market's equilibrium price
+updates discontinuously, without a causal price path connecting the endpoints.
+This corresponds physically to news announcements, earnings surprises, and
+liquidity gaps.
+
+\paragraph{Newtonian limit.}  As $\cmarket \to \infty$, every bar becomes
+\textsc{timelike} regardless of price change magnitude.  Classical finance,
+which assumes no speed limit, operates entirely in the Newtonian limit.
+
+\subsection{The Covariance Manifold and Its Geometry}
+\label{subsec:manifold}
+
+\subsubsection{Rolling Feature Covariance}
+
+Let $\mathbf{f}_t \in \mathbb{R}^n$ be a vector of rolling price features
+at bar $t$ (log-return, realised variance, ${\pbeta}_t$, ${\pgamma}_t$, volume
+$z$-score, etc.).  Define the \emph{empirical covariance matrix} over a
+window of $W$ bars:
+\begin{equation}
+  \Sigma_t = \frac{1}{W-1} \sum_{k=0}^{W-1} (\mathbf{f}_{t-k} - \bar{\mathbf{f}}_t)
+             (\mathbf{f}_{t-k} - \bar{\mathbf{f}}_t)^\top \in \mathcal{P}_n,
+  \label{eq:cov_matrix}
+\end{equation}
+where $\mathcal{P}_n$ denotes the symmetric positive-definite (SPD) cone.
+
+\subsubsection{The Affine-Invariant Metric}
+
+The space $\mathcal{P}_n$ is a Riemannian manifold.  The most natural metric
+for statistical applications is the \emph{affine-invariant metric}
+(also called the Fisher-Rao metric on the normal family)~\cite{Pennec2006}:
+\begin{equation}
+  \langle V, W \rangle_\Sigma
+  = \tr\!\left(\Sigma^{-1} V \, \Sigma^{-1} W\right)
+  \quad \text{for } V, W \in T_\Sigma \mathcal{P}_n \cong \mathrm{Sym}_n.
+  \label{eq:fisher_rao_metric}
+\end{equation}
+The geodesic distance between two SPD matrices $\Sigma_1, \Sigma_2 \in
+\mathcal{P}_n$ under this metric is
+\begin{equation}
+  d(\Sigma_1, \Sigma_2)
+  = \left\| \log(\Sigma_1^{-1/2} \Sigma_2 \, \Sigma_1^{-1/2}) \right\|_F,
+  \label{eq:spd_geodesic_dist}
+\end{equation}
+where $\log$ is the matrix logarithm and $\|\cdot\|_F$ is the Frobenius norm.
+
+\subsubsection{Christoffel Symbols on $\mathcal{P}_n$}
+
+We coordinatise $\mathcal{P}_n$ by the upper-triangular entries of $\Sigma$.
+Let $x^\mu$ denote coordinate index $\mu \in \{1, \ldots, n(n+1)/2\}$.
+The metric components are
+\begin{equation}
+  g_{\mu\nu}(\Sigma) = \frac{\partial^2 \Psi(\Sigma)}{\partial x^\mu \partial x^\nu},
+  \label{eq:metric_from_potential}
+\end{equation}
+where $\Psi(\Sigma) = -\log \det \Sigma$ is the log-determinant potential
+(the Kähler potential of the Siegel domain).
+
+The Christoffel symbols of the Levi-Civita connection on $(\mathcal{P}_n, g)$
+are
+\begin{equation}
+  \Gamma^{\lambda}{}_{\mu}{\nu}
+  = \frac{1}{2} g^{\lambda\rho}
+    \left(
+      \partial_\mu g_{\nu\rho} + \partial_\nu g_{\mu\rho} - \partial_\rho g_{\mu\nu}
+    \right),
+  \label{eq:christoffel_def}
+\end{equation}
+where $g^{\lambda\rho}$ is the inverse metric.
+
+\begin{proposition}[Explicit Christoffel Symbols for $\mathcal{P}_n$]
+  \label{prop:christoffel}
+  Under the affine-invariant metric~\eqref{eq:fisher_rao_metric},
+  coordinatised by the entries $\Sigma^{ij}$ for $i \leq j$, the Christoffel
+  symbols satisfy
+  \begin{equation}
+    \Gamma^{\lambda}{}_{\mu}{\nu}
+    = -\frac{1}{2}\left(
+        \delta^\lambda_\mu (\Sigma^{-1})_{\nu\cdot}
+      + \delta^\lambda_\nu (\Sigma^{-1})_{\mu\cdot}
+      - (\Sigma^{-1})^{\lambda\cdot} g_{\mu\nu}
+    \right),
+    \label{eq:christoffel_spd}
+  \end{equation}
+  where indices are lowered and raised with $g_{\mu\nu}$ and its inverse.
+\end{proposition}
+
+\begin{proof}
+  Differentiate the metric components $g_{\mu\nu} = \tr(\Sigma^{-1}
+  E_\mu \Sigma^{-1} E_\nu)$ (where $E_\mu$ is the basis matrix for
+  coordinate $\mu$) with respect to $x^\rho$, using
+  $\partial_\rho \Sigma^{-1} = -\Sigma^{-1} E_\rho \Sigma^{-1}$, and
+  substitute into Eq.~\eqref{eq:christoffel_def}.  See also~\cite{Pennec2006},
+  Prop.~3.
+\end{proof}
+
+In our implementation, the partial derivatives $\partial_\rho g_{\mu\nu}$
+are computed by centred finite differences on the SPD manifold, using the
+geodesic exponential map to perturb $\Sigma$ in coordinate direction $\rho$
+while remaining on $\mathcal{P}_n$.
+
+\subsubsection{The Geodesic Equation}
+
+A curve $\Sigma(\tproper)$ on $\mathcal{P}_n$ is a geodesic iff
+\begin{equation}
+  \frac{d^2 x^\mu}{d\tproper^2}
+  + \Gamma^{\mu}{}_{\nu}{\rho} \frac{dx^\nu}{d\tproper} \frac{dx^\rho}{d\tproper}
+  = 0.
+  \label{eq:geodesic_eq}
+\end{equation}
+For $\mathcal{P}_n$ with the affine-invariant metric, the geodesic through
+$\Sigma_0$ with initial velocity $V_0 \in T_{\Sigma_0}\mathcal{P}_n$ is given
+in closed form by the \emph{geodesic exponential map}:
+\begin{equation}
+  \Sigma(\tproper) = \Sigma_0^{1/2}
+    \exp\!\left(\tproper \, \Sigma_0^{-1/2} V_0 \, \Sigma_0^{-1/2}\right)
+    \Sigma_0^{1/2}.
+  \label{eq:geodesic_expmap}
+\end{equation}
+
+\subsubsection{Geodesic Deviation Equation}
+
+Consider two nearby geodesics $\Sigma(\tproper)$ and
+$\tilde{\Sigma}(\tproper) = \Sigma(\tproper) + \epsilon \, J(\tproper)$,
+where $J^\mu(\tproper)$ is the \emph{geodesic deviation vector} (Jacobi
+field).  It satisfies the \emph{Jacobi equation}:
+\begin{equation}
+  \boxed{
+    \frac{D^2 J^\mu}{d\tproper^2}
+    + R^{\mu}{}_{\nu\rho\sigma} U^\nu J^\rho U^\sigma = 0,
+  }
+  \label{eq:jacobi_eq}
+\end{equation}
+where $U^\mu = dx^\mu/d\tproper$ is the geodesic tangent vector,
+$D/d\tproper$ is the covariant derivative along the geodesic, and
+$R^{\mu}{}_{\nu\rho\sigma}$ is the Riemann curvature tensor:
+\begin{equation}
+  R^{\mu}{}_{\nu\rho\sigma}
+  = \partial_\rho \Gamma^{\mu}{}_{\sigma\nu}
+  - \partial_\sigma \Gamma^{\mu}{}_{\rho\nu}
+  + \Gamma^{\mu}{}_{\rho\lambda} \Gamma^{\lambda}{}_{\sigma\nu}
+  - \Gamma^{\mu}{}_{\sigma\lambda} \Gamma^{\lambda}{}_{\rho\nu}.
+  \label{eq:riemann_def}
+\end{equation}
+
+The norm $\|J(\tproper)\|_g = \sqrt{g_{\mu\nu} J^\mu J^\nu}$ measures how
+rapidly nearby covariance trajectories diverge.  Large $\|J\|$ signals that
+the market's covariance structure is leaving the regime defined by its current
+geodesic---a precursor to regime change.
+
+\subsubsection{Relativistic Momentum}
+
+The four-momentum of a bar is
+\begin{equation}
+  p^\mu = m \, U^\mu = (\pgamma m c,\; \pgamma m v),
+  \label{eq:four_momentum}
+\end{equation}
+where $m$ is interpreted as the ``market mass'' (a function of traded volume
+and tick size), $c = \cmarket$, and $v = \pbeta \cmarket$.  The
+mass-energy relation is
+\begin{equation}
+  E^2 = (pc)^2 + (mc^2)^2,
+  \label{eq:energy_momentum}
+\end{equation}
+which in the Newtonian limit ($p \ll mc$) gives $E \approx mc^2 +
+\tfrac{p^2}{2m}$, recovering classical kinetic energy.
+
+\subsection{Summary of Defined Quantities}
+
+Table~\ref{tab:quantities} summarises all quantities defined in this section
+and their empirical proxies.
+
+\begin{table}[ht]
+\centering
+\caption{Relativistic finance quantities and their \ohlcv{} proxies.}
+\label{tab:quantities}
+\begin{tabular}{llll}
+  \toprule
+  \textbf{Symbol} & \textbf{Name} & \textbf{Units} & \textbf{\ohlcv{} Proxy} \\
+  \midrule
+  $\cmarket$      & Market speed of light & log-price/bar & calibrated constant \\
+  $\pbeta$        & Price velocity        & dimensionless & $\overline{r}/\cmarket$ \\
+  $\pgamma$       & Lorentz factor        & dimensionless & $(1-\pbeta^2)^{-1/2}$ \\
+  $\tproper$      & Proper time           & bars          & $\int\sqrt{1-\pbeta^2}\,dt$ \\
+  $\rapidity$     & Rapidity              & dimensionless & $\arctanh(\pbeta)$ \\
+  $\sinterval^2$  & Spacetime interval    & log-price$^2$ & $c^2\Delta t^2 - \Delta x^2$ \\
+  $\Sigma_t$      & Covariance matrix     & various       & rolling sample covariance \\
+  $g_{\mu\nu}$    & Metric tensor         & dimensionless & $\tr(\Sigma^{-1}E_\mu\Sigma^{-1}E_\nu)$ \\
+  $\Gamma^{\lambda}{}_{\mu}{\nu}$ & Christoffel symbols & $1/\text{coord}$ & finite-difference on $\mathcal{P}_n$ \\
+  $J^\mu$         & Geodesic deviation    & coord         & Jacobi field solution \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+

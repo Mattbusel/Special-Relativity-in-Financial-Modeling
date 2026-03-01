@@ -1,0 +1,151 @@
+%% 03_related_work.tex — Related Work
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Wissner-Gross \& Freer (2010): Relativistic Statistical Arbitrage}
+
+Wissner-Gross and Freer~\cite{WissnerGross2010} introduced the concept of
+\emph{relativistic statistical arbitrage} by observing that the light-cone
+structure of special relativity constrains which exchange pairs can engage in
+latency-sensitive arbitrage.  Let two exchanges be located at spacetime
+coordinates $(t_1, \mathbf{x}_1)$ and $(t_2, \mathbf{x}_2)$.  An arbitrage
+signal can propagate between them only if the spacetime interval satisfies
+\begin{equation}
+  \Delta s^2 = c^2 (t_2 - t_1)^2 - |\mathbf{x}_2 - \mathbf{x}_1|^2 > 0,
+\end{equation}
+where $c$ is the speed of light (or electromagnetic signal propagation speed
+through fibre).  Their key result is that optimal arbitrage relay nodes lie on
+the hyperboloid of constant proper time between the two exchanges.
+
+\textbf{What they did not do.}  Wissner-Gross and Freer operate entirely in
+physical spacetime; their ``price'' is the trigger for a binary arbitrage
+decision, not a quantity with its own relativistic kinematics.  They do not
+define price velocity, Lorentz factor, or any relativistic transformation of
+the price time series itself.  Their framework cannot be applied to a single
+\ohlcv{} bar.
+
+\subsection{Kakushadze (2017): Volatility Smile as Relativistic Effect}
+
+Kakushadze~\cite{Kakushadze2017} observed that the implied volatility smile
+admits a natural interpretation as a Lorentz contraction effect.  Starting
+from the covariant generalisation of the Black-Scholes PDE, he derives a
+boost-covariant option pricing formula in which the volatility parameter
+transforms as
+\begin{equation}
+  \sigma' = \sigma \sqrt{1 - \beta^2} = \frac{\sigma}{\pgamma},
+  \label{eq:kakushadze_vol}
+\end{equation}
+where $\beta$ is the ``price velocity'' of the underlying in some reference
+frame.  The smile arises because different strikes correspond to different
+effective velocities relative to the at-the-money frame.
+
+\textbf{What he did not do.}  Kakushadze treats $\beta$ as a free parameter to
+be inferred from option market data (the smile itself), not as a quantity
+computable from the underlying's \ohlcv{} time series.  The Lorentz factor
+$\pgamma$ is thus a fit parameter, not a measurement.  No Christoffel symbols,
+geodesics, or spacetime intervals are computed.  The framework is self-contained
+within the options domain and requires option market access that is unavailable
+for most assets.
+
+\subsection{Romero \& Zubieta-Martinez (2016): Relativistic Quantum Finance}
+
+Romero and Zubieta-Martinez~\cite{Romero2016} extended the quantum finance
+programme of Baaquie by replacing the non-relativistic Schrödinger equation
+with the relativistic Dirac equation.  The Dirac Hamiltonian for a ``price
+spinor'' $\Psi$ is
+\begin{equation}
+  i\hbar \frac{\partial \Psi}{\partial t} = \left(
+    -ic\hbar \boldsymbol{\alpha} \cdot \nabla_x + mc^2 \beta_D
+  \right) \Psi,
+\end{equation}
+where $\boldsymbol{\alpha}$ and $\beta_D$ are Dirac matrices, and the mass $m$
+encodes the mean-reverting strength of the asset.  The resulting option pricing
+formula contains additional spinor correction terms relative to
+Black-Scholes.
+
+\textbf{What they did not do.}  This work is entirely theoretical; no
+empirical test is performed.  The connection between the ``price spinor'' and
+observable \ohlcv{} quantities is not established.  The framework requires
+quantum field-theoretic machinery that has no clear operational analogue in a
+trading system.  No Lorentz factors, spacetime intervals, or geodesics appear.
+
+\subsection{Carvalho \& Gaspar (2021): Relativistic Option Pricing}
+
+Carvalho and Gaspar~\cite{Carvalho2021} take the most geometrically
+sophisticated approach among the four: they equip the price manifold $\mathcal{M}$
+with a Riemannian metric $g_{\mu\nu}$ and derive the covariant SDE for price
+dynamics,
+\begin{equation}
+  dS^\mu + \chris{\mu}{\nu}{\rho} S^\nu \, dS^\rho
+  = \mu^\mu \, dt + \sigma^\mu{}_\nu \, dW^\nu,
+  \label{eq:carvalho_sde}
+\end{equation}
+where the Christoffel symbols account for curvature in the price manifold.
+They show that geodesic pricing corresponds to the minimum-entropy risk-neutral
+measure, and derive a covariant Black-Scholes formula.
+
+\textbf{What they did not do.}  Carvalho and Gaspar define the metric $g_{\mu\nu}$
+as a theoretical object associated with the chosen parameterisation of price
+space; they do not specify how to \emph{compute} $g_{\mu\nu}$ or the Christoffel
+symbols from observed \ohlcv{} data.  The geodesic equation
+\eqref{eq:carvalho_sde} is written but not solved numerically.  No empirical
+validation is provided.  In particular, the Christoffel symbols $\chris{\mu}{\nu}{\rho}$
+in Eq.~\eqref{eq:carvalho_sde} are treated as formal objects, not computable
+quantities.
+
+\subsection{Comparison Matrix}
+
+Table~\ref{tab:prior_work} summarises the capabilities of each prior work
+relative to the present contribution.
+
+\begin{table}[ht]
+\centering
+\caption{%
+  Prior work comparison. \checkmark~= present and operational;
+  $\circ$~= present but as a free parameter or theoretical object;
+  $\times$~= absent.
+}
+\label{tab:prior_work}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lccccc}
+  \toprule
+  \textbf{Capability} &
+  \rotatebox{70}{\parbox{2.5cm}{\centering WG\&F\\(2010)}} &
+  \rotatebox{70}{\parbox{2.5cm}{\centering Kakushadze\\(2017)}} &
+  \rotatebox{70}{\parbox{2.5cm}{\centering R\&ZM\\(2016)}} &
+  \rotatebox{70}{\parbox{2.5cm}{\centering C\&G\\(2021)}} &
+  \rotatebox{70}{\parbox{2.5cm}{\centering \textbf{SRFM}\\(2026)}} \\
+  \midrule
+  Price velocity $\pbeta$ from \ohlcv{}       & $\times$ & $\circ$ & $\times$ & $\times$ & \checkmark \\
+  Lorentz factor $\pgamma$ computed            & $\times$ & $\circ$ & $\times$ & $\times$ & \checkmark \\
+  Spacetime interval classifier                & $\times$ & $\times$ & $\times$ & $\times$ & \checkmark \\
+  Metric tensor $g_{\mu\nu}$ from data         & $\times$ & $\times$ & $\times$ & $\circ$  & \checkmark \\
+  Christoffel symbols $\Gamma$ computed        & $\times$ & $\times$ & $\times$ & $\circ$  & \checkmark \\
+  Geodesic equation solved                     & $\times$ & $\times$ & $\times$ & $\circ$  & \checkmark \\
+  Geodesic deviation signal                    & $\times$ & $\times$ & $\times$ & $\times$ & \checkmark \\
+  Rapidity / velocity composition              & $\times$ & $\times$ & $\times$ & $\times$ & \checkmark \\
+  Empirical validation on \ohlcv{} data        & $\times$ & $\times$ & $\times$ & $\times$ & \checkmark \\
+  C++ / production implementation              & $\times$ & $\times$ & $\times$ & $\times$ & \checkmark \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Information Geometry and SPD Manifolds}
+
+Our treatment of the covariance manifold (Section~\ref{sec:framework},
+§\ref{subsec:manifold}) draws on the information geometry
+literature~\cite{Amari1998, Pennec2006, Nielsen2020}.  The symmetric
+positive-definite (SPD) manifold $\mathcal{P}_n$ with the
+affine-invariant (Fisher-Rao) metric is well-studied in the context of
+diffusion tensor imaging and radar covariance estimation; we adapt these
+tools to the financial covariance matrix of rolling price features.
+
+\subsection{Positioning Relative to the Broader Econophysics Programme}
+
+Our work sits at the intersection of three active research programmes:
+(i)~econophysics, which applies statistical mechanics and field theory to
+financial markets~\cite{Mantegna1999, Bouchaud2003};
+(ii)~information geometry applied to finance~\cite{Amari1998}; and
+(iii)~the emerging relativistic finance literature surveyed above.  We are
+the first to bring all three together in an operational system.
+

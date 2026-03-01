@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\test\property\prop_velocity_subluminal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{0A3A9035-D960-37B2-8624-F2B29D158D01}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

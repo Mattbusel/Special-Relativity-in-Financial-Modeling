@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googletest-subbuild/CMakeFiles/googletest-populate"
+		},
+		{
+			"file" : "C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googletest-subbuild/CMakeFiles/5f8ca819a1c6d3abb960884a64395ed9/googletest-populate.rule"
+		},
+		{
+			"file" : "C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googletest-subbuild/CMakeFiles/7c723bd785ebf3eee250b9dccf590887/googletest-populate-complete.rule"
+		},
+		{
+			"file" : "C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googletest-subbuild/CMakeFiles/8886856712b3b1c093a55261634b3393/googletest-populate-build.rule"
+		},
+		{
+			"file" : "C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googletest-subbuild/CMakeFiles/8886856712b3b1c093a55261634b3393/googletest-populate-configure.rule"
+		},
+		{
+			"file" : "C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googletest-subbuild/CMakeFiles/8886856712b3b1c093a55261634b3393/googletest-populate-download.rule"
+		},
+		{
+			"file" : "C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googletest-subbuild/CMakeFiles/8886856712b3b1c093a55261634b3393/googletest-populate-install.rule"
+		},
+		{
+			"file" : "C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googletest-subbuild/CMakeFiles/8886856712b3b1c093a55261634b3393/googletest-populate-mkdir.rule"
+		},
+		{
+			"file" : "C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googletest-subbuild/CMakeFiles/8886856712b3b1c093a55261634b3393/googletest-populate-patch.rule"
+		},
+		{
+			"file" : "C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googletest-subbuild/CMakeFiles/8886856712b3b1c093a55261634b3393/googletest-populate-test.rule"
+		},
+		{
+			"file" : "C:/Users/Matthew/Special-Relativity-in-Financial-Modeling/build/_deps/googletest-subbuild/CMakeFiles/8886856712b3b1c093a55261634b3393/googletest-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"googletest-populate"
+		],
+		"name" : "googletest-populate"
+	}
+}

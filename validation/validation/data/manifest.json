@@ -1,0 +1,102 @@
+{
+  "AAPL": {
+    "ticker": "AAPL",
+    "rows": 1256,
+    "start_date": "2021-03-01 00:00:00+00:00",
+    "end_date": "2026-02-27 00:00:00+00:00",
+    "file_path": "validation\\data\\AAPL_1m.csv",
+    "status": "ok",
+    "dedup_removed": 0,
+    "failed_chunks": 0
+  },
+  "SPY": {
+    "ticker": "SPY",
+    "rows": 1256,
+    "start_date": "2021-03-01 00:00:00+00:00",
+    "end_date": "2026-02-27 00:00:00+00:00",
+    "file_path": "validation\\data\\SPY_1m.csv",
+    "status": "ok",
+    "dedup_removed": 0,
+    "failed_chunks": 0
+  },
+  "QQQ": {
+    "ticker": "QQQ",
+    "rows": 1256,
+    "start_date": "2021-03-01 00:00:00+00:00",
+    "end_date": "2026-02-27 00:00:00+00:00",
+    "file_path": "validation\\data\\QQQ_1m.csv",
+    "status": "ok",
+    "dedup_removed": 0,
+    "failed_chunks": 0
+  },
+  "TSLA": {
+    "ticker": "TSLA",
+    "rows": 1256,
+    "start_date": "2021-03-01 00:00:00+00:00",
+    "end_date": "2026-02-27 00:00:00+00:00",
+    "file_path": "validation\\data\\TSLA_1m.csv",
+    "status": "ok",
+    "dedup_removed": 0,
+    "failed_chunks": 0
+  },
+  "GS": {
+    "ticker": "GS",
+    "rows": 1256,
+    "start_date": "2021-03-01 00:00:00+00:00",
+    "end_date": "2026-02-27 00:00:00+00:00",
+    "file_path": "validation\\data\\GS_1m.csv",
+    "status": "ok",
+    "dedup_removed": 0,
+    "failed_chunks": 0
+  },
+  "JPM": {
+    "ticker": "JPM",
+    "rows": 1256,
+    "start_date": "2021-03-01 00:00:00+00:00",
+    "end_date": "2026-02-27 00:00:00+00:00",
+    "file_path": "validation\\data\\JPM_1m.csv",
+    "status": "ok",
+    "dedup_removed": 0,
+    "failed_chunks": 0
+  },
+  "NVDA": {
+    "ticker": "NVDA",
+    "rows": 1256,
+    "start_date": "2021-03-01 00:00:00+00:00",
+    "end_date": "2026-02-27 00:00:00+00:00",
+    "file_path": "validation\\data\\NVDA_1m.csv",
+    "status": "ok",
+    "dedup_removed": 0,
+    "failed_chunks": 0
+  },
+  "META": {
+    "ticker": "META",
+    "rows": 1256,
+    "start_date": "2021-03-01 00:00:00+00:00",
+    "end_date": "2026-02-27 00:00:00+00:00",
+    "file_path": "validation\\data\\META_1m.csv",
+    "status": "ok",
+    "dedup_removed": 0,
+    "failed_chunks": 0
+  },
+  "BTC-USD": {
+    "ticker": "BTC-USD",
+    "rows": 1827,
+    "start_date": "2021-03-01 00:00:00+00:00",
+    "end_date": "2026-03-01 00:00:00+00:00",
+    "file_path": "validation\\data\\BTC_USD_1m.csv",
+    "status": "ok",
+    "dedup_removed": 0,
+    "failed_chunks": 0
+  },
+  "GLD": {
+    "ticker": "GLD",
+    "rows": 1256,
+    "start_date": "2021-03-01 00:00:00+00:00",
+    "end_date": "2026-02-27 00:00:00+00:00",
+    "file_path": "validation\\data\\GLD_1m.csv",
+    "status": "ok",
+    "dedup_removed": 0,
+    "failed_chunks": 0
+  }
+}

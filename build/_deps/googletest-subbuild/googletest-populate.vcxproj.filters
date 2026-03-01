@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googletest-subbuild\CMakeFiles\8886856712b3b1c093a55261634b3393\googletest-populate-mkdir.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googletest-subbuild\CMakeFiles\8886856712b3b1c093a55261634b3393\googletest-populate-download.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googletest-subbuild\CMakeFiles\8886856712b3b1c093a55261634b3393\googletest-populate-update.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googletest-subbuild\CMakeFiles\8886856712b3b1c093a55261634b3393\googletest-populate-patch.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googletest-subbuild\CMakeFiles\8886856712b3b1c093a55261634b3393\googletest-populate-configure.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googletest-subbuild\CMakeFiles\8886856712b3b1c093a55261634b3393\googletest-populate-build.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googletest-subbuild\CMakeFiles\8886856712b3b1c093a55261634b3393\googletest-populate-install.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googletest-subbuild\CMakeFiles\8886856712b3b1c093a55261634b3393\googletest-populate-test.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googletest-subbuild\CMakeFiles\7c723bd785ebf3eee250b9dccf590887\googletest-populate-complete.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googletest-subbuild\CMakeFiles\5f8ca819a1c6d3abb960884a64395ed9\googletest-populate.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googletest-subbuild\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\Matthew\Special-Relativity-in-Financial-Modeling\build\_deps\googletest-subbuild\CMakeFiles\googletest-populate" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{F3F9ED70-2FFB-3603-B22C-47D70924863E}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

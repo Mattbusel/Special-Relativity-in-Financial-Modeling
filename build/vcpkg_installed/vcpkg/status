@@ -1,0 +1,51 @@
+Package: vcpkg-cmake-config
+Version: 2024-05-23
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 24557825f114712a7c109f99e687adaccee2433c5c6338bce82eb2106f8ce178
+Status: install ok installed
+
+Package: vcpkg-cmake
+Version: 2024-04-23
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 14d924e179912bd0e59eb717a35054ce309e151bc08b2be8508f638ea60d585c
+Status: install ok installed
+
+Package: rapidcheck
+Version: 2023-12-14
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 28a9e89922266f419d318e1fb4ec3dbcd7ab5977bc95f01f4b8d00f970688bcc
+Description: A property-based testing library for C++ (a la QuickCheck) with the goal of being simple to use with as little boilerplate as possible.
+Status: install ok installed
+
+Package: eigen3
+Version: 5.0.1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 9843a2c2daaa24a559e60a10b60daf1cbf4f0a9ac0b649e858955afacf0beed3
+Description: C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms.
+Status: install ok installed
+
+Package: fmt
+Version: 12.1.0
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 672e4bbb0a4a3f069f182f48b0f93d71d85b16d13ada02cf302d9cdc332bf611
+Description: {fmt} is an open-source formatting library providing a fast and safe alternative to C stdio and C++ iostreams.
+Status: install ok installed
+
+Package: gtest
+Version: 1.17.0
+Port-Version: 2
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 3eea5d2c4ab35c1aaeacbc619075640f952fb439176b2e562419d681c17c2d8c
+Description: Google Testing and Mocking Framework
+Status: install ok installed
+

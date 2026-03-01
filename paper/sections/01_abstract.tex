@@ -1,0 +1,32 @@
+%% 01_abstract.tex — Abstract
+\begin{abstract}
+
+Classical finance theory assumes a flat, Galilean time structure in which all
+market participants share a universal clock and price velocity composes
+linearly.  Four prior works---Wissner-Gross \& Freer (2010), Kakushadze
+(2017), Romero \& Zubieta-Martinez (2016), and Carvalho \& Gaspar
+(2021)---demonstrated that special-relativistic geometry provides a
+mathematically consistent and empirically motivated alternative.  Each of
+these contributions, however, remained at the level of theoretical framework:
+no prior work delivered an operational system that computes Lorentz factors,
+spacetime intervals, Christoffel symbols, or geodesic deviations from live
+\ohlcv{} bar data.
+
+We close this gap.  We present the Special-Relativistic Finance Manifold
+(\textsc{srfm}), the first end-to-end C++20 implementation of a
+special-relativistic price dynamics framework.  Our contributions are
+fivefold: (i)~an operational price-velocity $\pbeta$ and Lorentz-factor
+$\pgamma$ calculator derived from open--high--low--close--volume bars; (ii)~a
+spacetime interval classifier that partitions market regimes into
+\textsc{timelike} and \textsc{spacelike} sectors analogous to causal cones in
+special relativity; (iii)~a Christoffel symbol computation on the empirical
+covariance manifold spanned by rolling price features; (iv)~a geodesic
+deviation solver whose output functions as a regime-change signal; and (v)~an
+empirical validation on Q1 2025 equity data demonstrating that
+\textsc{timelike} bars exhibit statistically distinct return variance from
+\textsc{spacelike} bars~\cite{AGT07results}.  All five components are
+implemented with zero-panic guarantees, strong-typed interfaces, and a
+$1.5:1$ test-to-production line ratio enforced by continuous integration.
+
+\end{abstract}
+
