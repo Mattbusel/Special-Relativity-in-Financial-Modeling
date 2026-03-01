@@ -52,13 +52,13 @@
 \contentsline {subsection}{\numberline {5.2}Q1: Spacetime Interval Regime Separation}{18}{subsection.5.2}%
 \contentsline {subsection}{\numberline {5.3}Q2: Geodesic Deviation Backtest}{18}{subsection.5.3}%
 \contentsline {subsection}{\numberline {5.4}Robustness Checks}{19}{subsection.5.4}%
-\contentsline {paragraph}{Sensitivity to $c_{\mathrm {mkt}}$ calibration.}{20}{section*.21}%
-\contentsline {paragraph}{Out-of-sample stability.}{20}{section*.22}%
-\contentsline {paragraph}{Cross-sectional consistency.}{20}{section*.23}%
+\contentsline {paragraph}{Sensitivity to $c_{\mathrm {mkt}}$ calibration.}{19}{section*.19}%
+\contentsline {paragraph}{Out-of-sample stability.}{19}{section*.20}%
+\contentsline {paragraph}{Cross-sectional consistency.}{20}{section*.21}%
 \contentsline {section}{\numberline {6}Open Questions}{22}{section.6}%
 \contentsline {section}{\numberline {7}Conclusion}{24}{section.7}%
 \contentsline {subsection}{\numberline {7.1}Summary of Contributions}{24}{subsection.7.1}%
 \contentsline {subsection}{\numberline {7.2}Closing the Gap in the Literature}{24}{subsection.7.2}%
 \contentsline {subsection}{\numberline {7.3}Limitations and Future Work}{24}{subsection.7.3}%
-\contentsline {paragraph}{Future directions.}{25}{section*.24}%
+\contentsline {paragraph}{Future directions.}{25}{section*.22}%
 \contentsline {subsection}{\numberline {7.4}On the Epistemology of Financial Geometry}{25}{subsection.7.4}%

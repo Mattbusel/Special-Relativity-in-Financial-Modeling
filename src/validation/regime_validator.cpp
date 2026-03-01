@@ -185,6 +185,7 @@ struct ClassifiedBar {
     std::size_t bar_index          = 0;
     std::string interval_type;        // "Timelike", "Spacelike", "Lightlike"
     double      next_bar_abs_return = 0.0;
+    double      next_bar_return    = 0.0;  ///< Signed next-bar return (for backtesting)
     double      beta               = 0.0;
     double      geodesic_deviation = 0.0;
 };
@@ -262,8 +263,10 @@ static std::vector<ClassifiedBar> classify_bars(
 
         // next-bar absolute return  = |close[i+1] / close[i] - 1|
         double next_abs_ret = 0.0;
+        double next_ret     = 0.0;
         if (bars[i].close > 0.0) {
-            next_abs_ret = std::abs(bars[i + 1].close / bars[i].close - 1.0);
+            next_ret     = bars[i + 1].close / bars[i].close - 1.0;
+            next_abs_ret = std::abs(next_ret);
         }
 
         // Geodesic deviation at bar i
@@ -278,6 +281,7 @@ static std::vector<ClassifiedBar> classify_bars(
             .bar_index          = i,
             .interval_type      = std::string(type_str),
             .next_bar_abs_return = next_abs_ret,
+            .next_bar_return    = next_ret,
             .beta               = beta,
             .geodesic_deviation = geo_dev,
         });
@@ -298,7 +302,7 @@ static void write_output(
         throw std::runtime_error("Cannot open output file: " + output_path);
     }
 
-    out << "ticker,bar_index,interval_type,next_bar_abs_return,beta,geodesic_deviation\n";
+    out << "ticker,bar_index,interval_type,next_bar_abs_return,next_bar_return,beta,geodesic_deviation\n";
 
     for (const auto& b : bars) {
         out << ticker << ","
@@ -307,6 +311,7 @@ static void write_output(
             << std::fixed;
         out.precision(10);
         out << b.next_bar_abs_return << ","
+            << b.next_bar_return << ","
             << b.beta << ","
             << b.geodesic_deviation << "\n";
     }

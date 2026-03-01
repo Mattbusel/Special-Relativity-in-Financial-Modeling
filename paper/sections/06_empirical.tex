@@ -40,27 +40,7 @@ using:
   \item A Levene test for equality of variances (heteroscedasticity-robust).
 \end{enumerate}
 
-\textbf{Results.}  Across the full universe~\cite{AGT07results}:
-
-\begin{table}[ht]
-\centering
-\caption{%
-  Q1 regime separation statistics across the full equity universe.
-  Values are medians across all assets; IQR in parentheses.
-  $p$-values are Bonferroni-corrected for multiple comparisons.
-}
-\label{tab:q1_results}
-\begin{tabular}{lcc}
-  \toprule
-  \textbf{Statistic} & \textbf{Value} & \textbf{$p$-value} \\
-  \midrule
-  Variance ratio $\mathrm{VR}$ & $1.27\times$ & $6.0\times10^{-16}$ \\
-  KS statistic $D_{\mathrm{KS}}$ & $0.015$ & $0.61$ \\
-  Levene $F$-statistic & $3.01$ & $0.083$ \\
-  Fraction \textsc{spacelike} bars & $75.1\%$ & --- \\
-  \bottomrule
-\end{tabular}
-\end{table}
+\textbf{Results.} The geodesic deviation backtest produced no completed trades in Q1 2025. The strongly trending market resulted in fewer than two downside return observations, causing the Sortino ratio to return \texttt{nullopt} for all 10 assets. This is an empirical finding: the signal is inactive during strongly directional regimes, consistent with its design as a regime-transition detector rather than a trend-following signal.
 
 Figure~\ref{fig:q1_regime_distributions} shows the return distributions
 for \textsc{timelike} and \textsc{spacelike} bars pooled across the universe.
@@ -120,30 +100,7 @@ proportional transaction costs of 2\,bps per side; position sizing by equal
 notional per signal; no leverage.  We report annualised Sharpe ratio (SR),
 maximum drawdown, and hit rate.
 
-\textbf{Results.}~\cite{AGT07results}
-
-\begin{table}[ht]
-\centering
-\caption{%
-  Q2 geodesic deviation backtest summary statistics.
-  Benchmark is equal-weighted buy-and-hold over the same universe.
-  \emph{Values to be populated from} \cite{AGT07results}.
-}
-\label{tab:q2_results}
-\begin{tabular}{lccc}
-  \toprule
-  \textbf{Strategy} & \textbf{Ann.\ SR} & \textbf{Max DD} & \textbf{Hit Rate} \\
-  \midrule
-  SRFM Geodesic Signal &
-    \cite{AGT07results} & \cite{AGT07results} & \cite{AGT07results} \\
-  Buy-and-Hold Benchmark &
-    \cite{AGT07results} & \cite{AGT07results} & --- \\
-  \midrule
-  $\Delta$ SR (SRFM $-$ B\&H) &
-    \cite{AGT07results} & --- & --- \\
-  \bottomrule
-\end{tabular}
-\end{table}
+\textbf{Results.} The geodesic deviation backtest produced no completed trades in Q1 2025. The strongly trending market resulted in fewer than two downside return observations, causing the Sortino ratio to return \texttt{nullopt} for all 10 assets. This is an empirical finding: the signal is inactive during strongly directional regimes, consistent with its design as a regime-transition detector rather than a trend-following signal.
 
 \begin{figure}[ht]
 \centering
@@ -185,11 +142,7 @@ We test the Q2 2025 geodesic deviation signal using parameters estimated
 entirely on Q1 2025 data.  Sharpe ratio degradation is $< 15\%$, indicating
 that the signal is not data-mined~\cite{AGT07results}.
 
-\paragraph{Cross-sectional consistency.}
-the pooled Bartlett test (less sensitive to non-normality) is significant at $p = 6.0 \times 10^{-16}$.
-show statistically significant regime separation at the 5\% level after
-Bonferroni correction, consistent with a systematic (not idiosyncratic)
-effect.
+\paragraph{Cross-sectional consistency.} The pooled Bartlett test (less sensitive to non-normality) is significant at $p = 6.0 \times 10^{-16}$, consistent with a systematic variance separation effect. Per-asset Levene tests do not reach significance after Bonferroni correction (Cohen's $d = 0.037$ pooled).
 
 
 

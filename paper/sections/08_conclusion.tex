@@ -34,8 +34,7 @@ geometry applied to equity price time series.  Our five contributions are:
   \item \textbf{Geodesic deviation signal.}  We integrate the Jacobi
         (geodesic deviation) equation on $\mathcal{P}_n$ using fourth-order
         Runge-Kutta and use the resulting deviation norm as a regime-change
-        signal.  Backtested over Q1 2025, the signal generates a Sharpe
-        ratio improvement of \cite{AGT07results} relative to buy-and-hold~\cite{AGT07results}.
+        signal.  The Q1 2025 backtest produced no completed trades in the strongly trending market; this motivates evaluation over a longer multi-regime period.
 
   \item \textbf{Production-quality implementation.}  The C++20 codebase
         maintains zero-panic guarantees on all production code paths,

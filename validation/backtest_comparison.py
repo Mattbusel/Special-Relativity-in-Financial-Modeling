@@ -164,10 +164,10 @@ def print_comparison_table(df: pd.DataFrame) -> None:
     tickers = [t for t in TICKERS_ORDER if t in df["ticker"].unique()]
     strategies = [s for s in STRATEGIES if s in df["strategy"].unique()]
 
-    print("\n" + "═" * 110)
-    print("  SRFM Q2 — Strategy Performance Comparison")
+    print("\n" + "=" * 110)
+    print("  SRFM Q2 - Strategy Performance Comparison")
     print("  Strategies: RAW vs RELATIVISTIC vs GEODESIC_DEVIATION")
-    print("═" * 110)
+    print("=" * 110)
 
     # Header
     header = f"  {'Ticker':<12}"
@@ -176,7 +176,7 @@ def print_comparison_table(df: pd.DataFrame) -> None:
             short = {"RAW": "Raw", "RELATIVISTIC": "Rel", "GEODESIC_DEVIATION": "Geo"}
             header += f"  {METRIC_LABELS[metric]}/{short.get(strategy, strategy):<7}"
     print(header)
-    print("─" * 110)
+    print("-" * 110)
 
     for ticker in tickers:
         sub = df[df["ticker"] == ticker].set_index("strategy")
@@ -190,7 +190,7 @@ def print_comparison_table(df: pd.DataFrame) -> None:
                     line += f"  {'N/A':<12}"
         print(line)
 
-    print("═" * 110)
+    print("=" * 110)
 
     # Summary: mean lift
     rel_lift = compute_relativistic_lift(df)
@@ -213,7 +213,7 @@ def print_latex_table(df: pd.DataFrame) -> None:
     short = {"RAW": "Raw", "RELATIVISTIC": "Rel.", "GEODESIC_DEVIATION": "Geo."}
     col_spec = "l" + "r" * (len(METRICS) * len(strategies))
 
-    print("\n% ─── LaTeX Table ────────────────────────────────────────────────")
+    print("\n% --- LaTeX Table ---")
     print("\\begin{table}[ht]")
     print("\\centering")
     print("\\small")
@@ -251,7 +251,7 @@ def print_latex_table(df: pd.DataFrame) -> None:
     print("\\caption{SRFM strategy comparison: RAW vs RELATIVISTIC vs GEODESIC\\_DEVIATION.}")
     print("\\label{tab:srfm-comparison}")
     print("\\end{table}")
-    print("% ─────────────────────────────────────────────────────────────────\n")
+    print("% ---\n")
 
 
 def save_comparison_csv(df: pd.DataFrame, output_dir: str = DEFAULT_OUTPUT_DIR) -> None:

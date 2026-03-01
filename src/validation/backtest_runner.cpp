@@ -86,6 +86,7 @@ struct RegimeRow {
     std::size_t bar_index          = 0;
     std::string interval_type;
     double      next_bar_abs_return = 0.0;
+    double      next_bar_return    = 0.0;  ///< Signed return (may be 0 if column absent)
     double      beta               = 0.0;
     double      geodesic_deviation = 0.0;
 };
@@ -102,11 +103,12 @@ static std::vector<RegimeRow> load_regime_csv(const std::string& path) {
     }
     auto hdr = split_csv(line);
 
-    int col_idx  = find_col(hdr, "bar_index");
-    int col_type = find_col(hdr, "interval_type");
-    int col_ret  = find_col(hdr, "next_bar_abs_return");
-    int col_beta = find_col(hdr, "beta");
-    int col_geo  = find_col(hdr, "geodesic_deviation");
+    int col_idx      = find_col(hdr, "bar_index");
+    int col_type     = find_col(hdr, "interval_type");
+    int col_ret      = find_col(hdr, "next_bar_abs_return");
+    int col_sret     = find_col(hdr, "next_bar_return");
+    int col_beta     = find_col(hdr, "beta");
+    int col_geo      = find_col(hdr, "geodesic_deviation");
 
     if (col_type < 0 || col_ret < 0) {
         throw std::runtime_error("CSV missing required columns interval_type / next_bar_abs_return");
@@ -130,6 +132,9 @@ static std::vector<RegimeRow> load_regime_csv(const std::string& path) {
             : auto_idx;
         row.interval_type      = fields[static_cast<std::size_t>(col_type)];
         row.next_bar_abs_return = *maybe_ret;
+        row.next_bar_return    = (col_sret >= 0)
+            ? safe_double(fields[static_cast<std::size_t>(col_sret)]).value_or(0.0)
+            : 0.0;
         row.beta               = (col_beta >= 0)
             ? safe_double(fields[static_cast<std::size_t>(col_beta)]).value_or(0.0)
             : 0.0;
@@ -172,10 +177,15 @@ build_bars(const std::vector<RegimeRow>& rows) {
             .geodesic_deviation = row.geodesic_deviation,
         });
 
-        // Asset return = unsigned abs return; Backtester applies direction via raw_signal.
-        // Passing raw_signal * abs_return would double-sign: sign(raw_signal) * raw_signal * abs_return
-        // = abs_return (always positive), making Sortino nullopt (no returns below zero).
-        asset_returns.push_back(row.next_bar_abs_return);
+        // Asset return = signed market return.
+        // Backtester applies position sign via raw_signal: return = sign(signal) * market_return.
+        // Geodesic strategy uses 0/1 positions applied to this same signed market return,
+        // ensuring the return series contains both positive and negative values (Sortino computable).
+        // Fall back to abs return if signed column is absent (legacy CSVs without next_bar_return).
+        double asset_ret = (row.next_bar_return != 0.0 || row.next_bar_abs_return == 0.0)
+            ? row.next_bar_return
+            : row.next_bar_abs_return;
+        asset_returns.push_back(asset_ret);
     }
 
     return {bars, asset_returns};
