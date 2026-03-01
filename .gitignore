@@ -1,0 +1,24 @@
+# Build artifacts
+build/
+build_audit/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# LaTeX
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.pdf
+paper/*.synctex.gz
+
+# Node / Vite
+viz/node_modules/
+viz/dist/
+
+# OS
+.DS_Store
+Thumbs.db

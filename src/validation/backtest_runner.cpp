@@ -172,9 +172,10 @@ build_bars(const std::vector<RegimeRow>& rows) {
             .geodesic_deviation = row.geodesic_deviation,
         });
 
-        // Asset return = signed next-bar return (direction from interval type)
-        double asset_ret = raw_signal * row.next_bar_abs_return;
-        asset_returns.push_back(asset_ret);
+        // Asset return = unsigned abs return; Backtester applies direction via raw_signal.
+        // Passing raw_signal * abs_return would double-sign: sign(raw_signal) * raw_signal * abs_return
+        // = abs_return (always positive), making Sortino nullopt (no returns below zero).
+        asset_returns.push_back(row.next_bar_abs_return);
     }
 
     return {bars, asset_returns};
