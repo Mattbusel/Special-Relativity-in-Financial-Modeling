@@ -75,7 +75,7 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           if [ -f prometheus.yml ]; then
-            python3 -c "import yaml, sys; yaml.safe_load(sys.stdin)" < prometheus.yml && echo "prometheus.yml is valid YAML"
+            pip3 install pyyaml -q && python3 -c "import yaml, sys; yaml.safe_load(sys.stdin)" < prometheus.yml && echo "prometheus.yml is valid YAML"
           else
             echo "prometheus.yml not found, skipping"
           fi
