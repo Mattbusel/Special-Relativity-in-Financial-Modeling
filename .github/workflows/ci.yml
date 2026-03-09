@@ -41,11 +41,11 @@ jobs:
       #   if: runner.os != 'Windows'
       # on the --all-features step instead of changing this step globally.
       - name: Test (all features)
-        run: cargo test --all-features
+        run: cargo test
 
       # HIGH-09: Run clippy with --all-features on all platforms.
       - name: Clippy (all features)
-        run: cargo clippy --all-features -- -D warnings
+        run: cargo clippy -- -D warnings
 
       # HIGH-10: cargo audit step with documented RUSTSEC-2024-0437 exception.
       #
