@@ -1,4 +1,4 @@
-//! # AgentSpawner — fleet spawning and coordination
+//! # AgentSpawner  -  fleet spawning and coordination
 //!
 //! ## Responsibility
 //! Spawn N agent processes, each running a claim-execute-complete loop.
@@ -89,7 +89,7 @@ impl AgentSpawner {
     ///
     /// # Arguments
     ///
-    /// * `config` — Shared coordination configuration
+    /// * `config`  -  Shared coordination configuration
     ///
     /// # Panics
     ///
@@ -102,7 +102,7 @@ impl AgentSpawner {
     ///
     /// # Arguments
     ///
-    /// * `queue` — Shared task queue for claiming work
+    /// * `queue`  -  Shared task queue for claiming work
     ///
     /// # Returns
     ///
@@ -143,8 +143,8 @@ impl AgentSpawner {
     ///
     /// # Arguments
     ///
-    /// * `count` — Number of agents to spawn
-    /// * `queue` — Shared task queue for claiming work
+    /// * `count`  -  Number of agents to spawn
+    /// * `queue`  -  Shared task queue for claiming work
     ///
     /// # Returns
     ///
@@ -188,10 +188,10 @@ impl AgentSpawner {
     ///
     /// # Arguments
     ///
-    /// * `worker` — The agent worker to execute tasks with
-    /// * `queue` — The shared task queue
-    /// * `shutdown_rx` — Watch receiver for shutdown signals
-    /// * `agent_id` — The agent's identifier for logging
+    /// * `worker`  -  The agent worker to execute tasks with
+    /// * `queue`  -  The shared task queue
+    /// * `shutdown_rx`  -  Watch receiver for shutdown signals
+    /// * `agent_id`  -  The agent's identifier for logging
     ///
     /// # Panics
     ///
@@ -223,7 +223,7 @@ impl AgentSpawner {
                         tracing::info!(agent = agent_id, "all tasks complete, shutting down");
                         break;
                     }
-                    // No pending tasks but some in-flight — wait and retry
+                    // No pending tasks but some in-flight  -  wait and retry
                     tokio::time::sleep(std::time::Duration::from_millis(500)).await;
                     continue;
                 }
@@ -295,7 +295,7 @@ impl AgentSpawner {
 ///
 /// # Arguments
 ///
-/// * `handles` — The list of agent handles from `spawn_fleet`
+/// * `handles`  -  The list of agent handles from `spawn_fleet`
 ///
 /// # Returns
 ///
@@ -432,7 +432,7 @@ mod tests {
         assert_eq!(handles[1].agent_id, "agent-1");
         assert_eq!(handles[2].agent_id, "agent-2");
 
-        // Wait for handles to finish (they'll exit immediately — no tasks)
+        // Wait for handles to finish (they'll exit immediately  -  no tasks)
         let stats = await_fleet(handles).await;
         assert_eq!(stats.len(), 3);
     }

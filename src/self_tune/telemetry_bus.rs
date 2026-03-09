@@ -11,7 +11,7 @@
 //! # Telemetry Bus (Task 1.1)
 //!
 //! A bounded broadcast channel that aggregates metrics from every pipeline stage
-//! into a unified stream.  This is the nervous system — every other self-improving
+//! into a unified stream.  This is the nervous system  -  every other self-improving
 //! module reads from this bus.
 //!
 //! ## What it produces
@@ -40,7 +40,7 @@ use serde::{Deserialize, Serialize};
 use tokio::sync::{broadcast, Mutex, RwLock};
 use tracing::debug;
 
-// ─── Public types ────────────────────────────────────────────────────────────
+//  Public types 
 
 /// A single latency sample with p50 / p95 / p99 breakdowns (ms).
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -87,7 +87,7 @@ pub struct StageMetrics {
     pub latency: LatencyStats,
     /// Requests processed per second in this window.
     pub throughput_rps: f64,
-    /// Fraction of requests that returned an error (0.0 – 1.0).
+    /// Fraction of requests that returned an error (0.0  -  1.0).
     pub error_rate: f64,
 }
 
@@ -103,9 +103,9 @@ pub struct TelemetrySnapshot {
     pub unix_ts: u64,
     /// Per-stage metrics, one entry per pipeline stage.
     pub stages: Vec<StageMetrics>,
-    /// Cache hit rate across all caching layers (0.0 – 1.0).
+    /// Cache hit rate across all caching layers (0.0  -  1.0).
     pub cache_hit_rate: f64,
-    /// Deduplication collision rate (0.0 – 1.0).
+    /// Deduplication collision rate (0.0  -  1.0).
     pub dedup_collision_rate: f64,
     /// Circuit-breaker state per named service.
     pub circuit_states: Vec<(String, CircuitState)>,
@@ -115,7 +115,7 @@ pub struct TelemetrySnapshot {
     pub total_dropped: u64,
     /// Total error count since process start.
     pub total_errors: u64,
-    /// System-level composite pressure score (0.0 – 1.0).
+    /// System-level composite pressure score (0.0  -  1.0).
     pub pressure: f64,
 }
 
@@ -183,7 +183,7 @@ impl RollingWindow {
     }
 }
 
-// ─── Counters supplied by the pipeline ───────────────────────────────────────
+//  Counters supplied by the pipeline 
 
 /// Atomic counters the pipeline increments; the bus reads them on each tick.
 ///
@@ -231,7 +231,7 @@ impl PipelineCounters {
     }
 }
 
-// ─── Stage probe ─────────────────────────────────────────────────────────────
+//  Stage probe 
 
 /// Callback the telemetry bus calls each tick to collect per-stage metrics.
 ///
@@ -245,7 +245,7 @@ pub trait StageProbe: Send + Sync {
     }
 }
 
-// ─── Bus configuration ───────────────────────────────────────────────────────
+//  Bus configuration 
 
 /// Configuration for [`TelemetryBus`].
 #[derive(Debug, Clone)]
@@ -278,7 +278,7 @@ impl Default for TelemetryBusConfig {
     }
 }
 
-// ─── Bus ─────────────────────────────────────────────────────────────────────
+//  Bus 
 
 /// Handle that lets external code publish ad-hoc circuit-state transitions.
 #[derive(Clone, Debug)]
@@ -391,7 +391,7 @@ impl TelemetryBus {
 
     /// Spawn the background sampling loop.
     ///
-    /// This method is idempotent — calling it multiple times spawns multiple
+    /// This method is idempotent  -  calling it multiple times spawns multiple
     /// loops (each with their own tick), so only call it once.
     pub fn start(&self) {
         let inner = self.inner.clone();
@@ -416,9 +416,9 @@ impl TelemetryBus {
                     }
                 }
 
-                // Broadcast (best-effort — no subscribers is fine)
+                // Broadcast (best-effort  -  no subscribers is fine)
                 if let Err(e) = inner.tx.send(snap) {
-                    // broadcast::SendError means no receivers — not an error
+                    // broadcast::SendError means no receivers  -  not an error
                     let _ = e; // suppress unused-variable warning
                     inner.publish_errors.fetch_add(1, Ordering::Relaxed);
                 }
@@ -481,14 +481,14 @@ impl TelemetryBus {
     /// This function never panics.
     pub fn set_external_pressure(&self, pressure: f64) {
         let clamped = pressure.clamp(0.0, 1.0);
-        // Store as fixed-point milli (0–1000) to avoid f64 atomics.
+        // Store as fixed-point milli (0 - 1000) to avoid f64 atomics.
         let milli = (clamped * 1000.0) as u64;
         self.inner
             .external_pressure_milli
             .store(milli, Ordering::Relaxed);
     }
 
-    /// Read the currently injected external pressure (0.0 – 1.0).
+    /// Read the currently injected external pressure (0.0  -  1.0).
     ///
     /// Returns `0.0` when no external signal has been set.
     pub fn external_pressure(&self) -> f64 {
@@ -496,7 +496,7 @@ impl TelemetryBus {
         milli as f64 / 1000.0
     }
 
-    // ── Internal ──────────────────────────────────────────────────────────
+    //  Internal 
 
     async fn collect(inner: &Arc<BusInner>) -> TelemetrySnapshot {
         let elapsed_secs = inner.started_at.elapsed().as_secs();
@@ -579,7 +579,7 @@ impl TelemetryBus {
     }
 }
 
-// ─── Latency helpers ─────────────────────────────────────────────────────────
+//  Latency helpers 
 
 /// Compute [`LatencyStats`] from a mutable slice of millisecond samples.
 ///
@@ -607,14 +607,14 @@ pub fn compute_latency_stats(samples: &mut [u64]) -> LatencyStats {
     }
 }
 
-// ─── Tests ───────────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::sync::atomic::AtomicUsize;
 
-    // ── Helpers ───────────────────────────────────────────────────────────
+    //  Helpers 
 
     fn make_bus() -> TelemetryBus {
         let counters = PipelineCounters::new();
@@ -648,7 +648,7 @@ mod tests {
         }
     }
 
-    // ── Unit tests ────────────────────────────────────────────────────────
+    //  Unit tests 
 
     #[test]
     fn test_pipeline_counters_cache_hit_rate_zero_with_no_lookups() {
@@ -921,7 +921,7 @@ mod tests {
         assert_eq!(l.sample_count, 0);
     }
 
-    // ── External pressure injection (HelixRouter integration) ─────────────
+    //  External pressure injection (HelixRouter integration) 
 
     #[test]
     fn test_external_pressure_default_is_zero() {

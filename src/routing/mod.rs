@@ -10,7 +10,7 @@
 //! - Deterministic: the same prompt text always produces the same complexity
 //!   score and initial routing decision.
 //! - Thread-safe: all state (`CostTracker`, adaptive threshold) uses atomics
-//!   or interior locking — safe under concurrent pipeline access.
+//!   or interior locking  -  safe under concurrent pipeline access.
 //! - Non-blocking: `route()` is a pure O(n) scan over the prompt with no
 //!   I/O, allocation-free hot path.
 //! - Bounded: adaptive threshold adjustment is clamped between

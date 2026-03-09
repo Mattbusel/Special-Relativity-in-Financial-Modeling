@@ -104,7 +104,7 @@ pub struct ModelRouter {
     config: RoutingConfig,
     cost_tracker: CostTracker,
 
-    /// Effective cloud threshold — may diverge from config when adaptive
+    /// Effective cloud threshold  -  may diverge from config when adaptive
     /// adjustment is active.
     effective_cloud_threshold: RwLock<f64>,
 
@@ -127,7 +127,7 @@ impl ModelRouter {
     ///
     /// # Arguments
     ///
-    /// * `config` — Routing thresholds, cost rates, and adaptive settings.
+    /// * `config`  -  Routing thresholds, cost rates, and adaptive settings.
     ///
     /// # Returns
     ///
@@ -157,7 +157,7 @@ impl ModelRouter {
     ///
     /// # Arguments
     ///
-    /// * `prompt` — The raw prompt text to analyse and route.
+    /// * `prompt`  -  The raw prompt text to analyse and route.
     ///
     /// # Returns
     ///
@@ -203,9 +203,9 @@ impl ModelRouter {
     ///
     /// # Arguments
     ///
-    /// * `decision` — The routing decision that was made.
-    /// * `success` — Whether the primary worker succeeded.
-    /// * `tokens` — Number of tokens processed (for cost tracking).
+    /// * `decision`  -  The routing decision that was made.
+    /// * `success`  -  Whether the primary worker succeeded.
+    /// * `tokens`  -  Number of tokens processed (for cost tracking).
     ///
     /// # Panics
     ///
@@ -264,7 +264,7 @@ impl ModelRouter {
         &self.scorer
     }
 
-    // ── Adaptive threshold adjustment ──────────────────────────────────
+    //  Adaptive threshold adjustment 
 
     /// Check whether the adaptive threshold should be adjusted.
     fn maybe_adapt(&self) {
@@ -297,7 +297,7 @@ impl ModelRouter {
     }
 }
 
-// ── Tests ──────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {

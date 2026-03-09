@@ -1,31 +1,31 @@
-//! # Coordination — programmatic agent fleet management
+//! # Coordination  -  programmatic agent fleet management
 //!
 //! ## Responsibility
 //! Provide a complete agent coordination layer: define tasks in TOML,
 //! spawn agent processes, let them claim work atomically via filesystem
-//! locks, and monitor fleet health — all without manual terminal pane
+//! locks, and monitor fleet health  -  all without manual terminal pane
 //! management.
 //!
 //! ## Architecture
 //!
 //! ```text
-//! tasks.toml ──► TaskQueue (file-locked claiming)
-//!                    │
-//!                    ├──► AgentWorker 0 ──► claude process
-//!                    ├──► AgentWorker 1 ──► claude process
-//!                    ├──► AgentWorker N ──► claude process
-//!                    │
+//! tasks.toml  TaskQueue (file-locked claiming)
+//!                    
+//!                     AgentWorker 0  claude process
+//!                     AgentWorker 1  claude process
+//!                     AgentWorker N  claude process
+//!                    
 //!               AgentMonitor (health checks, status)
 //! ```
 //!
 //! ## Modules
 //!
-//! - [`task`] — Task struct, TaskStatus, priority ordering
-//! - [`config`] — CoordinationConfig with defaults and validation
-//! - [`queue`] — TaskQueue with file-locked concurrent claiming
-//! - [`worker`] — AgentWorker: spawn claude process, capture output
-//! - [`spawner`] — AgentSpawner: spawn N agents, manage fleet lifecycle
-//! - [`monitor`] — AgentMonitor: health checks, fleet status snapshots
+//! - [`task`]  -  Task struct, TaskStatus, priority ordering
+//! - [`config`]  -  CoordinationConfig with defaults and validation
+//! - [`queue`]  -  TaskQueue with file-locked concurrent claiming
+//! - [`worker`]  -  AgentWorker: spawn claude process, capture output
+//! - [`spawner`]  -  AgentSpawner: spawn N agents, manage fleet lifecycle
+//! - [`monitor`]  -  AgentMonitor: health checks, fleet status snapshots
 //!
 //! ## Guarantees
 //!

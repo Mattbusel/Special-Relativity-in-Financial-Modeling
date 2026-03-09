@@ -548,7 +548,7 @@ mod tests {
         // Bump prompt-b hit_count by re-inserting
         dedup.insert("prompt-b", None).unwrap();
 
-        // Insert a third — should evict prompt-a (lower hit_count)
+        // Insert a third  -  should evict prompt-a (lower hit_count)
         let key_c = dedup.insert("prompt-c", None).unwrap();
 
         let guard = dedup.index.read().unwrap();
@@ -848,7 +848,7 @@ mod tests {
         dedup.insert("alpha", None).unwrap(); // hit_count = 2
         dedup.insert("gamma", None).unwrap(); // hit_count = 1
 
-        // Insert a 4th entry — should evict beta (hit_count = 0)
+        // Insert a 4th entry  -  should evict beta (hit_count = 0)
         dedup.insert("delta", None).unwrap();
 
         let guard = dedup.index.read().unwrap();

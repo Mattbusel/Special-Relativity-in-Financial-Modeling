@@ -1,5 +1,5 @@
 #![cfg(feature = "intelligence")]
-//! # IntelligenceBridge — Closed-Loop Self-Improvement Coordinator
+//! # IntelligenceBridge  -  Closed-Loop Self-Improvement Coordinator
 //!
 //! ## Responsibility
 //!
@@ -11,26 +11,26 @@
 //!
 //! ```text
 //! Request arrives
-//!   └─ notify_request(rps) ──────────────────────► Autoscaler.record_rps()
+//!    notify_request(rps)  Autoscaler.record_rps()
 //!
 //! Routing decision needed
-//!   └─ advise_model(prompt, category) ──────────► LearnedRouter.select_model()
+//!    advise_model(prompt, category)  LearnedRouter.select_model()
 //!                                                  (epsilon-greedy bandit)
 //!
 //! Inference completes
-//!   └─ notify_completion(model, cat, prompt,
+//!    notify_completion(model, cat, prompt,
 //!                        response, latency, ok)
-//!       ├─ QualityEstimator.estimate() ──────────► quality score (0.0–1.0)
-//!       ├─ FeedbackCollector.record() ───────────► bounded feedback history
-//!       └─ LearnedRouter.record_outcome() ──────► bandit arm update
+//!        QualityEstimator.estimate()  quality score (0.0 - 1.0)
+//!        FeedbackCollector.record()  bounded feedback history
+//!        LearnedRouter.record_outcome()  bandit arm update
 //!
 //! Autoscale query
-//!   └─ autoscale_recommendation() ─────────────► Autoscaler.forecast()
+//!    autoscale_recommendation()  Autoscaler.forecast()
 //! ```
 //!
 //! ## Guarantees
 //!
-//! - **Thread-safe**: all state via `Arc<_>` — clone is cheap and correct.
+//! - **Thread-safe**: all state via `Arc<_>`  -  clone is cheap and correct.
 //! - **Non-panicking**: all fallible calls return `Result` or `Option`.
 //! - **Zero-cost when absent**: the bridge is `Option<Arc<IntelligenceBridge>>`
 //!   in callers; no overhead when the `intelligence` feature is disabled.
@@ -106,7 +106,7 @@ impl Default for BridgeConfig {
 /// Closed-loop intelligence coordinator.
 ///
 /// Holds all intelligence subsystems and exposes a unified API that the
-/// pipeline stages call. Cheap to clone — all internal state is `Arc`-wrapped.
+/// pipeline stages call. Cheap to clone  -  all internal state is `Arc`-wrapped.
 #[derive(Debug, Clone)]
 pub struct IntelligenceBridge {
     /// Epsilon-greedy bandit that learns which model wins per request category.
@@ -129,7 +129,7 @@ impl IntelligenceBridge {
     ///
     /// # Arguments
     ///
-    /// * `config` — Combined configuration for all subsystems.
+    /// * `config`  -  Combined configuration for all subsystems.
     ///
     /// # Panics
     ///
@@ -169,7 +169,7 @@ impl IntelligenceBridge {
     ///
     /// # Arguments
     ///
-    /// * `routing_config` — Thresholds and cost rates for the complexity router.
+    /// * `routing_config`  -  Thresholds and cost rates for the complexity router.
     ///
     /// # Panics
     ///
@@ -190,7 +190,7 @@ impl IntelligenceBridge {
     ///
     /// # Arguments
     ///
-    /// * `prompt` — The assembled prompt text.
+    /// * `prompt`  -  The assembled prompt text.
     ///
     /// # Returns
     ///
@@ -224,13 +224,13 @@ impl IntelligenceBridge {
     ///
     /// # Arguments
     ///
-    /// * `model` — Model identifier (e.g. `"claude-3-sonnet"`, `"llama-3-8b"`).
+    /// * `model`  -  Model identifier (e.g. `"claude-3-sonnet"`, `"llama-3-8b"`).
     ///
     /// # Panics
     ///
     /// This function never panics.
     pub fn register_model(&self, model: &str) {
-        // Log but don't propagate lock-poison errors — the bridge degrades
+        // Log but don't propagate lock-poison errors  -  the bridge degrades
         // gracefully to pass-through when the router is unavailable.
         if let Err(e) = self.learned_router.register_model(model) {
             tracing::warn!(model, error = %e, "bridge: register_model failed");
@@ -244,7 +244,7 @@ impl IntelligenceBridge {
     ///
     /// # Arguments
     ///
-    /// * `rps` — Current observed requests-per-second (may be approximate).
+    /// * `rps`  -  Current observed requests-per-second (may be approximate).
     ///
     /// # Panics
     ///
@@ -256,12 +256,12 @@ impl IntelligenceBridge {
     /// Ask the learned router which model to use for a request.
     ///
     /// Returns `None` if no models are registered or the router lock is
-    /// poisoned — callers should fall back to their default selection.
+    /// poisoned  -  callers should fall back to their default selection.
     ///
     /// # Arguments
     ///
-    /// * `prompt` — The prompt text (used only for token-estimate heuristic).
-    /// * `category` — Logical category (e.g. `"code"`, `"chat"`, `"local"`,
+    /// * `prompt`  -  The prompt text (used only for token-estimate heuristic).
+    /// * `category`  -  Logical category (e.g. `"code"`, `"chat"`, `"local"`,
     ///   `"cloud"`).
     ///
     /// # Panics
@@ -284,12 +284,12 @@ impl IntelligenceBridge {
     ///
     /// # Arguments
     ///
-    /// * `model` — The model that served this request.
-    /// * `category` — The routing category used during selection.
-    /// * `prompt` — The assembled prompt text (used for quality estimation).
-    /// * `response` — The model's response text.
-    /// * `latency_ms` — Observed end-to-end inference latency.
-    /// * `success` — Whether the inference call succeeded without error.
+    /// * `model`  -  The model that served this request.
+    /// * `category`  -  The routing category used during selection.
+    /// * `prompt`  -  The assembled prompt text (used for quality estimation).
+    /// * `response`  -  The model's response text.
+    /// * `latency_ms`  -  Observed end-to-end inference latency.
+    /// * `success`  -  Whether the inference call succeeded without error.
     ///
     /// # Panics
     ///
@@ -389,7 +389,7 @@ impl IntelligenceBridge {
     /// Return the best-known model for a given category, or `None` if no
     /// data exists yet.
     ///
-    /// Unlike `advise_model`, this never explores — it always returns the
+    /// Unlike `advise_model`, this never explores  -  it always returns the
     /// current exploitation choice. Useful for monitoring dashboards.
     ///
     /// # Panics
@@ -415,7 +415,7 @@ fn estimate_tokens(prompt: &str) -> u64 {
     ((words as f64) * 1.3) as u64
 }
 
-/// Heuristic complexity on 0.0–1.0 scale based on structural signals.
+/// Heuristic complexity on 0.0 - 1.0 scale based on structural signals.
 fn estimate_complexity(prompt: &str) -> f64 {
     let len_score = (prompt.len() as f64 / 2000.0).min(1.0) * 0.3;
     let code_score = if prompt.contains("```") { 0.3 } else { 0.0 };
@@ -436,7 +436,7 @@ mod tests {
         IntelligenceBridge::with_defaults()
     }
 
-    // ── construction ────────────────────────────────────────────────────
+    //  construction 
 
     #[test]
     fn test_bridge_with_defaults_constructs() {
@@ -463,7 +463,7 @@ mod tests {
         assert_eq!(clone.learned_router.model_count(), 1);
     }
 
-    // ── register_model ───────────────────────────────────────────────────
+    //  register_model 
 
     #[test]
     fn test_register_model_once() {
@@ -489,7 +489,7 @@ mod tests {
         assert_eq!(bridge.learned_router.model_count(), 3);
     }
 
-    // ── notify_request ───────────────────────────────────────────────────
+    //  notify_request 
 
     #[test]
     fn test_notify_request_records_rps() {
@@ -515,7 +515,7 @@ mod tests {
         assert_eq!(bridge.autoscaler.current_avg_rps(), 0.0);
     }
 
-    // ── advise_model ─────────────────────────────────────────────────────
+    //  advise_model 
 
     #[test]
     fn test_advise_model_no_models_returns_none() {
@@ -576,7 +576,7 @@ mod tests {
         );
     }
 
-    // ── notify_completion ────────────────────────────────────────────────
+    //  notify_completion 
 
     #[test]
     fn test_notify_completion_success_increments_feedback() {
@@ -637,7 +637,7 @@ mod tests {
     #[test]
     fn test_notify_completion_unregistered_model_does_not_panic() {
         let bridge = make_bridge();
-        // Model not registered — should degrade gracefully
+        // Model not registered  -  should degrade gracefully
         bridge.notify_completion(
             "unknown-model",
             "chat",
@@ -672,7 +672,7 @@ mod tests {
         assert!(fast_score.successes >= 10);
     }
 
-    // ── autoscale_recommendation ─────────────────────────────────────────
+    //  autoscale_recommendation 
 
     #[test]
     fn test_autoscale_recommendation_none_without_history() {
@@ -710,7 +710,7 @@ mod tests {
         assert!(rec.confidence >= 0.0 && rec.confidence <= 1.0);
     }
 
-    // ── best_model_for_category ──────────────────────────────────────────
+    //  best_model_for_category 
 
     #[test]
     fn test_best_model_unknown_category_returns_none() {
@@ -734,7 +734,7 @@ mod tests {
         assert_eq!(best, Some("winner".to_string()));
     }
 
-    // ── average_feedback_score ───────────────────────────────────────────
+    //  average_feedback_score 
 
     #[test]
     fn test_average_feedback_score_empty_is_zero() {
@@ -752,7 +752,7 @@ mod tests {
         assert!(avg > 0.0);
     }
 
-    // ── estimate helpers ─────────────────────────────────────────────────
+    //  estimate helpers 
 
     #[test]
     fn test_estimate_tokens_empty_prompt() {
@@ -797,7 +797,7 @@ mod tests {
         assert!(score >= 0.0);
     }
 
-    // ── feedback_count ───────────────────────────────────────────────────
+    //  feedback_count 
 
     #[test]
     fn test_feedback_count_zero_initially() {
@@ -834,7 +834,7 @@ mod tests {
         assert!(bridge.feedback_count() <= 5);
     }
 
-    // ── route_prompt / model_router ─────────────────────────────────────
+    //  route_prompt / model_router 
 
     #[test]
     fn test_route_prompt_without_model_router_short_is_local() {

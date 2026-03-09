@@ -6,9 +6,9 @@
 //! frontend with no external build step.
 //!
 //! ## Guarantees
-//! - No panics — all errors are returned as HTTP error responses
+//! - No panics  -  all errors are returned as HTTP error responses
 //! - SSE stream emits every 500ms for real-time feel
-//! - Single HTML file served inline — no static file dependencies at runtime
+//! - Single HTML file served inline  -  no static file dependencies at runtime
 //! - Graceful shutdown on SIGINT / SIGTERM
 //!
 //! ## NOT Responsible For
@@ -39,12 +39,12 @@ use tokio_prompt_orchestrator::{
 use tower_http::cors::{Any, CorsLayer};
 use tracing::info;
 
-// ── Dashboard HTML ───────────────────────────────────────────────────────────
+//  Dashboard HTML 
 
 /// Inline dashboard HTML, compiled into the binary at build time.
 const DASHBOARD_HTML: &str = include_str!("../../static/index.html");
 
-// ── Shared application state ─────────────────────────────────────────────────
+//  Shared application state 
 
 /// Shared state accessible from all route handlers.
 ///
@@ -53,7 +53,7 @@ const DASHBOARD_HTML: &str = include_str!("../../static/index.html");
 /// is not started and all data comes from the mock story state instead.
 #[derive(Clone)]
 pub struct DashboardState {
-    /// Sender side of the pipeline input channel — kept alive to prevent
+    /// Sender side of the pipeline input channel  -  kept alive to prevent
     /// pipeline shutdown; also used by future request-submission routes.
     /// `None` in mock mode where no real pipeline is running.
     #[allow(dead_code)]
@@ -70,7 +70,7 @@ pub struct DashboardState {
     mock_state: Option<Arc<Mutex<MockDashboardState>>>,
 }
 
-// ── SSE event payload ────────────────────────────────────────────────────────
+//  SSE event payload 
 
 /// Event payload pushed to SSE clients every 500ms.
 #[derive(Debug, Clone, Serialize)]
@@ -81,7 +81,7 @@ pub struct DashboardEvent {
     pub requests_total: u64,
     /// Total requests that were deduplicated (cache hits).
     pub requests_deduped: u64,
-    /// Deduplication hit rate as a percentage (0.0–100.0).
+    /// Deduplication hit rate as a percentage (0.0 - 100.0).
     pub dedup_rate: f32,
     /// Estimated USD saved through deduplication.
     pub cost_saved_usd: f64,
@@ -118,7 +118,7 @@ pub struct CircuitBreakerState {
     pub failures: usize,
     /// Total successes in the current tracking window.
     pub successes: usize,
-    /// Computed success rate (0.0–1.0).
+    /// Computed success rate (0.0 - 1.0).
     pub success_rate: f64,
 }
 
@@ -142,7 +142,7 @@ pub struct StageTiming {
 pub struct ModelRoutingStats {
     /// Name of the primary worker (kept for backwards compatibility).
     pub primary_model: String,
-    /// Percentage of requests routed to the primary model (0.0–100.0).
+    /// Percentage of requests routed to the primary model (0.0 - 100.0).
     pub primary_pct: f32,
     /// Percentage of requests using the fallback (echo) model.
     pub fallback_pct: f32,
@@ -155,7 +155,7 @@ pub struct ModelRoutingStats {
 pub struct ModelRoutingEntry {
     /// Model name (e.g., `"Mistral"`, `"Claude"`, `"OpenAI"`).
     pub name: String,
-    /// Percentage of requests routed to this model (0.0–100.0).
+    /// Percentage of requests routed to this model (0.0 - 100.0).
     pub pct: f32,
     /// CSS color variable name for the donut arc (e.g., `"var(--accent)"`).
     pub color: String,
@@ -202,7 +202,7 @@ pub struct StageCountMap {
     pub stream: u64,
 }
 
-// ── Mock dashboard state ────────────────────────────────────────────────────
+//  Mock dashboard state 
 
 /// Story cycle length in ticks. The mock story loops every 120 ticks (seconds).
 const STORY_CYCLE_TICKS: u64 = 120;
@@ -218,12 +218,12 @@ const MOCK_COST_PER_INFERENCE: f64 = 0.012;
 /// ## Story Phases
 /// | Phase     | Ticks   | Behavior                                          |
 /// |-----------|---------|---------------------------------------------------|
-/// | Warmup    |  0 – 29 | Low traffic, all CBs closed                       |
-/// | Load      | 30 – 44 | Rising throughput, channels filling                |
-/// | Failure   | 45 – 59 | llama.cpp CB opens, latency spikes                |
-/// | HalfOpen  | 60 – 74 | Probe requests, improving                         |
-/// | Recovery  | 75 – 89 | CB closes, recovery logs                          |
-/// | Steady    | 90 –119 | Nominal, high dedup                               |
+/// | Warmup    |  0  -  29 | Low traffic, all CBs closed                       |
+/// | Load      | 30  -  44 | Rising throughput, channels filling                |
+/// | Failure   | 45  -  59 | llama.cpp CB opens, latency spikes                |
+/// | HalfOpen  | 60  -  74 | Probe requests, improving                         |
+/// | Recovery  | 75  -  89 | CB closes, recovery logs                          |
+/// | Steady    | 90  - 119 | Nominal, high dedup                               |
 #[derive(Debug)]
 pub struct MockDashboardState {
     /// Monotonic tick counter.
@@ -824,7 +824,7 @@ impl MockDashboardState {
     }
 }
 
-// ── Snapshot builder ─────────────────────────────────────────────────────────
+//  Snapshot builder 
 
 /// Build a [`DashboardEvent`] from the current system state.
 ///
@@ -894,7 +894,7 @@ pub async fn build_snapshot(state: &DashboardState) -> DashboardEvent {
         success_rate: cb_stats.success_rate,
     }];
 
-    // Stage latencies from histogram — use sum / count as approximation
+    // Stage latencies from histogram  -  use sum / count as approximation
     let stage_latency_ms = |stage: &str| -> f64 {
         let families = metrics::gather();
         for family in &families {
@@ -971,9 +971,9 @@ pub async fn build_snapshot(state: &DashboardState) -> DashboardEvent {
     }
 }
 
-// ── Route handlers ───────────────────────────────────────────────────────────
+//  Route handlers 
 
-/// `GET /` — serve the dashboard HTML page.
+/// `GET /`  -  serve the dashboard HTML page.
 ///
 /// # Panics
 ///
@@ -982,7 +982,7 @@ async fn index_handler() -> Html<&'static str> {
     Html(DASHBOARD_HTML)
 }
 
-/// `GET /api/stats` — one-shot JSON snapshot of current dashboard state.
+/// `GET /api/stats`  -  one-shot JSON snapshot of current dashboard state.
 ///
 /// # Panics
 ///
@@ -1005,7 +1005,7 @@ async fn stats_handler(State(state): State<Arc<DashboardState>>) -> Response {
     }
 }
 
-/// `GET /api/status` — SSE stream emitting [`DashboardEvent`] every 500ms.
+/// `GET /api/status`  -  SSE stream emitting [`DashboardEvent`] every 500ms.
 ///
 /// # Panics
 ///
@@ -1027,7 +1027,7 @@ async fn sse_handler(
     Sse::new(stream).keep_alive(KeepAlive::default())
 }
 
-// ── Router construction ──────────────────────────────────────────────────────
+//  Router construction 
 
 /// Build the Axum [`Router`] with all dashboard routes.
 ///
@@ -1048,14 +1048,14 @@ pub fn build_router(state: Arc<DashboardState>) -> Router {
         .with_state(state)
 }
 
-// ── Server bootstrap ─────────────────────────────────────────────────────────
+//  Server bootstrap 
 
 /// Start the dashboard HTTP server.
 ///
 /// # Arguments
 ///
-/// * `addr` — Socket address to bind, e.g. `"0.0.0.0:3000"`.
-/// * `state` — Shared dashboard state.
+/// * `addr`  -  Socket address to bind, e.g. `"0.0.0.0:3000"`.
+/// * `state`  -  Shared dashboard state.
 ///
 /// # Errors
 ///
@@ -1083,7 +1083,7 @@ pub async fn start_dashboard(
     Ok(())
 }
 
-// ── Worker factory ───────────────────────────────────────────────────────────
+//  Worker factory 
 
 /// Create a [`ModelWorker`] from a CLI name string.
 ///
@@ -1147,7 +1147,7 @@ pub fn parse_mock_arg() -> bool {
     std::env::args().any(|arg| arg == "--mock")
 }
 
-// ── Main entry point ─────────────────────────────────────────────────────────
+//  Main entry point 
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
@@ -1164,7 +1164,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let mock_mode = parse_mock_arg();
 
     if mock_mode {
-        info!("Starting in MOCK mode — no pipeline, scripted 2-minute story");
+        info!("Starting in MOCK mode  -  no pipeline, scripted 2-minute story");
 
         let mock = Arc::new(Mutex::new(MockDashboardState::new()));
 
@@ -1221,7 +1221,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     Ok(())
 }
 
-// ── Tests ────────────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {
@@ -1313,7 +1313,7 @@ mod tests {
         }
     }
 
-    // ── DashboardEvent serialization tests ───────────────────────────────
+    //  DashboardEvent serialization tests 
 
     #[test]
     fn test_dashboard_event_serializes_to_json() {
@@ -1405,7 +1405,7 @@ mod tests {
         assert!(json.contains("\"rag\":10"));
     }
 
-    // ── Worker factory tests ─────────────────────────────────────────────
+    //  Worker factory tests 
 
     #[test]
     fn test_create_worker_echo_succeeds() {
@@ -1431,7 +1431,7 @@ mod tests {
         }
     }
 
-    // ── CLI argument parsing tests ───────────────────────────────────────
+    //  CLI argument parsing tests 
 
     #[test]
     fn test_parse_worker_arg_defaults_to_echo() {
@@ -1448,7 +1448,7 @@ mod tests {
         assert!(port > 0);
     }
 
-    // ── Route handler tests ──────────────────────────────────────────────
+    //  Route handler tests 
 
     #[tokio::test]
     async fn test_index_handler_returns_html() {
@@ -1616,7 +1616,7 @@ mod tests {
         );
     }
 
-    // ── Snapshot builder tests ───────────────────────────────────────────
+    //  Snapshot builder tests 
 
     #[tokio::test]
     async fn test_build_snapshot_returns_valid_event() {
@@ -1700,7 +1700,7 @@ mod tests {
         assert!(parsed.is_ok(), "serialized JSON must parse back");
     }
 
-    // ── Router construction tests ────────────────────────────────────────
+    //  Router construction tests 
 
     #[tokio::test]
     async fn test_build_router_does_not_panic() {
@@ -1708,7 +1708,7 @@ mod tests {
         let _router = build_router(state);
     }
 
-    // ── DashboardState clone tests ───────────────────────────────────────
+    //  DashboardState clone tests 
 
     #[tokio::test]
     async fn test_dashboard_state_is_cloneable() {
@@ -1717,7 +1717,7 @@ mod tests {
         assert_eq!(inner.worker_name, "echo");
     }
 
-    // ── Post method tests ────────────────────────────────────────────────
+    //  Post method tests 
 
     #[tokio::test]
     async fn test_post_to_index_returns_method_not_allowed() {
@@ -1782,7 +1782,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::METHOD_NOT_ALLOWED);
     }
 
-    // ── Dashboard HTML content tests ─────────────────────────────────────
+    //  Dashboard HTML content tests 
 
     #[test]
     fn test_dashboard_html_is_not_empty() {
@@ -1816,7 +1816,7 @@ mod tests {
         );
     }
 
-    // ── Dedup rate calculation tests ─────────────────────────────────────
+    //  Dedup rate calculation tests 
 
     #[test]
     fn test_dedup_rate_zero_when_no_requests() {
@@ -1857,7 +1857,7 @@ mod tests {
         assert!((rps - 5.0).abs() < 0.01);
     }
 
-    // ── Circuit breaker status string conversion tests ───────────────────
+    //  Circuit breaker status string conversion tests 
 
     #[test]
     fn test_circuit_status_closed_to_string() {
@@ -1892,7 +1892,7 @@ mod tests {
         assert_eq!(s, "half_open");
     }
 
-    // ── New struct serialization tests ───────────────────────────────────
+    //  New struct serialization tests 
 
     #[test]
     fn test_model_routing_entry_serializes() {
@@ -1991,7 +1991,7 @@ mod tests {
         assert!(s.contains("active_stages"));
     }
 
-    // ── CLI mock arg test ───────────────────────────────────────────────
+    //  CLI mock arg test 
 
     #[test]
     fn test_parse_mock_arg_returns_bool() {
@@ -1999,7 +1999,7 @@ mod tests {
         // Must not panic
     }
 
-    // ── MockDashboardState tests ────────────────────────────────────────
+    //  MockDashboardState tests 
 
     #[test]
     fn test_mock_state_new_initial_values() {
@@ -2341,7 +2341,7 @@ mod tests {
         assert!(mock.requests_total > mock.inferences_total);
     }
 
-    // ── MockDashboardState build_event tests ────────────────────────────
+    //  MockDashboardState build_event tests 
 
     #[test]
     fn test_mock_build_event_serializes() {
@@ -2420,7 +2420,7 @@ mod tests {
         }
     }
 
-    // ── Mock mode snapshot tests ─────────────────────────────────────────
+    //  Mock mode snapshot tests 
 
     #[tokio::test]
     async fn test_build_snapshot_mock_mode_returns_mock_data() {
@@ -2505,7 +2505,7 @@ mod tests {
         assert!(text.contains("models"));
     }
 
-    // ── Live mode new field tests ────────────────────────────────────────
+    //  Live mode new field tests 
 
     #[tokio::test]
     async fn test_build_snapshot_live_mode_has_empty_recent_requests() {

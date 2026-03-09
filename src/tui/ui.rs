@@ -207,7 +207,7 @@ fn draw_help_overlay(f: &mut Frame, area: Rect) {
         )),
         Line::from(""),
         Line::from(Span::styled(
-            "  ──────────────────────────────────────",
+            "  ",
             Style::default().fg(Color::DarkGray),
         )),
         Line::from(Span::styled(

@@ -21,7 +21,7 @@
 //! |                    | the orchestrator is already throttling).          |
 //! | pressure ≤ 0.3     | Relax: restore `spawn_threshold` and              |
 //! |                    | `cpu_p95_budget_ms` toward their defaults.        |
-//! | 0.3 < pressure < 0.7 | No push — hysteresis band avoids thrashing.    |
+//! | 0.3 < pressure < 0.7 | No push  -  hysteresis band avoids thrashing.    |
 //!
 //! ## Guarantees
 //!
@@ -41,7 +41,7 @@ use std::time::Duration;
 use serde::Serialize;
 use tracing::{debug, info};
 
-// ── Wire-format patch ──────────────────────────────────────────────────────────
+//  Wire-format patch 
 
 /// Sparse config patch for HelixRouter's `PATCH /api/config`.
 ///
@@ -60,7 +60,7 @@ impl PressurePatch {
     }
 }
 
-// ── Pressure tier ─────────────────────────────────────────────────────────────
+//  Pressure tier 
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum PressureTier {
@@ -69,7 +69,7 @@ enum PressureTier {
     Low,    // ≤ low_threshold: relax HelixRouter
 }
 
-// ── Configuration ─────────────────────────────────────────────────────────────
+//  Configuration 
 
 /// Configuration for [`HelixFeedbackPusher`].
 #[derive(Debug, Clone)]
@@ -105,7 +105,7 @@ impl Default for HelixFeedbackConfig {
     }
 }
 
-// ── Pusher ────────────────────────────────────────────────────────────────────
+//  Pusher 
 
 /// Per-tick pressure-driven config pusher.
 ///
@@ -159,7 +159,7 @@ impl HelixFeedbackPusher {
 
         let patch = match tier {
             PressureTier::Normal => {
-                // Tier changed to Normal but we don't push anything — just reset tracking.
+                // Tier changed to Normal but we don't push anything  -  just reset tracking.
                 debug!(pressure, "helix_feedback: pressure normal, no patch");
                 return Ok(());
             }
@@ -238,7 +238,7 @@ impl HelixFeedbackPusher {
     }
 }
 
-// ─── Tests ────────────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {
@@ -248,7 +248,7 @@ mod tests {
         HelixFeedbackPusher::new(HelixFeedbackConfig::default())
     }
 
-    // ── Config ────────────────────────────────────────────────────────────
+    //  Config 
 
     #[test]
     fn config_default_thresholds() {
@@ -279,7 +279,7 @@ mod tests {
         assert_eq!(cfg.base_url, "http://127.0.0.1:8080");
     }
 
-    // ── PressureTier classification ───────────────────────────────────────
+    //  PressureTier classification 
 
     #[test]
     fn classify_high_threshold() {
@@ -306,7 +306,7 @@ mod tests {
         assert_eq!(p.classify(0.31), PressureTier::Normal);
     }
 
-    // ── Patch construction ────────────────────────────────────────────────
+    //  Patch construction 
 
     #[test]
     fn tighten_patch_reduces_spawn_threshold() {
@@ -354,11 +354,11 @@ mod tests {
         assert!(PressurePatch::default().is_empty());
     }
 
-    // ── Tighten patch spawn_threshold clamping ────────────────────────────
+    //  Tighten patch spawn_threshold clamping 
 
     #[test]
     fn tighten_clamps_very_low_baseline() {
-        // With a tiny baseline, 90% could go below 10_000 — must clamp.
+        // With a tiny baseline, 90% could go below 10_000  -  must clamp.
         let mut cfg = HelixFeedbackConfig::default();
         cfg.baseline_spawn_threshold = 5_000;
         let p = HelixFeedbackPusher::new(cfg);
@@ -377,7 +377,7 @@ mod tests {
         assert!(t <= 500_000, "must not exceed 500_000: {t}");
     }
 
-    // ── Hysteresis / idempotency ──────────────────────────────────────────
+    //  Hysteresis / idempotency 
 
     #[tokio::test]
     async fn maybe_push_same_tier_twice_skips_second_push() {
@@ -411,7 +411,7 @@ mod tests {
         assert!(result.is_ok(), "normal pressure should return Ok without HTTP: {result:?}");
     }
 
-    // ── Patch serialisation ───────────────────────────────────────────────
+    //  Patch serialisation 
 
     #[test]
     fn pressure_patch_serialises_both_fields() {
@@ -430,7 +430,7 @@ mod tests {
         assert!(!json.contains("cpu_p95_budget_ms"), "None field must be absent: {json}");
     }
 
-    // ── Mock-HTTP integration tests ───────────────────────────────────────
+    //  Mock-HTTP integration tests 
 
     async fn bind_mock_server() -> (u16, tokio::net::TcpListener) {
         let listener = tokio::net::TcpListener::bind("127.0.0.1:0")

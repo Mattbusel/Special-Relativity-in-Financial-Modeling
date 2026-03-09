@@ -24,12 +24,12 @@ const STORY_CYCLE_SECS: u64 = 120;
 /// ## Story Phases
 /// | Phase     | Ticks   | What happens                                      |
 /// |-----------|---------|---------------------------------------------------|
-/// | Warmup    |  0 – 29 | Low traffic, all circuits closed, low latencies    |
-/// | Load      | 30 – 44 | Channels fill, throughput rises                    |
-/// | Failure   | 45 – 59 | llama.cpp opens, INFER spikes, error logs          |
-/// | HalfOpen  | 60 – 74 | Probe requests, latencies improving                |
-/// | Recovery  | 75 – 89 | Circuit closes, recovery logs                      |
-/// | Steady    | 90 –119 | Nominal metrics, dedup climbing, smooth operation  |
+/// | Warmup    |  0  -  29 | Low traffic, all circuits closed, low latencies    |
+/// | Load      | 30  -  44 | Channels fill, throughput rises                    |
+/// | Failure   | 45  -  59 | llama.cpp opens, INFER spikes, error logs          |
+/// | HalfOpen  | 60  -  74 | Probe requests, latencies improving                |
+/// | Recovery  | 75  -  89 | Circuit closes, recovery logs                      |
+/// | Steady    | 90  - 119 | Nominal metrics, dedup climbing, smooth operation  |
 #[derive(Debug)]
 pub struct MockMetrics {
     /// Base throughput for organic load pattern.

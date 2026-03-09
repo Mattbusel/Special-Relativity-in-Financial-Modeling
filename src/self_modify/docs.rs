@@ -18,7 +18,7 @@ use std::{
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-// ─── Error ────────────────────────────────────────────────────────────────────
+//  Error 
 
 /// Errors from the documentation generator.
 #[derive(Debug, Error)]
@@ -32,7 +32,7 @@ pub enum DocsError {
     Io(String),
 }
 
-// ─── Document types ───────────────────────────────────────────────────────────
+//  Document types 
 
 /// A metric value before and after a modification.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -106,12 +106,12 @@ impl ChangelogEntry {
     pub fn to_markdown(&self) -> String {
         let ts = self.timestamp_secs;
         let kept_str = if self.kept {
-            "✅ Deployed"
+            " Deployed"
         } else {
-            "🔄 Rolled back"
+            " Rolled back"
         };
         let mut md = format!(
-            "## [{title}](#{id}) — {kept}\n\n\
+            "## [{title}](#{id})  -  {kept}\n\n\
              - **ID**: `{id}`\n\
              - **When**: Unix timestamp `{ts}`\n\
              - **By**: {by}\n\
@@ -136,9 +136,9 @@ impl ChangelogEntry {
             md.push_str("|--------|--------|-------|-------|--------|\n");
             for d in &self.metric_deltas {
                 let result = if d.is_improvement() {
-                    "✅ Improved"
+                    " Improved"
                 } else {
-                    "⚠️ Degraded"
+                    " Degraded"
                 };
                 md.push_str(&format!(
                     "| {} | {:.3} | {:.3} | {:+.3} ({:+.1}%) | {} |\n",
@@ -220,7 +220,7 @@ impl DependencyImpact {
     /// Render as markdown.
     pub fn to_markdown(&self) -> String {
         let api_warning = if self.touches_public_api {
-            "⚠️ **This change touches public API surface — review carefully.**\n\n"
+            " **This change touches public API surface  -  review carefully.**\n\n"
         } else {
             ""
         };
@@ -260,7 +260,7 @@ fn collect_dependents(
     }
 }
 
-// ─── Documentation generator ─────────────────────────────────────────────────
+//  Documentation generator 
 
 struct DocsInner {
     changelog: Vec<ChangelogEntry>,
@@ -397,7 +397,7 @@ fn unix_now() -> u64 {
         .unwrap_or(0)
 }
 
-// ─── Tests ────────────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {

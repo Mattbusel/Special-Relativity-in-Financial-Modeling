@@ -7,22 +7,22 @@
 //!
 //! ```text
 //!   TelemetryBus
-//!       │  subscribe()
-//!       ▼
-//!   AnomalyDetector  ──── critical anomalies ──► TuningController
-//!       │                                               │  process(snap)
-//!       │ anomalies                                     │  tuning adjustments
-//!       ▼                                               ▼
-//!   MetaTaskGenerator ◄─────────────────────── SnapshotStore
-//!       │  process_snapshot()                  create_snapshot()
-//!       │  generated tasks
-//!       ▼
+//!         subscribe()
+//!       
+//!   AnomalyDetector   critical anomalies  TuningController
+//!                                                        process(snap)
+//!        anomalies                                       tuning adjustments
+//!                                                      
+//!   MetaTaskGenerator  SnapshotStore
+//!         process_snapshot()                  create_snapshot()
+//!         generated tasks
+//!       
 //!   ValidationGate
-//!       │  evaluate()
-//!       ▼
+//!         evaluate()
+//!       
 //!   AgentMemory
-//!       │  insert_modification()
-//!       └── loop status / metrics
+//!         insert_modification()
+//!        loop status / metrics
 //! ```
 //!
 //! ## Usage
@@ -172,7 +172,7 @@ pub struct LoopStatus {
 }
 
 // ---------------------------------------------------------------------------
-// SelfImprovementLoop — internal state
+// SelfImprovementLoop  -  internal state
 // ---------------------------------------------------------------------------
 
 struct Inner {
@@ -390,7 +390,7 @@ impl SelfImprovementLoop {
             .fetch_add(1, Ordering::Relaxed);
         debug!("Processing telemetry snapshot #{snap_id}");
 
-        // ── 1. Anomaly detection ─────────────────────────────────────────
+        //  1. Anomaly detection 
         let anomalies = self.run_anomaly_detection(&snap)?;
         let critical_count = anomalies
             .iter()
@@ -406,7 +406,7 @@ impl SelfImprovementLoop {
             );
         }
 
-        // ── 2. PID tuning controller ─────────────────────────────────────
+        //  2. PID tuning controller 
         let adjustments = self.run_tuning_controller(&snap);
         if !adjustments.is_empty() {
             self.inner
@@ -418,10 +418,10 @@ impl SelfImprovementLoop {
             );
         }
 
-        // ── 3. Snapshot store — record current config ────────────────────
+        //  3. Snapshot store  -  record current config 
         self.record_config_snapshot(&snap, &adjustments)?;
 
-        // ── 4. Task generation ───────────────────────────────────────────
+        //  4. Task generation 
         // Only generate tasks when anomaly severity meets the threshold.
         let should_generate = anomalies
             .iter()
@@ -441,7 +441,7 @@ impl SelfImprovementLoop {
                     .fetch_add(generated.len() as u64, Ordering::Relaxed);
                 info!("Snapshot #{snap_id}: {} tasks generated", generated.len());
 
-                // ── 5. Validate each task through the gate ────────────────
+                //  5. Validate each task through the gate 
                 for task in &generated {
                     self.run_gate_and_record(task, snap_id).await;
                 }
@@ -663,7 +663,7 @@ mod tests {
         SelfImprovementLoop::new(cfg, bus)
     }
 
-    // ── status ──────────────────────────────────────────────────────────────
+    //  status 
 
     #[test]
     fn test_status_initial_state_all_zeros() {
@@ -677,7 +677,7 @@ mod tests {
         assert!(!s.running);
     }
 
-    // ── snapshot_to_metrics ──────────────────────────────────────────────────
+    //  snapshot_to_metrics 
 
     #[test]
     fn test_snapshot_to_metrics_includes_error_rate() {
@@ -703,7 +703,7 @@ mod tests {
         assert!(m.contains_key("dedup.error_rate"));
     }
 
-    // ── severity helpers ─────────────────────────────────────────────────────
+    //  severity helpers 
 
     #[test]
     fn test_severity_gte_critical_ge_warn() {
@@ -720,7 +720,7 @@ mod tests {
         assert!(severity_gte(&Severity::Warning, &Severity::Warning));
     }
 
-    // ── LoopConfig defaults ──────────────────────────────────────────────────
+    //  LoopConfig defaults 
 
     #[test]
     fn test_loop_config_defaults_sane() {
@@ -731,7 +731,7 @@ mod tests {
         assert!(cfg.target_throughput_rps > 0.0);
     }
 
-    // ── run + shutdown ───────────────────────────────────────────────────────
+    //  run + shutdown 
 
     #[tokio::test]
     async fn test_run_stops_on_shutdown_signal() {
@@ -753,7 +753,7 @@ mod tests {
         assert!(!sil.inner.running.load(Ordering::Relaxed));
     }
 
-    // ── process_snapshot counter increments ──────────────────────────────────
+    //  process_snapshot counter increments 
 
     #[tokio::test]
     async fn test_process_snapshot_increments_counter() {
@@ -773,12 +773,12 @@ mod tests {
         assert!(sil.snapshots.version_count() >= 1);
     }
 
-    // ── gate counters ────────────────────────────────────────────────────────
+    //  gate counters 
     // NOTE: test_run_gate_increments_gate_evaluations is an integration test
     // (tests/self_improve_integration.rs) because ValidationGate::evaluate
     // runs `cargo test` as a subprocess which would deadlock inside a unit test.
 
-    // ── live_tuning actuation ────────────────────────────────────────────────
+    //  live_tuning actuation 
 
     #[tokio::test]
     async fn test_live_tuning_accessible_after_construction() {
@@ -846,7 +846,7 @@ mod tests {
         assert!((clone.get(ParameterId::DedupTtlMs) - expected).abs() < f64::EPSILON);
     }
 
-    // ── with_components constructor ──────────────────────────────────────────
+    //  with_components constructor 
 
     #[test]
     fn test_with_components_constructs_without_panic() {

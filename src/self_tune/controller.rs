@@ -38,12 +38,12 @@ use tracing::{info, warn};
 
 use crate::self_tune::telemetry_bus::{StageMetrics, TelemetrySnapshot};
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+//  Constants 
 
 /// How long after a parameter change we watch for metric degradation.
 const ROLLBACK_WINDOW: Duration = Duration::from_secs(30);
 
-// ─── ParameterId ─────────────────────────────────────────────────────────────
+//  ParameterId 
 
 /// One of the 12 tunable pipeline parameters.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -125,7 +125,7 @@ impl ParameterId {
     }
 }
 
-// ─── ParameterSpec ───────────────────────────────────────────────────────────
+//  ParameterSpec 
 
 /// Constraints and rollback policy for a single tunable parameter.
 #[derive(Debug, Clone)]
@@ -214,7 +214,7 @@ impl ParameterSpec {
     }
 }
 
-// ─── PidState ────────────────────────────────────────────────────────────────
+//  PidState 
 
 /// State for a single PID controller instance.
 #[derive(Debug, Clone)]
@@ -260,7 +260,7 @@ impl PidState {
     }
 }
 
-// ─── ParameterValue ──────────────────────────────────────────────────────────
+//  ParameterValue 
 
 #[derive(Debug, Clone)]
 struct ParameterValue {
@@ -281,7 +281,7 @@ impl ParameterValue {
     }
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+//  Helpers 
 
 /// Round `value` to the nearest multiple of `step`.
 pub fn pid_round_to_step(value: f64, step: f64) -> f64 {
@@ -331,7 +331,7 @@ fn avg_p99_ms(snap: &TelemetrySnapshot) -> f64 {
     stages.iter().map(|s| s.latency.p99_ms as f64).sum::<f64>() / stages.len() as f64
 }
 
-// ─── TuningController ────────────────────────────────────────────────────────
+//  TuningController 
 
 /// Top-level PID controller that tunes all 12 pipeline parameters simultaneously.
 pub struct TuningController {
@@ -568,7 +568,7 @@ impl TuningController {
     }
 }
 
-// ─── Tests ───────────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {
@@ -608,7 +608,7 @@ mod tests {
         }
     }
 
-    // ── ParameterId ──────────────────────────────────────────────────────────
+    //  ParameterId 
 
     #[test]
     fn test_parameter_id_all_has_12_elements() {
@@ -636,7 +636,7 @@ mod tests {
         assert_eq!(names.len(), 12);
     }
 
-    // ── ParameterSpec ────────────────────────────────────────────────────────
+    //  ParameterSpec 
 
     #[test]
     fn test_parameter_spec_default_valid_for_all() {
@@ -672,7 +672,7 @@ mod tests {
         assert_eq!(s.max, 300_000.0);
     }
 
-    // ── PidState ─────────────────────────────────────────────────────────────
+    //  PidState 
 
     #[test]
     fn test_pid_zero_error_zero_output() {
@@ -729,7 +729,7 @@ mod tests {
         assert_eq!(pid.update(100.0, 0.0), 0.0);
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────────
+    //  Helpers 
 
     #[test]
     fn test_round_to_step_basic() {
@@ -789,7 +789,7 @@ mod tests {
         assert!((avg_throughput_rps(&s) - 42.5).abs() < 1e-6);
     }
 
-    // ── TuningController ─────────────────────────────────────────────────────
+    //  TuningController 
 
     #[test]
     fn test_controller_new_initialises_all_12() {
@@ -847,7 +847,7 @@ mod tests {
         let s = snap(999, 1.0, 0.95);
         let first: std::collections::HashSet<ParameterId> =
             ctrl.process(&s).into_iter().map(|(id, _)| id).collect();
-        // Second call immediately — cooldowns should prevent re-adjusting same params
+        // Second call immediately  -  cooldowns should prevent re-adjusting same params
         for (id, _) in ctrl.process(&s) {
             assert!(
                 !first.contains(&id),

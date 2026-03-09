@@ -21,7 +21,7 @@ use std::{
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-// ─── Error ────────────────────────────────────────────────────────────────────
+//  Error 
 
 /// Errors from the capability discovery module.
 #[derive(Debug, Error)]
@@ -35,7 +35,7 @@ pub enum DiscoveryError {
     WorkspaceError(String),
 }
 
-// ─── Discovery finding ────────────────────────────────────────────────────────
+//  Discovery finding 
 
 /// Category of a discovery finding.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -104,9 +104,9 @@ impl DiscoveryFinding {
             id = self.id,
             effort = self.estimated_effort,
             status = if self.resolved {
-                "✅ Resolved"
+                " Resolved"
             } else {
-                "🔍 Open"
+                " Open"
             },
             desc = self.description,
             action = self.suggested_action,
@@ -120,7 +120,7 @@ impl DiscoveryFinding {
     }
 }
 
-// ─── Scan result ─────────────────────────────────────────────────────────────
+//  Scan result 
 
 /// Result of a single discovery scan run.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -135,7 +135,7 @@ pub struct ScanResult {
     pub categories_scanned: Vec<FindingCategory>,
 }
 
-// ─── Scanner configuration ────────────────────────────────────────────────────
+//  Scanner configuration 
 
 /// Configuration for the capability discovery scanner.
 #[derive(Debug, Clone)]
@@ -167,7 +167,7 @@ impl Default for DiscoveryConfig {
     }
 }
 
-// ─── Scanner ─────────────────────────────────────────────────────────────────
+//  Scanner 
 
 struct DiscoveryInner {
     cfg: DiscoveryConfig,
@@ -354,7 +354,7 @@ impl CapabilityDiscovery {
             .unwrap_or(0)
     }
 
-    // ── Internal scan implementations ──────────────────────────────────────
+    //  Internal scan implementations 
 
     fn scan_category(
         &self,
@@ -474,7 +474,7 @@ impl CapabilityDiscovery {
         {
             Ok(o) => o,
             Err(_) => {
-                // cargo-audit not installed — return empty, don't fail scan
+                // cargo-audit not installed  -  return empty, don't fail scan
                 return Vec::new();
             }
         };
@@ -533,7 +533,7 @@ impl CapabilityDiscovery {
 
     fn scan_performance(&self) -> Vec<DiscoveryFinding> {
         // Performance hotspot analysis requires criterion benchmark output.
-        // Stub returns empty — performance findings come from telemetry-driven
+        // Stub returns empty  -  performance findings come from telemetry-driven
         // anomaly detection instead.
         Vec::new()
     }
@@ -552,7 +552,7 @@ fn unix_now() -> u64 {
         .unwrap_or(0)
 }
 
-// ─── Tests ────────────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {

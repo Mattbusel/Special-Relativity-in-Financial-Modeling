@@ -71,13 +71,13 @@ impl LeaderElection {
     /// Create a new leader election instance.
     ///
     /// # Arguments
-    /// * `redis_url` — Redis connection URL
-    /// * `node_id` — This node's unique identifier
-    /// * `ttl_seconds` — Leader lease TTL in seconds
+    /// * `redis_url`  -  Redis connection URL
+    /// * `node_id`  -  This node's unique identifier
+    /// * `ttl_seconds`  -  Leader lease TTL in seconds
     ///
     /// # Returns
-    /// - `Ok(LeaderElection)` — ready to participate in elections
-    /// - `Err(DistributedError::RedisConnection)` — invalid Redis URL
+    /// - `Ok(LeaderElection)`  -  ready to participate in elections
+    /// - `Err(DistributedError::RedisConnection)`  -  invalid Redis URL
     ///
     /// # Panics
     /// This function never panics.
@@ -105,9 +105,9 @@ impl LeaderElection {
     /// Create a leader election from an existing Redis client.
     ///
     /// # Arguments
-    /// * `client` — Pre-configured Redis client
-    /// * `node_id` — This node's unique identifier
-    /// * `ttl_seconds` — Leader lease TTL in seconds
+    /// * `client`  -  Pre-configured Redis client
+    /// * `node_id`  -  This node's unique identifier
+    /// * `ttl_seconds`  -  Leader lease TTL in seconds
     ///
     /// # Returns
     /// A `LeaderElection` wrapping the provided client.
@@ -128,12 +128,12 @@ impl LeaderElection {
 
     /// Attempt to become the leader.
     ///
-    /// Uses `SET key NX EX ttl` — succeeds only if no leader currently exists.
+    /// Uses `SET key NX EX ttl`  -  succeeds only if no leader currently exists.
     ///
     /// # Returns
-    /// - `Ok(true)` — this node is now the leader
-    /// - `Ok(false)` — another node is already leader
-    /// - `Err(DistributedError::RedisOperation)` — Redis command failed
+    /// - `Ok(true)`  -  this node is now the leader
+    /// - `Ok(false)`  -  another node is already leader
+    /// - `Err(DistributedError::RedisOperation)`  -  Redis command failed
     ///
     /// # Panics
     /// This function never panics.
@@ -183,9 +183,9 @@ impl LeaderElection {
     /// Uses a Lua script for atomic compare-and-extend.
     ///
     /// # Returns
-    /// - `Ok(true)` — lease renewed
-    /// - `Ok(false)` — this node is not the leader (lease stolen or expired)
-    /// - `Err(DistributedError::RedisOperation)` — Redis command failed
+    /// - `Ok(true)`  -  lease renewed
+    /// - `Ok(false)`  -  this node is not the leader (lease stolen or expired)
+    /// - `Err(DistributedError::RedisOperation)`  -  Redis command failed
     ///
     /// # Panics
     /// This function never panics.
@@ -221,7 +221,7 @@ impl LeaderElection {
             debug!(node = %self.node_id, ttl = self.ttl_seconds, "leader lease renewed");
             Ok(true)
         } else {
-            warn!(node = %self.node_id, "lease renewal failed — no longer leader");
+            warn!(node = %self.node_id, "lease renewal failed  -  no longer leader");
             let _ = self.role_tx.send(LeaderRole::Follower(None));
             Ok(false)
         }
@@ -232,9 +232,9 @@ impl LeaderElection {
     /// Only deletes the key if this node is the current holder (atomic).
     ///
     /// # Returns
-    /// - `Ok(true)` — successfully stepped down
-    /// - `Ok(false)` — was not the leader
-    /// - `Err(DistributedError::RedisOperation)` — Redis command failed
+    /// - `Ok(true)`  -  successfully stepped down
+    /// - `Ok(false)`  -  was not the leader
+    /// - `Err(DistributedError::RedisOperation)`  -  Redis command failed
     ///
     /// # Panics
     /// This function never panics.
@@ -269,7 +269,7 @@ impl LeaderElection {
             let _ = self.role_tx.send(LeaderRole::Follower(None));
             Ok(true)
         } else {
-            debug!(node = %self.node_id, "step down — was not leader");
+            debug!(node = %self.node_id, "step down  -  was not leader");
             Ok(false)
         }
     }
@@ -277,9 +277,9 @@ impl LeaderElection {
     /// Query who the current leader is.
     ///
     /// # Returns
-    /// - `Ok(Some(node_id))` — the current leader's node ID
-    /// - `Ok(None)` — no leader (election needed)
-    /// - `Err(DistributedError::RedisOperation)` — Redis command failed
+    /// - `Ok(Some(node_id))`  -  the current leader's node ID
+    /// - `Ok(None)`  -  no leader (election needed)
+    /// - `Err(DistributedError::RedisOperation)`  -  Redis command failed
     ///
     /// # Panics
     /// This function never panics.
@@ -383,7 +383,7 @@ impl LeaderElection {
                             info!(node = %this.node_id, "won election in loop");
                         }
                         Ok(false) => {
-                            debug!(node = %this.node_id, "election attempt — not elected");
+                            debug!(node = %this.node_id, "election attempt  -  not elected");
                         }
                         Err(e) => {
                             warn!(node = %this.node_id, error = ?e, "election attempt failed");

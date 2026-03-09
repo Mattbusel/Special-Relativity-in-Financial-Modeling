@@ -133,7 +133,7 @@ pub struct OpenAiWorker {
     max_tokens: u32,
     temperature: f32,
     timeout: Duration,
-    /// API base URL — override for OpenAI-compatible endpoints or testing.
+    /// API base URL  -  override for OpenAI-compatible endpoints or testing.
     base_url: String,
 }
 
@@ -286,7 +286,7 @@ pub struct AnthropicWorker {
     max_tokens: u32,
     temperature: f32,
     timeout: Duration,
-    /// API base URL — override for Anthropic-compatible endpoints or testing.
+    /// API base URL  -  override for Anthropic-compatible endpoints or testing.
     base_url: String,
 }
 
@@ -691,7 +691,7 @@ mod tests {
     /// Serialise all tests that read/write environment variables so they don't race.
     static ENV_MUTEX: Mutex<()> = Mutex::new(());
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    //  Helpers 
 
     /// Create an `OpenAiWorker` that points at `base_url`.
     /// Must be called while `ENV_MUTEX` is held.
@@ -731,7 +731,7 @@ mod tests {
         serde_json::json!({"text": ["hello world response"]})
     }
 
-    // ── EchoWorker ────────────────────────────────────────────────────────────
+    //  EchoWorker 
 
     #[tokio::test]
     async fn test_echo_worker_infer_splits_on_whitespace() {
@@ -788,7 +788,7 @@ mod tests {
         assert!(worker.infer("anything").await.is_ok());
     }
 
-    // ── OpenAiWorker — constructor ────────────────────────────────────────────
+    //  OpenAiWorker  -  constructor 
 
     #[test]
     fn test_openai_worker_new_missing_key_returns_config_error() {
@@ -819,7 +819,7 @@ mod tests {
         assert!(result.is_ok(), "Expected Ok when OPENAI_API_KEY is set");
     }
 
-    // ── OpenAiWorker — inference ──────────────────────────────────────────────
+    //  OpenAiWorker  -  inference 
 
     #[tokio::test]
     async fn test_openai_infer_success_parses_response_correctly() {
@@ -913,7 +913,7 @@ mod tests {
         let server = MockServer::start().await;
         // The mock only matches if the Authorization header has the right value.
         // An unmatched request returns 404, which makes the worker return Err,
-        // causing the final assert to fail — which is the desired test signal.
+        // causing the final assert to fail  -  which is the desired test signal.
         Mock::given(method("POST"))
             .and(path("/completions"))
             .and(header("authorization", "Bearer test-key-openai"))
@@ -1009,7 +1009,7 @@ mod tests {
         );
     }
 
-    // ── AnthropicWorker — constructor ─────────────────────────────────────────
+    //  AnthropicWorker  -  constructor 
 
     #[test]
     fn test_anthropic_worker_new_missing_key_returns_config_error() {
@@ -1040,7 +1040,7 @@ mod tests {
         assert!(result.is_ok(), "Expected Ok when ANTHROPIC_API_KEY is set");
     }
 
-    // ── AnthropicWorker — inference ───────────────────────────────────────────
+    //  AnthropicWorker  -  inference 
 
     #[tokio::test]
     async fn test_anthropic_infer_success_returns_tokens() {
@@ -1219,11 +1219,11 @@ mod tests {
         );
     }
 
-    // ── LlamaCppWorker ────────────────────────────────────────────────────────
+    //  LlamaCppWorker 
 
     #[test]
     fn test_llamacpp_default_constructor_builds_worker() {
-        // Uses unwrap_or_else — always succeeds
+        // Uses unwrap_or_else  -  always succeeds
         let worker = LlamaCppWorker::new();
         assert!(!worker.url.is_empty(), "URL should be non-empty");
     }
@@ -1336,7 +1336,7 @@ mod tests {
             .mount(&server)
             .await;
 
-        // If with_url works, this request reaches our mock — not localhost:8080
+        // If with_url works, this request reaches our mock  -  not localhost:8080
         let worker = LlamaCppWorker::new().with_url(server.uri());
         let result = worker.infer("test").await;
         assert!(
@@ -1345,7 +1345,7 @@ mod tests {
         );
     }
 
-    // ── VllmWorker ────────────────────────────────────────────────────────────
+    //  VllmWorker 
 
     #[test]
     fn test_vllm_default_constructor_builds_worker() {
@@ -1486,7 +1486,7 @@ mod tests {
             .mount(&server)
             .await;
 
-        // If with_url works, the request reaches our mock — not localhost:8000
+        // If with_url works, the request reaches our mock  -  not localhost:8000
         let worker = VllmWorker::new().with_url(server.uri());
         let result = worker.infer("test").await;
         assert!(

@@ -6,7 +6,7 @@
 //!
 //! ## Guarantees
 //! - Serves over stdio (Claude Desktop uses stdio transport)
-//! - No panics — all errors are returned as MCP error responses
+//! - No panics  -  all errors are returned as MCP error responses
 //! - Tools are stateless except for pipeline configuration
 
 // rmcp re-exports schemars 1.x; alias it so #[derive(JsonSchema)] resolves correctly
@@ -25,7 +25,7 @@ use tokio_prompt_orchestrator::{
     OrchestratorError, PipelineHandles, PostOutput, PromptRequest, SessionId,
 };
 
-// ── Parameter types ──────────────────────────────────────────────────────────
+//  Parameter types 
 
 /// Parameters for the `infer` tool.
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
@@ -79,7 +79,7 @@ pub struct ConfigureParams {
     pub rate_limit_rps: Option<u32>,
 }
 
-// ── Response types ───────────────────────────────────────────────────────────
+//  Response types 
 
 /// Structured response from the `infer` tool.
 #[derive(Debug, Serialize)]
@@ -131,7 +131,7 @@ impl Default for PipelineConfig {
     }
 }
 
-// ── MCP Server ───────────────────────────────────────────────────────────────
+//  MCP Server 
 
 /// Map of in-flight request IDs to their oneshot response senders.
 type PendingMap = Arc<tokio::sync::Mutex<HashMap<String, oneshot::Sender<PostOutput>>>>;
@@ -188,13 +188,13 @@ impl OrchestratorMcp {
         let output_text = match result {
             Ok(Ok(post_output)) => post_output.text,
             Ok(Err(_)) => {
-                // Oneshot sender dropped — request was shed or inference failed.
+                // Oneshot sender dropped  -  request was shed or inference failed.
                 return format!(
                     "{{\"error\": \"request dropped by pipeline (shed or inference failure)\", \"request_id\": \"{request_id}\"}}"
                 );
             }
             Err(_) => {
-                // Timeout — clean up the pending entry.
+                // Timeout  -  clean up the pending entry.
                 let mut map = self.pending.lock().await;
                 map.remove(&request_id);
                 return format!(
@@ -400,7 +400,7 @@ pub fn new_mcp_server(pipeline: PipelineHandles) -> OrchestratorMcp {
             match guard.take() {
                 Some(rx) => rx,
                 None => {
-                    tracing::error!("output_rx already taken — collector cannot start");
+                    tracing::error!("output_rx already taken  -  collector cannot start");
                     return;
                 }
             }
@@ -410,10 +410,10 @@ pub fn new_mcp_server(pipeline: PipelineHandles) -> OrchestratorMcp {
             let request_id = post_output.request_id.clone();
             let mut map = collector_pending.lock().await;
             if let Some(sender) = map.remove(&request_id) {
-                // Ignore send error — caller may have timed out already.
+                // Ignore send error  -  caller may have timed out already.
                 let _ = sender.send(post_output);
             }
-            // No pending entry means batch_infer or fire-and-forget — discard.
+            // No pending entry means batch_infer or fire-and-forget  -  discard.
         }
         tracing::info!("Output collector task shutting down");
     });
@@ -457,7 +457,7 @@ fn create_worker(name: &str) -> Result<Arc<dyn ModelWorker>, OrchestratorError> 
             LlamaCppWorker::new().with_url("http://localhost:8080"),
         )),
         other => Err(OrchestratorError::ConfigError(format!(
-            "worker '{other}' is not supported — use echo or llama_cpp"
+            "worker '{other}' is not supported  -  use echo or llama_cpp"
         ))),
     }
 }

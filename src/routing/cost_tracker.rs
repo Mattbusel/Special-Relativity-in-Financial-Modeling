@@ -42,8 +42,8 @@ impl CostTracker {
     ///
     /// # Arguments
     ///
-    /// * `local_cost_per_1k` — Cost per 1 000 tokens for the local model (USD).
-    /// * `cloud_cost_per_1k` — Cost per 1 000 tokens for the cloud model (USD).
+    /// * `local_cost_per_1k`  -  Cost per 1 000 tokens for the local model (USD).
+    /// * `cloud_cost_per_1k`  -  Cost per 1 000 tokens for the cloud model (USD).
     ///
     /// # Returns
     ///
@@ -68,7 +68,7 @@ impl CostTracker {
     ///
     /// # Arguments
     ///
-    /// * `tokens` — Number of tokens processed.
+    /// * `tokens`  -  Number of tokens processed.
     ///
     /// # Panics
     ///
@@ -82,7 +82,7 @@ impl CostTracker {
     ///
     /// # Arguments
     ///
-    /// * `tokens` — Number of tokens processed.
+    /// * `tokens`  -  Number of tokens processed.
     ///
     /// # Panics
     ///
@@ -99,7 +99,7 @@ impl CostTracker {
     ///
     /// # Arguments
     ///
-    /// * `tokens` — Number of tokens processed by the cloud fallback.
+    /// * `tokens`  -  Number of tokens processed by the cloud fallback.
     ///
     /// # Panics
     ///
@@ -193,7 +193,7 @@ pub struct CostSnapshot {
     pub savings_percent: f64,
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────
+//  Helpers 
 
 /// Convert a USD-per-1K-tokens rate to micro-dollars-per-1K-tokens.
 fn f64_to_micro(usd: f64) -> u64 {
@@ -205,7 +205,7 @@ fn micro_to_f64(micro: u64) -> f64 {
     micro as f64 / 1_000_000.0
 }
 
-// ── Tests ──────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {

@@ -1,4 +1,4 @@
-//! # TaskQueue — file-locked concurrent task claiming
+//! # TaskQueue  -  file-locked concurrent task claiming
 //!
 //! ## Responsibility
 //! Provide atomic task claiming using filesystem lock files.
@@ -61,9 +61,9 @@ impl LockInfo {
 /// in a dedicated directory for atomic claiming. Lock file presence
 /// determines task status at runtime:
 ///
-/// - `{lock_dir}/{task_id}.claimed` — task is claimed by an agent
-/// - `{lock_dir}/{task_id}.completed` — task finished successfully
-/// - `{lock_dir}/{task_id}.failed` — task failed (contents: reason)
+/// - `{lock_dir}/{task_id}.claimed`  -  task is claimed by an agent
+/// - `{lock_dir}/{task_id}.completed`  -  task finished successfully
+/// - `{lock_dir}/{task_id}.failed`  -  task failed (contents: reason)
 ///
 /// # Thread Safety
 ///
@@ -106,7 +106,7 @@ impl TaskQueue {
     ///
     /// # Arguments
     ///
-    /// * `config` — Shared coordination configuration
+    /// * `config`  -  Shared coordination configuration
     ///
     /// # Returns
     ///
@@ -176,8 +176,8 @@ impl TaskQueue {
     ///
     /// # Arguments
     ///
-    /// * `config` — Shared coordination configuration
-    /// * `tasks` — Pre-loaded task list
+    /// * `config`  -  Shared coordination configuration
+    /// * `tasks`  -  Pre-loaded task list
     ///
     /// # Panics
     ///
@@ -208,7 +208,7 @@ impl TaskQueue {
     ///
     /// # Arguments
     ///
-    /// * `agent_id` — Identifier of the claiming agent
+    /// * `agent_id`  -  Identifier of the claiming agent
     ///
     /// # Returns
     ///
@@ -244,7 +244,7 @@ impl TaskQueue {
                     return Ok(Some(tasks[idx].clone()));
                 }
                 Ok(false) => {
-                    // Lock exists — check if stale
+                    // Lock exists  -  check if stale
                     if self.is_lock_stale(&lock_path).await? {
                         // Steal the lock from a dead/stale agent
                         self.steal_lock(&lock_path, agent_id).await?;
@@ -252,7 +252,7 @@ impl TaskQueue {
                         tasks[idx].claimed_by = agent_id.to_string();
                         return Ok(Some(tasks[idx].clone()));
                     }
-                    // Not stale — skip this task, try next
+                    // Not stale  -  skip this task, try next
                     continue;
                 }
                 Err(e) => return Err(e),
@@ -268,8 +268,8 @@ impl TaskQueue {
     ///
     /// # Arguments
     ///
-    /// * `task_id` — ID of the completed task
-    /// * `agent_id` — ID of the agent that completed the task
+    /// * `task_id`  -  ID of the completed task
+    /// * `agent_id`  -  ID of the agent that completed the task
     ///
     /// # Returns
     ///
@@ -313,9 +313,9 @@ impl TaskQueue {
     ///
     /// # Arguments
     ///
-    /// * `task_id` — ID of the failed task
-    /// * `agent_id` — ID of the agent that reported the failure
-    /// * `reason` — Human-readable failure reason
+    /// * `task_id`  -  ID of the failed task
+    /// * `agent_id`  -  ID of the agent that reported the failure
+    /// * `reason`  -  Human-readable failure reason
     ///
     /// # Returns
     ///
@@ -363,7 +363,7 @@ impl TaskQueue {
     ///
     /// # Arguments
     ///
-    /// * `task_id` — ID of the task to release
+    /// * `task_id`  -  ID of the task to release
     ///
     /// # Returns
     ///
@@ -441,7 +441,7 @@ impl TaskQueue {
         tasks.iter().all(|t| t.status.is_terminal())
     }
 
-    // ── Private helpers ──────────────────────────────────────────────
+    //  Private helpers 
 
     /// Path for a claimed lock file.
     fn claimed_path(&self, task_id: &str) -> PathBuf {
@@ -509,7 +509,7 @@ impl TaskQueue {
                 // (a 0-second-old lock is stale when the threshold is 0).
                 Ok(now.saturating_sub(info.timestamp) >= stale_secs)
             } else {
-                // Corrupt lock file — treat as stale
+                // Corrupt lock file  -  treat as stale
                 Ok(true)
             }
         })

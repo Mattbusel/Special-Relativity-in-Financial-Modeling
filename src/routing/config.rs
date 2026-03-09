@@ -6,7 +6,7 @@
 
 use serde::{Deserialize, Serialize};
 
-// ── Default value functions ────────────────────────────────────────────
+//  Default value functions 
 
 /// Default complexity threshold below which prompts route to the local model.
 fn default_local_threshold() -> f64 {
@@ -48,7 +48,7 @@ fn default_adaptive_enabled() -> bool {
     true
 }
 
-// ── RoutingConfig ──────────────────────────────────────────────────────
+//  RoutingConfig 
 
 /// Configuration for the model routing layer.
 ///
@@ -140,7 +140,7 @@ impl Default for AdaptiveConfig {
 ///
 /// # Arguments
 ///
-/// * `config` — The routing configuration to validate.
+/// * `config`  -  The routing configuration to validate.
 ///
 /// # Returns
 ///
@@ -204,7 +204,7 @@ pub fn validate(config: &RoutingConfig) -> Vec<String> {
     errors
 }
 
-// ── Tests ──────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {

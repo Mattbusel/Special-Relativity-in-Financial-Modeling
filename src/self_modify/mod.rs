@@ -8,11 +8,11 @@
 //! disabled.
 //!
 //! ## Module map
-//! - [`task_gen`]  — converts telemetry signals into agent work orders
-//! - [`gate`]      — validates proposed changes through cargo/clippy/benchmark gates
-//! - [`memory`]    — persistent knowledge base for the agent fleet
-//! - [`docs`]      — auto-generates changelogs, diagrams, and impact reports
-//! - [`discover`]  — periodic codebase scanning for improvement opportunities
+//! - [`task_gen`]   -  converts telemetry signals into agent work orders
+//! - [`gate`]       -  validates proposed changes through cargo/clippy/benchmark gates
+//! - [`memory`]     -  persistent knowledge base for the agent fleet
+//! - [`docs`]       -  auto-generates changelogs, diagrams, and impact reports
+//! - [`discover`]   -  periodic codebase scanning for improvement opportunities
 
 pub mod deployment;
 pub mod discover;

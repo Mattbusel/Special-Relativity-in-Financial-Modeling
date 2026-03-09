@@ -2,9 +2,9 @@
 //!
 //! ## Responsibility
 //! Renders circuit breaker states for each worker backend with colored symbols.
-//! - `●` CLOSED — green
-//! - `◐` HALF-OPEN — yellow, with countdown
-//! - `○` OPEN — red, with duration since opened
+//! - `` CLOSED  -  green
+//! - `` HALF-OPEN  -  yellow, with countdown
+//! - `` OPEN  -  red, with duration since opened
 //!
 //! ## Guarantees
 //! - All three states display correctly with proper symbols and colors

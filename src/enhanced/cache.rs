@@ -307,7 +307,7 @@ mod tests {
         assert_ne!(key1, key3); // Different input = different key
     }
 
-    // ── Hardening tests ──────────────────────────────────────────────
+    //  Hardening tests 
 
     #[tokio::test]
     async fn test_eviction_at_capacity() {
@@ -391,7 +391,7 @@ mod tests {
 
         cache.set("key", "value", 3600).await;
         // With capacity 0, the eviction check (len >= max_entries) fires
-        // before insert but the entry is still inserted — so we get 1 entry
+        // before insert but the entry is still inserted  -  so we get 1 entry
         // on the first insert. Subsequent inserts keep evicting.
         // Verify it doesn't panic.
         cache.set("key2", "value2", 3600).await;

@@ -6,13 +6,13 @@
 //! ## Data flow
 //!
 //! ```text
-//! TelemetryBus ──► AnomalyDetector ──► MetaTaskGenerator
-//!      │                                       │
-//!      ├──► TuningController ──► SnapshotStore │
-//!      │                                       ▼
-//!      ├──► CostOptimizer             (logged to AgentMemory)
-//!      │
-//!      └──► Autoscaler + LearnedRouter
+//! TelemetryBus  AnomalyDetector  MetaTaskGenerator
+//!                                             
+//!       TuningController  SnapshotStore 
+//!                                             
+//!       CostOptimizer             (logged to AgentMemory)
+//!      
+//!       Autoscaler + LearnedRouter
 //! ```
 //!
 //! ## Guarantees
@@ -65,7 +65,7 @@ use crate::intelligence::{
 use crate::self_tune::helix_probe::HelixProbeConfig;
 use crate::self_tune::helix_feedback::{HelixFeedbackConfig, HelixFeedbackPusher};
 
-// ─── Configuration ────────────────────────────────────────────────────────────
+//  Configuration 
 
 /// Configuration for the self-improving control loop.
 #[derive(Debug, Clone)]
@@ -104,7 +104,7 @@ pub struct LoopConfig {
     /// Optional HelixRouter feedback pusher configuration.
     ///
     /// When set, each loop tick examines the current pipeline pressure and pushes
-    /// a `RouterConfigPatch` to HelixRouter's `PATCH /api/config` endpoint —
+    /// a `RouterConfigPatch` to HelixRouter's `PATCH /api/config` endpoint  - 
     /// tightening thresholds under high pressure, relaxing them when load is low.
     ///
     /// This closes the **two-way** cross-repo feedback loop:
@@ -135,7 +135,7 @@ impl Default for LoopConfig {
     }
 }
 
-// ─── Subsystem handles ───────────────────────────────────────────────────────
+//  Subsystem handles 
 
 /// Cheaply-cloneable handles to every self-improving subsystem.
 ///
@@ -164,7 +164,7 @@ pub struct SubsystemHandles {
     pub helix_feedback: Option<Arc<HelixFeedbackPusher>>,
 }
 
-// ─── Main loop ───────────────────────────────────────────────────────────────
+//  Main loop 
 
 /// The self-improving control plane.
 ///
@@ -244,7 +244,7 @@ impl SelfImprovingLoop {
             use crate::self_tune::helix_probe::HelixPressureProbe;
             let probe = HelixPressureProbe::new(probe_cfg, self.bus.clone());
             tokio::spawn(async move { probe.run().await });
-            info!("HelixPressureProbe started — cross-repo pressure feedback active");
+            info!("HelixPressureProbe started  -  cross-repo pressure feedback active");
         }
 
         tokio::spawn(async move {
@@ -259,7 +259,7 @@ impl SelfImprovingLoop {
                         continue;
                     }
                     Err(tokio::sync::broadcast::error::RecvError::Closed) => {
-                        info!("telemetry bus closed — self-improving loop exiting");
+                        info!("telemetry bus closed  -  self-improving loop exiting");
                         break;
                     }
                 };
@@ -299,7 +299,7 @@ impl SelfImprovingLoop {
         })
     }
 
-    // ── Step functions (pub so tests can invoke them directly) ───────────────
+    //  Step functions (pub so tests can invoke them directly) 
 
     /// Feed aggregate RPS into the autoscaler.
     pub fn step_autoscaler(h: &SubsystemHandles, snap: &TelemetrySnapshot) {
@@ -316,7 +316,7 @@ impl SelfImprovingLoop {
                 );
             }
             Err(e) => {
-                // Normal early in a session — insufficient history
+                // Normal early in a session  -  insufficient history
                 debug!(err = ?e, "autoscale forecast skipped");
             }
         }
@@ -499,7 +499,7 @@ impl SelfImprovingLoop {
     }
 }
 
-// ─── Tests ───────────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {
@@ -511,7 +511,7 @@ mod tests {
         TelemetryBus::new(TelemetryBusConfig::default(), counters)
     }
 
-    // ── Construction ────────────────────────────────────────────────────────
+    //  Construction 
 
     #[test]
     fn test_loop_config_default_is_sane() {
@@ -556,7 +556,7 @@ mod tests {
         assert_eq!(cfg.anomaly_task_threshold, 3);
     }
 
-    // ── Step functions ───────────────────────────────────────────────────────
+    //  Step functions 
 
     #[tokio::test]
     async fn test_step_anomaly_returns_zero_for_empty_snapshot() {
@@ -612,7 +612,7 @@ mod tests {
         let h = loop_.handles();
         let snap = bus.tick_now().await;
         SelfImprovingLoop::step_autoscaler(&h, &snap);
-        // After one point, forecast returns InsufficientHistory — that's fine
+        // After one point, forecast returns InsufficientHistory  -  that's fine
     }
 
     #[tokio::test]
@@ -632,7 +632,7 @@ mod tests {
         SelfImprovingLoop::step_snapshot(&handles, &snap);
     }
 
-    // ── Loop lifecycle ───────────────────────────────────────────────────────
+    //  Loop lifecycle 
 
     #[tokio::test]
     async fn test_loop_exits_when_bus_drops() {
@@ -643,12 +643,12 @@ mod tests {
         // Tick once so the loop processes at least one snapshot
         bus.tick_now().await;
 
-        // Drop the bus — broadcast channel closes, loop should exit
+        // Drop the bus  -  broadcast channel closes, loop should exit
         drop(bus);
 
         let result =
             tokio::time::timeout(std::time::Duration::from_millis(300), handle).await;
-        // Either completes cleanly or times out — both are acceptable;
+        // Either completes cleanly or times out  -  both are acceptable;
         // the important thing is no panic.
         let _ = result;
     }

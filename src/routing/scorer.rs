@@ -6,16 +6,16 @@
 //! | Score       | Route                                       |
 //! |-------------|---------------------------------------------|
 //! | `< 0.4`     | Local model (free, fast)                    |
-//! | `0.4 – 0.7` | Local model with cloud fallback on failure  |
+//! | `0.4  -  0.7` | Local model with cloud fallback on failure  |
 //! | `> 0.7`     | Cloud model directly                        |
 //!
 //! ## Heuristics
 //!
-//! 1. **Token count** — >500 whitespace-delimited tokens → +0.3
-//! 2. **Code blocks** — presence of fenced code blocks (` ``` `) → +0.2
-//! 3. **Multi-step instructions** — numbered list items → +0.2
-//! 4. **Ambiguous references** — words like "it", "that", "the thing" → +0.15
-//! 5. **Domain-specific terms** — Rust/financial keywords → +0.15
+//! 1. **Token count**  -  >500 whitespace-delimited tokens → +0.3
+//! 2. **Code blocks**  -  presence of fenced code blocks (` ``` `) → +0.2
+//! 3. **Multi-step instructions**  -  numbered list items → +0.2
+//! 4. **Ambiguous references**  -  words like "it", "that", "the thing" → +0.15
+//! 5. **Domain-specific terms**  -  Rust/financial keywords → +0.15
 //!
 //! The raw sum is clamped to `[0.0, 1.0]`.
 
@@ -45,7 +45,7 @@ impl ComplexityScorer {
     ///
     /// # Arguments
     ///
-    /// * `token_count_threshold` — Prompts with more whitespace-delimited
+    /// * `token_count_threshold`  -  Prompts with more whitespace-delimited
     ///   tokens than this value receive the long-prompt bonus.
     pub fn with_token_threshold(token_count_threshold: usize) -> Self {
         Self {
@@ -57,7 +57,7 @@ impl ComplexityScorer {
     ///
     /// # Arguments
     ///
-    /// * `prompt` — The raw prompt text to analyse.
+    /// * `prompt`  -  The raw prompt text to analyse.
     ///
     /// # Returns
     ///
@@ -93,7 +93,7 @@ impl ComplexityScorer {
     ///
     /// # Arguments
     ///
-    /// * `prompt` — The raw prompt text to analyse.
+    /// * `prompt`  -  The raw prompt text to analyse.
     ///
     /// # Returns
     ///
@@ -122,7 +122,7 @@ impl ComplexityScorer {
         }
     }
 
-    // ── Individual signals ─────────────────────────────────────────────
+    //  Individual signals 
 
     /// +0.3 if the prompt exceeds the token-count threshold.
     fn token_count_signal(&self, prompt: &str) -> f64 {
@@ -286,7 +286,7 @@ pub struct ScoreBreakdown {
     pub total: f64,
 }
 
-// ── Tests ──────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {

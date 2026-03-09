@@ -23,7 +23,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-// ─── Error ────────────────────────────────────────────────────────────────────
+//  Error 
 
 /// Errors produced by the deployment pipeline.
 #[derive(Debug, Error)]
@@ -70,7 +70,7 @@ pub enum DeploymentError {
     },
 }
 
-// ─── Deployment stage ─────────────────────────────────────────────────────────
+//  Deployment stage 
 
 /// The current stage of a deployment in the pipeline.
 ///
@@ -79,7 +79,7 @@ pub enum DeploymentError {
 /// most active stages.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum DeploymentStage {
-    /// Awaiting validation — initial state.
+    /// Awaiting validation  -  initial state.
     Pending,
     /// Running through validation gates.
     Validating,
@@ -87,17 +87,17 @@ pub enum DeploymentStage {
     Canary,
     /// Progressive rollout in progress.
     Rolling {
-        /// Current rollout progress percentage (0–100).
+        /// Current rollout progress percentage (0 - 100).
         progress_pct: u8,
     },
-    /// Fully deployed — terminal success state.
+    /// Fully deployed  -  terminal success state.
     Promoted,
     /// Rolled back from an active stage.
     RolledBack {
         /// Why the deployment was rolled back.
         reason: String,
     },
-    /// Failed at some stage — terminal error state.
+    /// Failed at some stage  -  terminal error state.
     Failed {
         /// Why the deployment failed.
         reason: String,
@@ -117,7 +117,7 @@ impl DeploymentStage {
     }
 }
 
-// ─── Configuration ────────────────────────────────────────────────────────────
+//  Configuration 
 
 /// Configuration for the deployment pipeline.
 ///
@@ -154,7 +154,7 @@ impl Default for DeploymentConfig {
     }
 }
 
-// ─── Stage transition record ──────────────────────────────────────────────────
+//  Stage transition record 
 
 /// A recorded stage transition in a deployment's audit trail.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -169,7 +169,7 @@ pub struct StageTransition {
     pub timestamp_secs: u64,
 }
 
-// ─── Deployment ───────────────────────────────────────────────────────────────
+//  Deployment 
 
 /// A single deployment tracked by the pipeline.
 ///
@@ -198,7 +198,7 @@ pub struct Deployment {
     pub updated_at_secs: u64,
 }
 
-// ─── Deployment summary ───────────────────────────────────────────────────────
+//  Deployment summary 
 
 /// Lightweight summary of a deployment for listing views.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -242,7 +242,7 @@ impl Deployment {
     }
 }
 
-// ─── Pipeline inner state ─────────────────────────────────────────────────────
+//  Pipeline inner state 
 
 struct PipelineInner {
     deployments: HashMap<String, Deployment>,
@@ -251,12 +251,12 @@ struct PipelineInner {
     max_history: usize,
 }
 
-// ─── Deployment pipeline ──────────────────────────────────────────────────────
+//  Deployment pipeline 
 
 /// Manages the lifecycle of agent-proposed code changes through a multi-stage
 /// deployment pipeline.
 ///
-/// Cheaply cloneable via `Arc<Mutex<_>>` — all clones share the same state.
+/// Cheaply cloneable via `Arc<Mutex<_>>`  -  all clones share the same state.
 #[derive(Clone)]
 pub struct DeploymentPipeline {
     inner: Arc<Mutex<PipelineInner>>,
@@ -289,10 +289,10 @@ impl DeploymentPipeline {
     /// Create a new deployment in `Pending` stage.
     ///
     /// # Arguments
-    /// * `id` — Unique identifier for the deployment
-    /// * `description` — Human-readable description of the change
-    /// * `proposal_id` — Links to the validation gate proposal
-    /// * `metrics_at_start` — Baseline metrics for health-check comparisons
+    /// * `id`  -  Unique identifier for the deployment
+    /// * `description`  -  Human-readable description of the change
+    /// * `proposal_id`  -  Links to the validation gate proposal
+    /// * `metrics_at_start`  -  Baseline metrics for health-check comparisons
     ///
     /// # Errors
     /// Returns [`DeploymentError::DeploymentAlreadyExists`] if a deployment
@@ -398,8 +398,8 @@ impl DeploymentPipeline {
     /// Transition a deployment from `Validating` to `Failed` after validation fails.
     ///
     /// # Arguments
-    /// * `deployment_id` — The deployment to fail
-    /// * `reason` — Human-readable reason for the failure
+    /// * `deployment_id`  -  The deployment to fail
+    /// * `reason`  -  Human-readable reason for the failure
     ///
     /// # Errors
     /// Returns [`DeploymentError::DeploymentNotFound`] if the deployment does not exist.
@@ -475,8 +475,8 @@ impl DeploymentPipeline {
     /// Transition a deployment from `Canary` to `RolledBack` after canary fails.
     ///
     /// # Arguments
-    /// * `deployment_id` — The deployment to roll back
-    /// * `reason` — Human-readable reason for the rollback
+    /// * `deployment_id`  -  The deployment to roll back
+    /// * `reason`  -  Human-readable reason for the rollback
     ///
     /// # Errors
     /// Returns [`DeploymentError::DeploymentNotFound`] if the deployment does not exist.
@@ -525,8 +525,8 @@ impl DeploymentPipeline {
     /// If already at 100% and `auto_promote` is enabled, promotes automatically.
     ///
     /// # Arguments
-    /// * `deployment_id` — The deployment to advance
-    /// * `current_metrics` — Latest observed metrics for health checking
+    /// * `deployment_id`  -  The deployment to advance
+    /// * `current_metrics`  -  Latest observed metrics for health checking
     ///
     /// # Returns
     /// The new [`DeploymentStage`] after advancement.
@@ -657,8 +657,8 @@ impl DeploymentPipeline {
     /// Roll back a deployment from any active (non-terminal) stage.
     ///
     /// # Arguments
-    /// * `deployment_id` — The deployment to roll back
-    /// * `reason` — Human-readable reason for the rollback
+    /// * `deployment_id`  -  The deployment to roll back
+    /// * `reason`  -  Human-readable reason for the rollback
     ///
     /// # Errors
     /// Returns [`DeploymentError::DeploymentNotFound`] if the deployment does not exist.
@@ -797,7 +797,7 @@ impl DeploymentPipeline {
             .ok_or_else(|| DeploymentError::DeploymentNotFound(deployment_id.to_string()))
     }
 
-    // ── Private helpers ──────────────────────────────────────────────────
+    //  Private helpers 
 
     /// If the deployment is in a terminal state, move it from active to completed.
     fn maybe_archive_deployment(inner: &mut PipelineInner, deployment_id: &str) {
@@ -820,7 +820,7 @@ impl DeploymentPipeline {
     }
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+//  Helpers 
 
 /// Return the current Unix timestamp in seconds.
 ///
@@ -833,7 +833,7 @@ fn unix_now() -> u64 {
         .unwrap_or(0)
 }
 
-// ─── Tests ────────────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {
@@ -890,7 +890,7 @@ mod tests {
         pipeline.canary_passed(id).ok();
     }
 
-    // ── test_create_deployment ────────────────────────────────────────────
+    //  test_create_deployment 
 
     #[test]
     fn test_create_deployment() {
@@ -907,7 +907,7 @@ mod tests {
         assert!(dep.stage_history.is_empty());
     }
 
-    // ── test_create_duplicate_fails ───────────────────────────────────────
+    //  test_create_duplicate_fails 
 
     #[test]
     fn test_create_duplicate_fails() {
@@ -922,7 +922,7 @@ mod tests {
         ));
     }
 
-    // ── test_start_validation ─────────────────────────────────────────────
+    //  test_start_validation 
 
     #[test]
     fn test_start_validation() {
@@ -938,7 +938,7 @@ mod tests {
         );
     }
 
-    // ── test_invalid_transition_pending_to_canary ─────────────────────────
+    //  test_invalid_transition_pending_to_canary 
 
     #[test]
     fn test_invalid_transition_pending_to_canary() {
@@ -954,7 +954,7 @@ mod tests {
         ));
     }
 
-    // ── test_validation_passed_moves_to_canary ────────────────────────────
+    //  test_validation_passed_moves_to_canary 
 
     #[test]
     fn test_validation_passed_moves_to_canary() {
@@ -967,7 +967,7 @@ mod tests {
         assert_eq!(pipeline.stage_of("dep-1").unwrap(), DeploymentStage::Canary);
     }
 
-    // ── test_validation_failed_moves_to_failed ────────────────────────────
+    //  test_validation_failed_moves_to_failed 
 
     #[test]
     fn test_validation_failed_moves_to_failed() {
@@ -991,7 +991,7 @@ mod tests {
         assert!(matches!(completed[0].stage, DeploymentStage::Failed { .. }));
     }
 
-    // ── test_canary_passed_starts_rollout ─────────────────────────────────
+    //  test_canary_passed_starts_rollout 
 
     #[test]
     fn test_canary_passed_starts_rollout() {
@@ -1008,7 +1008,7 @@ mod tests {
         );
     }
 
-    // ── test_canary_failed_rolls_back ─────────────────────────────────────
+    //  test_canary_failed_rolls_back 
 
     #[test]
     fn test_canary_failed_rolls_back() {
@@ -1030,7 +1030,7 @@ mod tests {
         ));
     }
 
-    // ── test_advance_rollout_progresses ───────────────────────────────────
+    //  test_advance_rollout_progresses 
 
     #[test]
     fn test_advance_rollout_progresses() {
@@ -1054,7 +1054,7 @@ mod tests {
         assert_eq!(stage, DeploymentStage::Rolling { progress_pct: 50 });
     }
 
-    // ── test_advance_rollout_checks_error_rate ────────────────────────────
+    //  test_advance_rollout_checks_error_rate 
 
     #[test]
     fn test_advance_rollout_checks_error_rate() {
@@ -1070,7 +1070,7 @@ mod tests {
             .any(|d| d.id == "dep-1" && matches!(d.stage, DeploymentStage::RolledBack { .. })));
     }
 
-    // ── test_advance_rollout_checks_latency ───────────────────────────────
+    //  test_advance_rollout_checks_latency 
 
     #[test]
     fn test_advance_rollout_checks_latency() {
@@ -1081,7 +1081,7 @@ mod tests {
         assert!(matches!(result, Err(DeploymentError::RolloutFailed { .. })));
     }
 
-    // ── test_advance_rollout_auto_promote ─────────────────────────────────
+    //  test_advance_rollout_auto_promote 
 
     #[test]
     fn test_advance_rollout_auto_promote() {
@@ -1102,7 +1102,7 @@ mod tests {
         assert_eq!(stage, DeploymentStage::Promoted);
     }
 
-    // ── test_advance_rollout_no_auto_promote ──────────────────────────────
+    //  test_advance_rollout_no_auto_promote 
 
     #[test]
     fn test_advance_rollout_no_auto_promote() {
@@ -1116,14 +1116,14 @@ mod tests {
                 .unwrap();
         }
 
-        // At 100% with no auto_promote — stays at 100
+        // At 100% with no auto_promote  -  stays at 100
         let stage = pipeline
             .advance_rollout("dep-1", healthy_metrics())
             .unwrap();
         assert_eq!(stage, DeploymentStage::Rolling { progress_pct: 100 });
     }
 
-    // ── test_rollback_from_any_active_stage ───────────────────────────────
+    //  test_rollback_from_any_active_stage 
 
     #[test]
     fn test_rollback_from_any_active_stage() {
@@ -1154,7 +1154,7 @@ mod tests {
         assert!(pipeline.rollback("d4", "metrics degraded").is_ok());
     }
 
-    // ── test_rollback_terminal_fails ──────────────────────────────────────
+    //  test_rollback_terminal_fails 
 
     #[test]
     fn test_rollback_terminal_fails() {
@@ -1179,7 +1179,7 @@ mod tests {
         ));
     }
 
-    // ── test_promote_from_rolling_100 ─────────────────────────────────────
+    //  test_promote_from_rolling_100 
 
     #[test]
     fn test_promote_from_rolling_100() {
@@ -1208,7 +1208,7 @@ mod tests {
             .any(|d| d.id == "dep-1" && d.stage == DeploymentStage::Promoted));
     }
 
-    // ── test_promote_from_non_rolling_fails ───────────────────────────────
+    //  test_promote_from_non_rolling_fails 
 
     #[test]
     fn test_promote_from_non_rolling_fails() {
@@ -1223,7 +1223,7 @@ mod tests {
         ));
     }
 
-    // ── test_get_deployment ───────────────────────────────────────────────
+    //  test_get_deployment 
 
     #[test]
     fn test_get_deployment() {
@@ -1237,7 +1237,7 @@ mod tests {
         assert!(!dep.metrics_at_start.is_empty());
     }
 
-    // ── test_get_nonexistent ──────────────────────────────────────────────
+    //  test_get_nonexistent 
 
     #[test]
     fn test_get_nonexistent() {
@@ -1249,7 +1249,7 @@ mod tests {
         ));
     }
 
-    // ── test_active_deployments ───────────────────────────────────────────
+    //  test_active_deployments 
 
     #[test]
     fn test_active_deployments() {
@@ -1265,7 +1265,7 @@ mod tests {
         assert_eq!(active.len(), 2);
     }
 
-    // ── test_completed_deployments ────────────────────────────────────────
+    //  test_completed_deployments 
 
     #[test]
     fn test_completed_deployments() {
@@ -1281,7 +1281,7 @@ mod tests {
         assert_eq!(completed[0].id, "d1");
     }
 
-    // ── test_stage_of ─────────────────────────────────────────────────────
+    //  test_stage_of 
 
     #[test]
     fn test_stage_of() {
@@ -1297,7 +1297,7 @@ mod tests {
         );
     }
 
-    // ── test_stage_history_recorded ───────────────────────────────────────
+    //  test_stage_history_recorded 
 
     #[test]
     fn test_stage_history_recorded() {
@@ -1316,7 +1316,7 @@ mod tests {
         assert_eq!(dep.stage_history[1].to, DeploymentStage::Canary);
     }
 
-    // ── test_config_defaults ──────────────────────────────────────────────
+    //  test_config_defaults 
 
     #[test]
     fn test_config_defaults() {
@@ -1330,7 +1330,7 @@ mod tests {
         assert!(!cfg.auto_promote);
     }
 
-    // ── test_clone_shares_state ───────────────────────────────────────────
+    //  test_clone_shares_state 
 
     #[test]
     fn test_clone_shares_state() {
@@ -1347,7 +1347,7 @@ mod tests {
         assert_eq!(dep.unwrap().id, "d1");
     }
 
-    // ── test_deployment_stage_serialization ────────────────────────────────
+    //  test_deployment_stage_serialization 
 
     #[test]
     fn test_deployment_stage_serialization() {
@@ -1372,7 +1372,7 @@ mod tests {
         }
     }
 
-    // ── test_full_lifecycle_happy_path ─────────────────────────────────────
+    //  test_full_lifecycle_happy_path 
 
     #[test]
     fn test_full_lifecycle_happy_path() {
@@ -1433,7 +1433,7 @@ mod tests {
         assert!(pipeline.active_deployments().is_empty());
     }
 
-    // ── Additional edge-case tests ────────────────────────────────────────
+    //  Additional edge-case tests 
 
     #[test]
     fn test_promote_from_rolling_50_fails() {

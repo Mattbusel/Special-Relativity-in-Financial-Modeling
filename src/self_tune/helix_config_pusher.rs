@@ -22,7 +22,7 @@
 //! | Tokio Prompt `ParameterId`      | HelixRouter field                |
 //! |---------------------------------|----------------------------------|
 //! | `BackpressureShedThreshold`     | `backpressure_busy_threshold`    |
-//! |   (0.0 – 1.0 fraction)         |   (usize: shed_frac × 10, min 1)|
+//! |   (0.0  -  1.0 fraction)         |   (usize: shed_frac × 10, min 1)|
 //!
 //! ## Guarantees
 //!
@@ -41,7 +41,7 @@ use serde::Serialize;
 use std::time::Duration;
 use tracing::{debug, trace, warn};
 
-// ── Wire-format mirror of HelixRouter's `RouterConfigPatch` ──────────────────
+//  Wire-format mirror of HelixRouter's `RouterConfigPatch` 
 //
 // We only declare the fields we actually push; serde(skip_serializing_if) ensures
 // no spurious null fields reach the HelixRouter PATCH endpoint.
@@ -52,7 +52,7 @@ use tracing::{debug, trace, warn};
 /// are omitted and ignored by HelixRouter's PATCH handler.
 #[derive(Debug, Clone, Default, Serialize)]
 struct ConfigPatch {
-    /// Mapped from `BackpressureShedThreshold` (0.0–1.0) → usize.
+    /// Mapped from `BackpressureShedThreshold` (0.0 - 1.0) → usize.
     #[serde(skip_serializing_if = "Option::is_none")]
     backpressure_busy_threshold: Option<usize>,
 }
@@ -63,7 +63,7 @@ impl ConfigPatch {
     }
 }
 
-// ── Configuration ─────────────────────────────────────────────────────────────
+//  Configuration 
 
 /// Configuration for [`HelixConfigPusher`].
 #[derive(Debug, Clone)]
@@ -95,7 +95,7 @@ impl Default for HelixConfigPusherConfig {
     }
 }
 
-// ── Pusher ────────────────────────────────────────────────────────────────────
+//  Pusher 
 
 /// Pushes Tokio Prompt tuning decisions to HelixRouter's `/api/config`.
 ///
@@ -126,7 +126,7 @@ pub struct HelixConfigPusher {
 impl HelixConfigPusher {
     /// Create a new pusher.
     ///
-    /// `tuning` is cheaply cloned — [`LiveTuning`] is internally `Arc`-backed.
+    /// `tuning` is cheaply cloned  -  [`LiveTuning`] is internally `Arc`-backed.
     ///
     /// # Panics
     /// This function never panics.
@@ -199,7 +199,7 @@ impl HelixConfigPusher {
     fn build_patch(&self, last_busy_threshold: &mut Option<usize>) -> ConfigPatch {
         let mut patch = ConfigPatch::default();
 
-        // ── BackpressureShedThreshold → backpressure_busy_threshold ──────────
+        //  BackpressureShedThreshold → backpressure_busy_threshold 
         //
         // LiveTuning stores a fraction in [0.0, 1.0].
         // HelixRouter's `backpressure_busy_threshold` is a usize counting how
@@ -209,7 +209,7 @@ impl HelixConfigPusher {
         let new_threshold = ((shed_frac * 10.0).floor() as usize).clamp(1, 20);
 
         let should_push = match *last_busy_threshold {
-            None => true, // first tick — always push baseline
+            None => true, // first tick  -  always push baseline
             Some(prev) => {
                 let prev_f = prev as f64;
                 let new_f = new_threshold as f64;
@@ -251,15 +251,15 @@ impl HelixConfigPusher {
     }
 }
 
-// ── Stand-alone config (no feature gate needed for tests) ────────────────────
+//  Stand-alone config (no feature gate needed for tests) 
 
-// ─── Tests ────────────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    // ── HelixConfigPusherConfig ───────────────────────────────────────────
+    //  HelixConfigPusherConfig 
 
     #[test]
     fn config_default_base_url() {
@@ -287,7 +287,7 @@ mod tests {
         assert_eq!(cfg.base_url, "http://127.0.0.1:8080");
     }
 
-    // ── ConfigPatch ───────────────────────────────────────────────────────
+    //  ConfigPatch 
 
     #[test]
     fn patch_default_is_empty() {
@@ -316,7 +316,7 @@ mod tests {
         assert_eq!(json, "{}");
     }
 
-    // ── Parameter mapping math ────────────────────────────────────────────
+    //  Parameter mapping math 
 
     #[test]
     fn shed_frac_to_busy_threshold_mapping() {
@@ -348,7 +348,7 @@ mod tests {
         assert_eq!(t, 20);
     }
 
-    // ── Change threshold logic ────────────────────────────────────────────
+    //  Change threshold logic 
 
     #[test]
     fn change_threshold_none_always_pushes() {
@@ -425,7 +425,7 @@ mod tests {
         assert!(!should_push);
     }
 
-    // ── Pusher construction ───────────────────────────────────────────────
+    //  Pusher construction 
 
     #[cfg(feature = "self-tune")]
     #[test]
@@ -457,9 +457,9 @@ mod tests {
         let pusher = HelixConfigPusher::new(HelixConfigPusherConfig::default(), tuning);
 
         let mut last: Option<usize> = None;
-        // First tick — seeds `last`.
+        // First tick  -  seeds `last`.
         let _ = pusher.build_patch(&mut last);
-        // Second tick with the same LiveTuning value — no change.
+        // Second tick with the same LiveTuning value  -  no change.
         let patch2 = pusher.build_patch(&mut last);
         assert!(patch2.is_empty(), "no change should produce empty patch");
     }

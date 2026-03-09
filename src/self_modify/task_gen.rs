@@ -1,7 +1,7 @@
 //! # Meta-Task Generator (Task 2.1)
 //!
 //! Reads anomaly events and telemetry degradation signals, then generates
-//! TOML task files for the agent coordinator — turning system problems into
+//! TOML task files for the agent coordinator  -  turning system problems into
 //! agent work orders.
 //!
 //! ## Example flow
@@ -32,7 +32,7 @@ use thiserror::Error;
 
 use crate::self_tune::telemetry_bus::TelemetrySnapshot;
 
-// ─── Error ────────────────────────────────────────────────────────────────────
+//  Error 
 
 /// Errors produced by the task generator.
 #[derive(Debug, Error)]
@@ -46,7 +46,7 @@ pub enum TaskGenError {
     SerializationFailed(String),
 }
 
-// ─── Generated task ───────────────────────────────────────────────────────────
+//  Generated task 
 
 /// Priority of a generated task.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
@@ -149,7 +149,7 @@ impl GeneratedTask {
     }
 }
 
-// ─── Task template ────────────────────────────────────────────────────────────
+//  Task template 
 
 /// A template that maps a metric threshold to a task description.
 #[derive(Debug, Clone)]
@@ -203,7 +203,7 @@ impl TaskTemplate {
     }
 }
 
-// ─── Generator ────────────────────────────────────────────────────────────────
+//  Generator 
 
 struct GenInner {
     templates: Vec<TaskTemplate>,
@@ -248,7 +248,7 @@ impl MetaTaskGenerator {
 
     /// Analyse a telemetry snapshot and generate tasks for any triggered thresholds.
     ///
-    /// Rate-limiting is respected — templates on cooldown are skipped.
+    /// Rate-limiting is respected  -  templates on cooldown are skipped.
     pub fn process_snapshot(
         &self,
         snap: &TelemetrySnapshot,
@@ -325,7 +325,7 @@ impl Default for MetaTaskGenerator {
     }
 }
 
-// ─── Metric extraction ────────────────────────────────────────────────────────
+//  Metric extraction 
 
 fn snapshot_to_metrics(snap: &TelemetrySnapshot) -> HashMap<String, f64> {
     let mut m = HashMap::new();
@@ -365,7 +365,7 @@ fn snapshot_to_metrics(snap: &TelemetrySnapshot) -> HashMap<String, f64> {
     m
 }
 
-// ─── Default templates ────────────────────────────────────────────────────────
+//  Default templates 
 
 fn default_templates() -> Vec<TaskTemplate> {
     vec![
@@ -428,7 +428,7 @@ fn unix_now() -> u64 {
         .unwrap_or(0)
 }
 
-// ─── Tests ────────────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {
@@ -512,7 +512,7 @@ mod tests {
         let gen = MetaTaskGenerator::new();
         gen.process_snapshot(&high_dedup_snap()).unwrap();
         let count_after_first = gen.task_count();
-        // Process again — cooldown prevents re-generation
+        // Process again  -  cooldown prevents re-generation
         gen.process_snapshot(&high_dedup_snap()).unwrap();
         assert_eq!(gen.task_count(), count_after_first);
     }

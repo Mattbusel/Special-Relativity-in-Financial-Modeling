@@ -25,7 +25,7 @@ use super::PipelineConfig;
 ///
 /// # Arguments
 ///
-/// * `path` — Path to the TOML configuration file.
+/// * `path`  -  Path to the TOML configuration file.
 ///
 /// # Returns
 ///
@@ -62,8 +62,8 @@ pub fn load_from_file(path: &Path) -> Result<PipelineConfig, ConfigError> {
 ///
 /// # Arguments
 ///
-/// * `content` — TOML content as a string.
-/// * `source_name` — Identifier for the source (used in error messages).
+/// * `content`  -  TOML content as a string.
+/// * `source_name`  -  Identifier for the source (used in error messages).
 ///
 /// # Returns
 ///

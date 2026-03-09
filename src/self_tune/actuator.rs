@@ -1,7 +1,7 @@
-// ── Lint policy (inherited from crate root) ──────────────────────────────────
+//  Lint policy (inherited from crate root) 
 #![cfg(feature = "self-tune")]
 
-//! # Live-Tuning Actuator (Task 1.x — Parameter Actuation)
+//! # Live-Tuning Actuator (Task 1.x  -  Parameter Actuation)
 //!
 //! ## Responsibility
 //!
@@ -12,12 +12,12 @@
 //! ## Design
 //!
 //! ```text
-//!  TelemetryBus ──snapshot──► TuningController ──adjustments──► LiveTuning
-//!                                                                      │
-//!               CircuitBreaker ◄── failure_threshold ─────────────────┤
-//!               RateLimiter    ◄── refill_rate ──────────────────────┤
-//!               DedupStore     ◄── ttl_ms ──────────────────────────┤
-//!               ShedPolicy     ◄── shed_threshold ─────────────────-┘
+//!  TelemetryBus snapshot TuningController adjustments LiveTuning
+//!                                                                      
+//!               CircuitBreaker  failure_threshold 
+//!               RateLimiter     refill_rate 
+//!               DedupStore      ttl_ms 
+//!               ShedPolicy      shed_threshold -
 //! ```
 //!
 //! All reads are lock-free (`AtomicU64` bit-cast to `f64`).  Writes use
@@ -39,7 +39,7 @@ use tracing::{debug, info};
 
 use crate::self_tune::controller::{ParameterId, ParameterSpec};
 
-// ─── LiveTuning ──────────────────────────────────────────────────────────────
+//  LiveTuning 
 
 /// Shared atomic parameter store.
 ///
@@ -48,7 +48,7 @@ use crate::self_tune::controller::{ParameterId, ParameterSpec};
 ///
 /// # Cloning
 ///
-/// Cheap — all state is behind `Arc`.  Callers should clone when they need
+/// Cheap  -  all state is behind `Arc`.  Callers should clone when they need
 /// to hold a local copy across async yield points.
 #[derive(Clone)]
 pub struct LiveTuning {
@@ -143,7 +143,7 @@ impl LiveTuning {
             .collect()
     }
 
-    // ── Convenience accessors ─────────────────────────────────────────────
+    //  Convenience accessors 
 
     /// Circuit-breaker failure threshold (number of consecutive failures).
     ///
@@ -154,7 +154,7 @@ impl LiveTuning {
         self.get(ParameterId::CircuitBreakerFailureThreshold) as usize
     }
 
-    /// Circuit-breaker success rate (0.0–1.0).
+    /// Circuit-breaker success rate (0.0 - 1.0).
     ///
     /// # Panics
     ///
@@ -210,7 +210,7 @@ impl LiveTuning {
         self.get(ParameterId::PriorityQueuePromotionIntervalMs) as u64
     }
 
-    /// Return the recommended channel buffer size for stage `n` (1-based, 1–5).
+    /// Return the recommended channel buffer size for stage `n` (1-based, 1 - 5).
     ///
     /// Returns the channel_buf_stage1 default for out-of-range `n`.
     ///
@@ -244,7 +244,7 @@ impl std::fmt::Debug for LiveTuning {
     }
 }
 
-// ─── AtomicF64 ───────────────────────────────────────────────────────────────
+//  AtomicF64 
 
 /// Lock-free `f64` cell backed by an `AtomicU64` bit-cast.
 ///
@@ -267,7 +267,7 @@ impl AtomicF64 {
     }
 }
 
-// ─── Tests ───────────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {
@@ -277,7 +277,7 @@ mod tests {
         LiveTuning::new()
     }
 
-    // ── AtomicF64 ─────────────────────────────────────────────────────────
+    //  AtomicF64 
 
     #[test]
     fn test_atomic_f64_roundtrip_zero() {
@@ -311,7 +311,7 @@ mod tests {
         assert_eq!(a.load(), 0.0);
     }
 
-    // ── LiveTuning::new ───────────────────────────────────────────────────
+    //  LiveTuning::new 
 
     #[test]
     fn test_new_initialises_all_params() {
@@ -333,7 +333,7 @@ mod tests {
         }
     }
 
-    // ── LiveTuning::set / get ────────────────────────────────────────────
+    //  LiveTuning::set / get 
 
     #[test]
     fn test_set_within_range_accepted() {
@@ -376,7 +376,7 @@ mod tests {
         assert!((lt.get(ParameterId::RateLimiterRefillRate) - spec.max).abs() < f64::EPSILON);
     }
 
-    // ── apply_adjustments ─────────────────────────────────────────────────
+    //  apply_adjustments 
 
     #[test]
     fn test_apply_empty_adjustments_is_noop() {
@@ -416,12 +416,12 @@ mod tests {
     fn test_apply_clamps_out_of_range_values() {
         let lt = make();
         let spec = ParameterSpec::default_for(ParameterId::CircuitBreakerSuccessRate);
-        // Attempt to set 200% — must be clamped to max
+        // Attempt to set 200%  -  must be clamped to max
         lt.apply_adjustments(&[(ParameterId::CircuitBreakerSuccessRate, 2.0)]);
         assert!(lt.get(ParameterId::CircuitBreakerSuccessRate) <= spec.max);
     }
 
-    // ── snapshot ──────────────────────────────────────────────────────────
+    //  snapshot 
 
     #[test]
     fn test_snapshot_contains_all_params() {
@@ -441,7 +441,7 @@ mod tests {
         assert!((snap[&ParameterId::DedupTtlMs] - expected).abs() < f64::EPSILON);
     }
 
-    // ── convenience accessors ─────────────────────────────────────────────
+    //  convenience accessors 
 
     #[test]
     fn test_circuit_breaker_failure_threshold_in_range() {
@@ -509,7 +509,7 @@ mod tests {
         assert!(v >= spec.min as usize && v <= spec.max as usize);
     }
 
-    // ── Clone / Arc sharing ───────────────────────────────────────────────
+    //  Clone / Arc sharing 
 
     #[test]
     fn test_clone_shares_state() {
@@ -526,7 +526,7 @@ mod tests {
         assert!(s.contains("LiveTuning"));
     }
 
-    // ── Concurrency ───────────────────────────────────────────────────────
+    //  Concurrency 
 
     #[test]
     fn test_concurrent_reads_consistent() {

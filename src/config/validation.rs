@@ -66,7 +66,7 @@ pub enum ConfigError {
 ///
 /// # Arguments
 ///
-/// * `config` — The parsed config to validate.
+/// * `config`  -  The parsed config to validate.
 ///
 /// # Returns
 ///
@@ -79,7 +79,7 @@ pub enum ConfigError {
 pub fn validate(config: &PipelineConfig) -> Result<(), Vec<ConfigError>> {
     let mut errors = Vec::new();
 
-    // ── Retry settings ───────────────────────────────────────────────
+    //  Retry settings 
     if config.resilience.retry_base_ms > config.resilience.retry_max_ms {
         errors.push(ConfigError::InvalidField {
             field: "resilience.retry_base_ms".into(),
@@ -96,7 +96,7 @@ pub fn validate(config: &PipelineConfig) -> Result<(), Vec<ConfigError>> {
         });
     }
 
-    // ── Circuit breaker ──────────────────────────────────────────────
+    //  Circuit breaker 
     if config.resilience.circuit_breaker_success_rate > 1.0
         || config.resilience.circuit_breaker_success_rate < 0.0
     {
@@ -123,7 +123,7 @@ pub fn validate(config: &PipelineConfig) -> Result<(), Vec<ConfigError>> {
         });
     }
 
-    // ── Inference temperature ────────────────────────────────────────
+    //  Inference temperature 
     if let Some(temp) = config.stages.inference.temperature {
         if !(0.0..=2.0).contains(&temp) {
             errors.push(ConfigError::InvalidField {
@@ -134,7 +134,7 @@ pub fn validate(config: &PipelineConfig) -> Result<(), Vec<ConfigError>> {
         }
     }
 
-    // ── Model name non-empty ─────────────────────────────────────────
+    //  Model name non-empty 
     if config.stages.inference.model.trim().is_empty() {
         errors.push(ConfigError::InvalidField {
             field: "stages.inference.model".into(),
@@ -143,7 +143,7 @@ pub fn validate(config: &PipelineConfig) -> Result<(), Vec<ConfigError>> {
         });
     }
 
-    // ── Pipeline name non-empty ──────────────────────────────────────
+    //  Pipeline name non-empty 
     if config.pipeline.name.trim().is_empty() {
         errors.push(ConfigError::InvalidField {
             field: "pipeline.name".into(),
@@ -152,7 +152,7 @@ pub fn validate(config: &PipelineConfig) -> Result<(), Vec<ConfigError>> {
         });
     }
 
-    // ── Pipeline version non-empty ───────────────────────────────────
+    //  Pipeline version non-empty 
     if config.pipeline.version.trim().is_empty() {
         errors.push(ConfigError::InvalidField {
             field: "pipeline.version".into(),
@@ -161,7 +161,7 @@ pub fn validate(config: &PipelineConfig) -> Result<(), Vec<ConfigError>> {
         });
     }
 
-    // ── RAG timeout > 0 ─────────────────────────────────────────────
+    //  RAG timeout > 0 
     if config.stages.rag.enabled && config.stages.rag.timeout_ms == 0 {
         errors.push(ConfigError::InvalidField {
             field: "stages.rag.timeout_ms".into(),
@@ -170,7 +170,7 @@ pub fn validate(config: &PipelineConfig) -> Result<(), Vec<ConfigError>> {
         });
     }
 
-    // ── RAG max_context_tokens > 0 ──────────────────────────────────
+    //  RAG max_context_tokens > 0 
     if config.stages.rag.enabled && config.stages.rag.max_context_tokens == 0 {
         errors.push(ConfigError::InvalidField {
             field: "stages.rag.max_context_tokens".into(),
@@ -179,7 +179,7 @@ pub fn validate(config: &PipelineConfig) -> Result<(), Vec<ConfigError>> {
         });
     }
 
-    // ── Channel capacities > 0 ──────────────────────────────────────
+    //  Channel capacities > 0 
     if let Some(cap) = config.stages.rag.channel_capacity {
         if cap == 0 {
             errors.push(ConfigError::InvalidField {
@@ -214,7 +214,7 @@ pub fn validate(config: &PipelineConfig) -> Result<(), Vec<ConfigError>> {
         });
     }
 
-    // ── Deduplication constraints ────────────────────────────────────
+    //  Deduplication constraints 
     if config.deduplication.enabled && config.deduplication.window_s == 0 {
         errors.push(ConfigError::InvalidField {
             field: "deduplication.window_s".into(),
@@ -231,7 +231,7 @@ pub fn validate(config: &PipelineConfig) -> Result<(), Vec<ConfigError>> {
         });
     }
 
-    // ── Metrics port range ──────────────────────────────────────────
+    //  Metrics port range 
     if let Some(port) = config.observability.metrics_port {
         if port == 0 {
             errors.push(ConfigError::InvalidField {
@@ -310,7 +310,7 @@ mod tests {
         }
     }
 
-    // ── Valid config passes ──────────────────────────────────────────
+    //  Valid config passes 
 
     #[test]
     fn test_validate_valid_config_passes() {
@@ -318,7 +318,7 @@ mod tests {
         assert!(validate(&config).is_ok());
     }
 
-    // ── Retry validation ────────────────────────────────────────────
+    //  Retry validation 
 
     #[test]
     fn test_validate_retry_base_exceeds_max_fails() {
@@ -349,7 +349,7 @@ mod tests {
         }));
     }
 
-    // ── Circuit breaker validation ──────────────────────────────────
+    //  Circuit breaker validation 
 
     #[test]
     fn test_validate_cb_success_rate_above_1_fails() {
@@ -409,7 +409,7 @@ mod tests {
         }));
     }
 
-    // ── Temperature validation ──────────────────────────────────────
+    //  Temperature validation 
 
     #[test]
     fn test_validate_temperature_negative_fails() {
@@ -454,7 +454,7 @@ mod tests {
         assert!(validate(&config).is_ok());
     }
 
-    // ── Name/version validation ─────────────────────────────────────
+    //  Name/version validation 
 
     #[test]
     fn test_validate_empty_model_name_fails() {
@@ -489,7 +489,7 @@ mod tests {
         }));
     }
 
-    // ── RAG constraints ─────────────────────────────────────────────
+    //  RAG constraints 
 
     #[test]
     fn test_validate_rag_enabled_zero_timeout_fails() {
@@ -523,7 +523,7 @@ mod tests {
         }));
     }
 
-    // ── Channel capacity ────────────────────────────────────────────
+    //  Channel capacity 
 
     #[test]
     fn test_validate_rag_channel_capacity_zero_fails() {
@@ -569,7 +569,7 @@ mod tests {
         }));
     }
 
-    // ── Dedup constraints ───────────────────────────────────────────
+    //  Dedup constraints 
 
     #[test]
     fn test_validate_dedup_enabled_zero_window_fails() {
@@ -603,7 +603,7 @@ mod tests {
         }));
     }
 
-    // ── Metrics port ────────────────────────────────────────────────
+    //  Metrics port 
 
     #[test]
     fn test_validate_metrics_port_zero_fails() {
@@ -623,7 +623,7 @@ mod tests {
         assert!(validate(&config).is_ok());
     }
 
-    // ── Multiple errors collected ───────────────────────────────────
+    //  Multiple errors collected 
 
     #[test]
     fn test_validate_collects_multiple_errors() {
@@ -642,7 +642,7 @@ mod tests {
         );
     }
 
-    // ── Error display ───────────────────────────────────────────────
+    //  Error display 
 
     #[test]
     fn test_config_error_parse_display() {

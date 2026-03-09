@@ -30,7 +30,7 @@ use tracing::{error, trace, warn};
 
 use crate::self_tune::telemetry_bus::TelemetryBus;
 
-// ── Wire-format mirror of HelixRouter's `/api/stats` response ────────────────
+//  Wire-format mirror of HelixRouter's `/api/stats` response 
 
 /// Per-strategy routing count from HelixRouter's `/api/stats`.
 #[derive(Debug, Clone, Deserialize, Default)]
@@ -64,7 +64,7 @@ pub struct HelixLatencyRow {
 /// relying solely on the aggregate pressure signal.
 #[derive(Debug, Clone, Default)]
 pub struct HelixStrategySnapshot {
-    /// Fraction of jobs explicitly shed via the `Drop` strategy (0.0–1.0).
+    /// Fraction of jobs explicitly shed via the `Drop` strategy (0.0 - 1.0).
     /// A non-zero value means HelixRouter is actively shedding load.
     pub drop_strategy_frac: f64,
     /// Highest p95 latency seen across all strategies (milliseconds).
@@ -85,18 +85,18 @@ struct HelixStats {
     pressure_score: f64,
     dropped: u64,
     completed: u64,
-    /// Current adaptive spawn threshold — logged for observability only.
+    /// Current adaptive spawn threshold  -  logged for observability only.
     #[serde(default)]
     adaptive_spawn_threshold: u64,
-    /// Per-strategy routing counts — used to detect explicit load shedding.
+    /// Per-strategy routing counts  -  used to detect explicit load shedding.
     #[serde(default)]
     routed_by_strategy: Vec<HelixRoutedStrategyCount>,
-    /// Per-strategy latency summaries — used to detect hot execution paths.
+    /// Per-strategy latency summaries  -  used to detect hot execution paths.
     #[serde(default)]
     latency_by_strategy: Vec<HelixLatencyRow>,
 }
 
-// ── Configuration ─────────────────────────────────────────────────────────────
+//  Configuration 
 
 /// Configuration for [`HelixPressureProbe`].
 #[derive(Debug, Clone)]
@@ -125,7 +125,7 @@ impl Default for HelixProbeConfig {
     }
 }
 
-// ── Probe ─────────────────────────────────────────────────────────────────────
+//  Probe 
 
 /// Polls HelixRouter and feeds its pressure score into the [`TelemetryBus`].
 ///
@@ -155,7 +155,7 @@ pub struct HelixPressureProbe {
 impl HelixPressureProbe {
     /// Create a new probe.
     ///
-    /// `bus` is cheaply cloned — [`TelemetryBus`] is internally `Arc`-backed.
+    /// `bus` is cheaply cloned  -  [`TelemetryBus`] is internally `Arc`-backed.
     ///
     /// # Panics
     /// This function never panics.
@@ -351,7 +351,7 @@ impl HelixPressureProbe {
     }
 }
 
-// ─── Tests ────────────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {
@@ -367,7 +367,7 @@ mod tests {
         HelixPressureProbe::new(HelixProbeConfig::default(), bus)
     }
 
-    // ── Config tests ──────────────────────────────────────────────────────
+    //  Config tests 
 
     #[test]
     fn config_default_base_url() {
@@ -408,7 +408,7 @@ mod tests {
         assert_eq!(cfg2.base_url, "http://other:9090");
     }
 
-    // ── Probe construction ────────────────────────────────────────────────
+    //  Probe construction 
 
     #[test]
     fn probe_new_constructs_without_panic() {
@@ -432,7 +432,7 @@ mod tests {
         assert_eq!(probe.config.error_threshold, 3);
     }
 
-    // ── Bus integration: external pressure wiring ─────────────────────────
+    //  Bus integration: external pressure wiring 
 
     #[test]
     fn probe_bus_starts_with_zero_pressure() {
@@ -475,7 +475,7 @@ mod tests {
         assert!((v - 0.55).abs() < 0.002, "expected ~0.55, got {v}");
     }
 
-    // ── HelixStats deserialization ────────────────────────────────────────
+    //  HelixStats deserialization 
 
     #[test]
     fn helix_stats_deserializes_from_json() {
@@ -516,7 +516,7 @@ mod tests {
         assert!(result.is_err(), "missing pressure_score should fail");
     }
 
-    // ── Blending integration ──────────────────────────────────────────────
+    //  Blending integration 
 
     #[tokio::test]
     async fn blended_pressure_visible_in_snapshot_after_probe_tick() {
@@ -539,7 +539,7 @@ mod tests {
             "cleared external pressure should yield 0.0: {}", snap.pressure);
     }
 
-    // ── Combined pressure signal tests ────────────────────────────────────
+    //  Combined pressure signal tests 
 
     #[test]
     fn combined_pressure_uses_drop_rate_when_higher_than_pressure_score() {
@@ -598,7 +598,7 @@ mod tests {
         assert!((combined - 0.5).abs() < 1e-9, "combined={combined}");
     }
 
-    // ── Mock-HTTP integration tests ───────────────────────────────────────
+    //  Mock-HTTP integration tests 
     //
     // These tests spin up a minimal tokio TCP listener that speaks just enough
     // HTTP/1.1 to satisfy reqwest, verifying the probe's fetch_pressure() method
@@ -685,7 +685,7 @@ mod tests {
         assert!(err.contains("500"), "error should mention status code: {err}");
     }
 
-    // ── Per-strategy snapshot tests ───────────────────────────────────────
+    //  Per-strategy snapshot tests 
 
     #[test]
     fn build_strategy_snapshot_detects_drop_strategy() {

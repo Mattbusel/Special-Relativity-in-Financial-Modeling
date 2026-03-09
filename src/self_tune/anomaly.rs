@@ -32,7 +32,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-// ─── Errors ──────────────────────────────────────────────────────────────────
+//  Errors 
 
 /// Errors produced by the anomaly detection subsystem.
 #[derive(Debug, Error)]
@@ -57,7 +57,7 @@ pub enum AnomalyError {
     MetricNotFound(String),
 }
 
-// ─── Enums ───────────────────────────────────────────────────────────────────
+//  Enums 
 
 /// Severity classification for a detected anomaly.
 ///
@@ -83,7 +83,7 @@ pub enum DetectionMethod {
     IsolationScore,
 }
 
-// ─── Anomaly record ──────────────────────────────────────────────────────────
+//  Anomaly record 
 
 /// A single detected anomaly event.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -106,7 +106,7 @@ pub struct Anomaly {
     pub detected_at_secs: u64,
 }
 
-// ─── Configuration ───────────────────────────────────────────────────────────
+//  Configuration 
 
 /// Configuration for the Z-score detection algorithm.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -177,7 +177,7 @@ impl Default for AnomalyDetectorConfig {
     }
 }
 
-// ─── Internal state ──────────────────────────────────────────────────────────
+//  Internal state 
 
 /// Per-metric CUSUM accumulator state.
 #[derive(Debug, Clone)]
@@ -207,7 +207,7 @@ struct DetectorInner {
     max_history: usize,
 }
 
-// ─── AnomalyDetector ─────────────────────────────────────────────────────────
+//  AnomalyDetector 
 
 /// Thread-safe statistical anomaly detector for telemetry streams.
 ///
@@ -264,8 +264,8 @@ impl AnomalyDetector {
     /// evaluate the new value independently.
     ///
     /// # Arguments
-    /// * `metric` — Name of the metric being observed
-    /// * `value` — The observed numeric value
+    /// * `metric`  -  Name of the metric being observed
+    /// * `value`  -  The observed numeric value
     ///
     /// # Returns
     /// A vector of detected anomalies (possibly empty).
@@ -285,7 +285,7 @@ impl AnomalyDetector {
     /// every metric.
     ///
     /// # Arguments
-    /// * `metrics` — Map of metric names to observed values
+    /// * `metrics`  -  Map of metric names to observed values
     ///
     /// # Returns
     /// A vector of all detected anomalies across all metrics.
@@ -345,9 +345,9 @@ impl AnomalyDetector {
     /// deviation is zero (all values identical).
     ///
     /// # Arguments
-    /// * `window` — Rolling window of recent samples
-    /// * `value` — The new observation to score
-    /// * `config` — Z-score algorithm configuration
+    /// * `window`  -  Rolling window of recent samples
+    /// * `value`  -  The new observation to score
+    /// * `config`  -  Z-score algorithm configuration
     ///
     /// # Returns
     /// `Some((z_score, severity))` if an anomaly is detected, `None` otherwise.
@@ -386,9 +386,9 @@ impl AnomalyDetector {
     /// configured threshold.
     ///
     /// # Arguments
-    /// * `state` — Mutable CUSUM accumulator state
-    /// * `value` — The new observation
-    /// * `config` — CUSUM algorithm configuration
+    /// * `state`  -  Mutable CUSUM accumulator state
+    /// * `value`  -  The new observation
+    /// * `config`  -  CUSUM algorithm configuration
     ///
     /// # Returns
     /// `Some((cusum_value, severity))` if an anomaly is detected, `None` otherwise.
@@ -435,8 +435,8 @@ impl AnomalyDetector {
     /// are skipped.
     ///
     /// # Arguments
-    /// * `windows` — All metric rolling windows
-    /// * `metrics` — Current metric values to score
+    /// * `windows`  -  All metric rolling windows
+    /// * `metrics`  -  Current metric values to score
     ///
     /// # Returns
     /// The average Z-score across all scoreable metrics, or `0.0` if none are
@@ -543,7 +543,7 @@ impl AnomalyDetector {
         Ok(())
     }
 
-    // ── Private helpers ──────────────────────────────────────────────────────
+    //  Private helpers 
 
     /// Core ingestion logic operating on the already-locked inner state.
     fn ingest_inner(inner: &mut DetectorInner, metric: &str, value: f64) -> Vec<Anomaly> {
@@ -578,7 +578,7 @@ impl AnomalyDetector {
             anomalies.push(anomaly);
         }
 
-        // CUSUM detection — skip until the window has at least 5 samples so the
+        // CUSUM detection  -  skip until the window has at least 5 samples so the
         // mean estimate is meaningful and the cold-start spike is avoided.
         let cusum_config = inner.config.cusum.clone();
         let (mean, _) = window_mean_stddev(window);
@@ -627,7 +627,7 @@ impl AnomalyDetector {
     }
 }
 
-// ─── Free helpers ────────────────────────────────────────────────────────────
+//  Free helpers 
 
 /// Compute mean and population standard deviation of a window.
 ///
@@ -651,13 +651,13 @@ fn unix_now() -> u64 {
         .unwrap_or(0)
 }
 
-// ─── Tests ───────────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    // ── Construction ─────────────────────────────────────────────────────────
+    //  Construction 
 
     #[test]
     fn test_new_creates_detector() {
@@ -677,7 +677,7 @@ mod tests {
         assert!(inner.config.isolation_enabled);
     }
 
-    // ── Ingestion / Z-score ──────────────────────────────────────────────────
+    //  Ingestion / Z-score 
 
     #[test]
     fn test_ingest_no_anomaly_normal_data() {
@@ -785,7 +785,7 @@ mod tests {
     #[test]
     fn test_z_score_insufficient_data_no_anomaly() {
         let det = AnomalyDetector::with_defaults();
-        // Only one sample — not enough for z-score
+        // Only one sample  -  not enough for z-score
         let result = det.ingest("new_metric", 999.0).unwrap();
         let z_anomalies: Vec<_> = result
             .iter()
@@ -849,7 +849,7 @@ mod tests {
         assert!(result.is_none());
     }
 
-    // ── CUSUM ────────────────────────────────────────────────────────────────
+    //  CUSUM 
 
     #[test]
     fn test_cusum_detects_drift() {
@@ -882,7 +882,7 @@ mod tests {
         let mut state = CusumState::new();
         let mean = 10.0;
 
-        // Feed values close to the mean — should not alarm
+        // Feed values close to the mean  -  should not alarm
         for _ in 0..100 {
             let result = AnomalyDetector::check_cusum(&mut state, 10.0, mean, &config);
             assert!(result.is_none(), "stable values should not trigger CUSUM");
@@ -932,7 +932,7 @@ mod tests {
         assert!(alarmed);
 
         // State should NOT be reset
-        // Feed another large deviation — cusum should still be elevated or accumulate
+        // Feed another large deviation  -  cusum should still be elevated or accumulate
         let _ = AnomalyDetector::check_cusum(&mut state, 20.0, 10.0, &config);
         // high should be non-zero (accumulated, not reset)
         assert!(
@@ -941,7 +941,7 @@ mod tests {
         );
     }
 
-    // ── Isolation score ──────────────────────────────────────────────────────
+    //  Isolation score 
 
     #[test]
     fn test_isolation_score_computes() {
@@ -980,7 +980,7 @@ mod tests {
         );
     }
 
-    // ── Batch ingestion ──────────────────────────────────────────────────────
+    //  Batch ingestion 
 
     #[test]
     fn test_ingest_batch_processes_all() {
@@ -1000,7 +1000,7 @@ mod tests {
         assert!(inner.windows.contains_key("disk"));
     }
 
-    // ── History ──────────────────────────────────────────────────────────────
+    //  History 
 
     #[test]
     fn test_anomaly_history_records() {
@@ -1118,7 +1118,7 @@ mod tests {
         }
     }
 
-    // ── Window stats ─────────────────────────────────────────────────────────
+    //  Window stats 
 
     #[test]
     fn test_window_stats_returns_mean_stddev() {
@@ -1142,7 +1142,7 @@ mod tests {
         assert!(det.window_stats("nonexistent").is_none());
     }
 
-    // ── Clear history ────────────────────────────────────────────────────────
+    //  Clear history 
 
     #[test]
     fn test_clear_history() {
@@ -1168,7 +1168,7 @@ mod tests {
         assert!(det.anomaly_history().is_empty());
     }
 
-    // ── Window bounding ──────────────────────────────────────────────────────
+    //  Window bounding 
 
     #[test]
     fn test_window_bounded_by_max() {
@@ -1195,7 +1195,7 @@ mod tests {
         );
     }
 
-    // ── Severity ordering ────────────────────────────────────────────────────
+    //  Severity ordering 
 
     #[test]
     fn test_severity_ordering() {
@@ -1204,7 +1204,7 @@ mod tests {
         assert!(Severity::Info < Severity::Critical);
     }
 
-    // ── Serialization ────────────────────────────────────────────────────────
+    //  Serialization 
 
     #[test]
     fn test_anomaly_serialization() {
@@ -1242,7 +1242,7 @@ mod tests {
         }
     }
 
-    // ── Config defaults ──────────────────────────────────────────────────────
+    //  Config defaults 
 
     #[test]
     fn test_config_default_values() {
@@ -1258,7 +1258,7 @@ mod tests {
         assert_eq!(config.max_window_size, 120);
     }
 
-    // ── Clone shares state ───────────────────────────────────────────────────
+    //  Clone shares state 
 
     #[test]
     fn test_clone_shares_state() {
@@ -1272,7 +1272,7 @@ mod tests {
         assert!(inner.windows.contains_key("shared_metric"));
     }
 
-    // ── Multiple metrics independent ─────────────────────────────────────────
+    //  Multiple metrics independent 
 
     #[test]
     fn test_multiple_metrics_independent() {
@@ -1297,7 +1297,7 @@ mod tests {
         assert!((beta_mean - 200.0).abs() < f64::EPSILON);
     }
 
-    // ── Gradual drift vs spike ───────────────────────────────────────────────
+    //  Gradual drift vs spike 
 
     #[test]
     fn test_gradual_drift_detected_by_cusum_not_zscore() {
@@ -1382,7 +1382,7 @@ mod tests {
         assert!(zscore_detected, "Z-score should detect sudden spike");
     }
 
-    // ── History cap ──────────────────────────────────────────────────────────
+    //  History cap 
 
     #[test]
     fn test_history_capped() {

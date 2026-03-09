@@ -222,7 +222,7 @@ impl SnapshotStore {
     /// Create a new, empty snapshot store.
     ///
     /// # Arguments
-    /// * `max_snapshots` — Maximum number of snapshots to retain. When exceeded,
+    /// * `max_snapshots`  -  Maximum number of snapshots to retain. When exceeded,
     ///   the oldest snapshot is evicted.
     ///
     /// # Panics
@@ -242,8 +242,8 @@ impl SnapshotStore {
     /// [`best_in_window`](Self::best_in_window).
     ///
     /// # Arguments
-    /// * `max_snapshots` — Maximum number of snapshots to retain.
-    /// * `metric` — The metric name to maximise when selecting the best snapshot.
+    /// * `max_snapshots`  -  Maximum number of snapshots to retain.
+    /// * `metric`  -  The metric name to maximise when selecting the best snapshot.
     ///
     /// # Panics
     /// This function never panics.
@@ -264,10 +264,10 @@ impl SnapshotStore {
     /// the oldest snapshot is evicted before the new one is inserted.
     ///
     /// # Arguments
-    /// * `parameters` — The full set of tunable parameters.
-    /// * `metric_scores` — Metric values at the time of this snapshot.
-    /// * `source` — What triggered this snapshot.
-    /// * `description` — Human-readable note.
+    /// * `parameters`  -  The full set of tunable parameters.
+    /// * `metric_scores`  -  Metric values at the time of this snapshot.
+    /// * `source`  -  What triggered this snapshot.
+    /// * `description`  -  Human-readable note.
     ///
     /// # Returns
     /// The newly created [`ConfigSnapshot`].
@@ -310,7 +310,7 @@ impl SnapshotStore {
     /// Retrieve a snapshot by its version number.
     ///
     /// # Arguments
-    /// * `version` — The version number to look up.
+    /// * `version`  -  The version number to look up.
     ///
     /// # Returns
     /// A clone of the matching [`ConfigSnapshot`].
@@ -354,8 +354,8 @@ impl SnapshotStore {
     /// Compute the diff between two snapshot versions.
     ///
     /// # Arguments
-    /// * `from` — The "before" version number.
-    /// * `to` — The "after" version number.
+    /// * `from`  -  The "before" version number.
+    /// * `to`  -  The "after" version number.
     ///
     /// # Returns
     /// A [`ConfigDiff`] describing all parameter and metric changes.
@@ -399,7 +399,7 @@ impl SnapshotStore {
     /// auto-incremented version number.
     ///
     /// # Arguments
-    /// * `to_version` — The version whose parameters should be restored.
+    /// * `to_version`  -  The version whose parameters should be restored.
     ///
     /// # Returns
     /// The newly created rollback [`ConfigSnapshot`].
@@ -430,7 +430,7 @@ impl SnapshotStore {
     /// the window is returned.
     ///
     /// # Arguments
-    /// * `window_secs` — How far back from now (in seconds) to search.
+    /// * `window_secs`  -  How far back from now (in seconds) to search.
     ///
     /// # Returns
     /// The best [`ConfigSnapshot`] within the window.
@@ -490,7 +490,7 @@ impl SnapshotStore {
     /// Return the last N snapshots, newest first.
     ///
     /// # Arguments
-    /// * `n` — Maximum number of snapshots to return.
+    /// * `n`  -  Maximum number of snapshots to return.
     ///
     /// # Returns
     /// A `Vec` of snapshots ordered from newest to oldest, containing at most
@@ -529,11 +529,11 @@ impl SnapshotStore {
 
     /// Find all snapshots created by the given source type.
     ///
-    /// For [`SnapshotSource::Rollback`], matching is by variant only — the
+    /// For [`SnapshotSource::Rollback`], matching is by variant only  -  the
     /// inner `from_version` value is ignored.
     ///
     /// # Arguments
-    /// * `source` — The source type to filter by.
+    /// * `source`  -  The source type to filter by.
     ///
     /// # Returns
     /// A `Vec` of matching snapshots (may be empty).
@@ -638,7 +638,7 @@ impl SnapshotStore {
         changes
     }
 
-    /// Compute metric-level changes — only for metrics present in both maps.
+    /// Compute metric-level changes  -  only for metrics present in both maps.
     fn compute_metric_changes(
         from: &HashMap<String, f64>,
         to: &HashMap<String, f64>,
@@ -719,8 +719,8 @@ impl RedisSnapshotStore {
     /// the store operates in degraded mode (in-memory only) and logs a warning.
     ///
     /// # Arguments
-    /// * `max_snapshots` — Maximum number of snapshots to retain in memory.
-    /// * `redis_url` — Redis connection string (e.g. `redis://127.0.0.1:6379`).
+    /// * `max_snapshots`  -  Maximum number of snapshots to retain in memory.
+    /// * `redis_url`  -  Redis connection string (e.g. `redis://127.0.0.1:6379`).
     ///
     /// # Panics
     /// This function never panics.
@@ -843,10 +843,10 @@ impl RedisSnapshotStore {
     /// Redis on a best-effort basis.
     ///
     /// # Arguments
-    /// * `parameters` — The full set of tunable parameters.
-    /// * `metric_scores` — Metric values at the time of this snapshot.
-    /// * `source` — What triggered this snapshot.
-    /// * `description` — Human-readable note.
+    /// * `parameters`  -  The full set of tunable parameters.
+    /// * `metric_scores`  -  Metric values at the time of this snapshot.
+    /// * `source`  -  What triggered this snapshot.
+    /// * `description`  -  Human-readable note.
     ///
     /// # Returns
     /// The newly created [`ConfigSnapshot`].
@@ -874,7 +874,7 @@ impl RedisSnapshotStore {
     /// Redis as a fallback.
     ///
     /// # Arguments
-    /// * `version` — The version number to look up.
+    /// * `version`  -  The version number to look up.
     ///
     /// # Returns
     /// A clone of the matching [`ConfigSnapshot`].
@@ -927,7 +927,7 @@ impl RedisSnapshotStore {
     /// Creates a new snapshot in both the in-memory store and Redis.
     ///
     /// # Arguments
-    /// * `to_version` — The version whose parameters should be restored.
+    /// * `to_version`  -  The version whose parameters should be restored.
     ///
     /// # Returns
     /// The newly created rollback [`ConfigSnapshot`].
@@ -1523,7 +1523,7 @@ mod tests {
         let pids = store.find_by_source(&SnapshotSource::PidAdjustment);
         assert_eq!(pids.len(), 1);
 
-        // Match by variant only — inner value is ignored.
+        // Match by variant only  -  inner value is ignored.
         let rollbacks = store.find_by_source(&SnapshotSource::Rollback { from_version: 0 });
         assert_eq!(rollbacks.len(), 1);
         assert_eq!(rollbacks[0].version, 3);

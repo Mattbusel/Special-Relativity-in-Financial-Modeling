@@ -1,4 +1,4 @@
-//! # CoordinationConfig — agent fleet configuration
+//! # CoordinationConfig  -  agent fleet configuration
 //!
 //! ## Responsibility
 //! Define configuration for the agent coordination layer including
@@ -20,14 +20,14 @@ use std::path::PathBuf;
 ///
 /// # Fields
 ///
-/// * `agent_count` — Number of agent processes to spawn (default: 4)
-/// * `task_file` — Path to the tasks TOML file (default: `tasks.toml`)
-/// * `lock_dir` — Directory for per-task lock files (default: `.coordination/locks`)
-/// * `claude_bin` — Path to the claude binary (default: `claude`)
-/// * `project_path` — Root path of the project for agents (default: `.`)
-/// * `timeout_secs` — Maximum seconds per task before timeout (default: 600)
-/// * `stale_lock_secs` — Lock files older than this are reclaimable (default: 300)
-/// * `health_interval_secs` — Seconds between health checks (default: 10)
+/// * `agent_count`  -  Number of agent processes to spawn (default: 4)
+/// * `task_file`  -  Path to the tasks TOML file (default: `tasks.toml`)
+/// * `lock_dir`  -  Directory for per-task lock files (default: `.coordination/locks`)
+/// * `claude_bin`  -  Path to the claude binary (default: `claude`)
+/// * `project_path`  -  Root path of the project for agents (default: `.`)
+/// * `timeout_secs`  -  Maximum seconds per task before timeout (default: 600)
+/// * `stale_lock_secs`  -  Lock files older than this are reclaimable (default: 300)
+/// * `health_interval_secs`  -  Seconds between health checks (default: 10)
 ///
 /// # Example
 ///

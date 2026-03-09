@@ -1,4 +1,4 @@
-//! # AgentMonitor — fleet health monitoring
+//! # AgentMonitor  -  fleet health monitoring
 //!
 //! ## Responsibility
 //! Watch running agents for crashes or hangs. Detect stale claims
@@ -159,8 +159,8 @@ impl AgentMonitor {
     ///
     /// # Arguments
     ///
-    /// * `config` — Shared coordination configuration
-    /// * `queue` — Shared task queue to monitor
+    /// * `config`  -  Shared coordination configuration
+    /// * `queue`  -  Shared task queue to monitor
     ///
     /// # Panics
     ///
@@ -177,7 +177,7 @@ impl AgentMonitor {
     ///
     /// # Arguments
     ///
-    /// * `agent_id` — The agent to register
+    /// * `agent_id`  -  The agent to register
     ///
     /// # Panics
     ///
@@ -191,7 +191,7 @@ impl AgentMonitor {
     ///
     /// # Arguments
     ///
-    /// * `agent_id` — The agent to mark as finished
+    /// * `agent_id`  -  The agent to mark as finished
     ///
     /// # Panics
     ///
@@ -205,8 +205,8 @@ impl AgentMonitor {
     ///
     /// # Arguments
     ///
-    /// * `agent_id` — The agent to mark
-    /// * `reason` — Human-readable reason for unhealthiness
+    /// * `agent_id`  -  The agent to mark
+    /// * `reason`  -  Human-readable reason for unhealthiness
     ///
     /// # Panics
     ///
@@ -248,7 +248,7 @@ impl AgentMonitor {
     ///
     /// # Arguments
     ///
-    /// * `shutdown` — Watch receiver for shutdown signals
+    /// * `shutdown`  -  Watch receiver for shutdown signals
     ///
     /// # Returns
     ///

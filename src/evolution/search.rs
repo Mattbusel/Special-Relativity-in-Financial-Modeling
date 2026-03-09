@@ -131,7 +131,7 @@ struct Inner {
 
 impl Inner {
     fn next_rng(&mut self) -> u64 {
-        // xorshift64 — lightweight, deterministic PRNG
+        // xorshift64  -  lightweight, deterministic PRNG
         let mut x = self.rng_state;
         x ^= x << 13;
         x ^= x >> 7;

@@ -6,16 +6,16 @@
 //! ## Endpoints
 //!
 //! ### REST API
-//! - `POST /api/v1/infer` — Submit inference request (JSON)
-//! - `POST /api/v1/stream` — SSE token streaming
-//! - `GET  /api/v1/status/{request_id}` — Check request status
-//! - `GET  /api/v1/result/{request_id}` — Get result (blocking until complete)
-//! - `GET  /api/v1/schema` — OpenAPI 3.0 schema
-//! - `GET  /health` — Health check
-//! - `GET  /metrics` — Prometheus metrics
+//! - `POST /api/v1/infer`  -  Submit inference request (JSON)
+//! - `POST /api/v1/stream`  -  SSE token streaming
+//! - `GET  /api/v1/status/{request_id}`  -  Check request status
+//! - `GET  /api/v1/result/{request_id}`  -  Get result (blocking until complete)
+//! - `GET  /api/v1/schema`  -  OpenAPI 3.0 schema
+//! - `GET  /health`  -  Health check
+//! - `GET  /metrics`  -  Prometheus metrics
 //!
 //! ### WebSocket
-//! - `WS /api/v1/ws` — Real-time streaming inference
+//! - `WS /api/v1/ws`  -  Real-time streaming inference
 
 #[cfg(feature = "web-api")]
 use axum::{
@@ -311,7 +311,7 @@ async fn body_size_middleware(
 // REST Handlers
 // ============================================================================
 
-/// `POST /api/v1/infer` — Submit an inference request.
+/// `POST /api/v1/infer`  -  Submit an inference request.
 ///
 /// Accepts an [`InferRequest`] JSON body and forwards it to the pipeline.
 ///
@@ -362,7 +362,7 @@ async fn infer_handler(
     }))
 }
 
-/// `GET /api/v1/status/{request_id}` — Check request status.
+/// `GET /api/v1/status/{request_id}`  -  Check request status.
 ///
 /// # Panics
 ///
@@ -386,7 +386,7 @@ async fn status_handler(
     }))
 }
 
-/// `GET /api/v1/result/{request_id}` — Block until result is ready.
+/// `GET /api/v1/result/{request_id}`  -  Block until result is ready.
 ///
 /// # Panics
 ///
@@ -428,7 +428,7 @@ async fn result_handler(
 // SSE Streaming
 // ============================================================================
 
-/// `POST /api/v1/stream` — SSE token streaming.
+/// `POST /api/v1/stream`  -  SSE token streaming.
 ///
 /// Sends tokens as Server-Sent Events as they are generated. Emits a `start`
 /// event with the request ID, then individual `token` events, and finally a
@@ -481,7 +481,7 @@ async fn sse_stream_handler(
 // WebSocket
 // ============================================================================
 
-/// `GET /api/v1/ws` — WebSocket upgrade handler.
+/// `GET /api/v1/ws`  -  WebSocket upgrade handler.
 ///
 /// Upgrades the connection to a WebSocket with a 1 MB message size limit.
 ///
@@ -509,7 +509,7 @@ async fn websocket_stream(mut socket: WebSocket, state: Arc<AppState>) {
             msg = socket.recv() => {
                 match msg {
                     Some(Ok(Message::Text(text))) => {
-                        // ── Rate limiting ───────────────────────────────
+                        //  Rate limiting 
                         if window_start.elapsed() > Duration::from_secs(60) {
                             msg_count = 0;
                             window_start = std::time::Instant::now();
@@ -523,7 +523,7 @@ async fn websocket_stream(mut socket: WebSocket, state: Arc<AppState>) {
                             continue;
                         }
 
-                        // ── Parse and process ──────────────────────────
+                        //  Parse and process 
                         let req: InferRequest = match serde_json::from_str(&text) {
                             Ok(r) => r,
                             Err(e) => {
@@ -586,7 +586,7 @@ async fn websocket_stream(mut socket: WebSocket, state: Arc<AppState>) {
                         warn!(error = %e, "WebSocket receive error");
                         break;
                     }
-                    _ => {} // Binary, Pong — ignore
+                    _ => {} // Binary, Pong  -  ignore
                 }
             }
             _ = ping_interval.tick() => {
@@ -597,14 +597,14 @@ async fn websocket_stream(mut socket: WebSocket, state: Arc<AppState>) {
         }
     }
 
-    info!("WebSocket client disconnected — resources released");
+    info!("WebSocket client disconnected  -  resources released");
 }
 
 // ============================================================================
 // Utility Handlers
 // ============================================================================
 
-/// `GET /health` — Health check endpoint.
+/// `GET /health`  -  Health check endpoint.
 ///
 /// # Panics
 ///
@@ -617,7 +617,7 @@ async fn health_handler() -> Json<serde_json::Value> {
     }))
 }
 
-/// `GET /metrics` — Prometheus metrics endpoint.
+/// `GET /metrics`  -  Prometheus metrics endpoint.
 ///
 /// # Panics
 ///
@@ -631,7 +631,7 @@ async fn metrics_handler() -> String {
 // OpenAPI Schema
 // ============================================================================
 
-/// `GET /api/v1/schema` — Serve the OpenAPI 3.0 schema.
+/// `GET /api/v1/schema`  -  Serve the OpenAPI 3.0 schema.
 ///
 /// # Panics
 ///

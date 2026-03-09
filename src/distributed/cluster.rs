@@ -49,8 +49,8 @@ impl NodeInfo {
     /// Create a new node info entry.
     ///
     /// # Arguments
-    /// * `node_id` — Unique node identifier
-    /// * `address` — Network address
+    /// * `node_id`  -  Unique node identifier
+    /// * `address`  -  Network address
     ///
     /// # Returns
     /// A `NodeInfo` with zero load and current heartbeat timestamp.
@@ -70,7 +70,7 @@ impl NodeInfo {
     /// Check if this node's heartbeat has expired.
     ///
     /// # Arguments
-    /// * `timeout` — Maximum time since last heartbeat
+    /// * `timeout`  -  Maximum time since last heartbeat
     ///
     /// # Returns
     /// `true` if the node has been silent longer than `timeout`.
@@ -134,8 +134,8 @@ impl ClusterManager {
     /// Create a new cluster manager.
     ///
     /// # Arguments
-    /// * `local_node_id` — This node's unique identifier
-    /// * `eviction_timeout` — Duration of silence before a node is evicted
+    /// * `local_node_id`  -  This node's unique identifier
+    /// * `eviction_timeout`  -  Duration of silence before a node is evicted
     ///
     /// # Returns
     /// A `ClusterManager` with an empty topology.
@@ -155,9 +155,9 @@ impl ClusterManager {
     /// If the node already exists, updates its heartbeat and load.
     ///
     /// # Arguments
-    /// * `node_id` — Node identifier
-    /// * `address` — Node network address
-    /// * `load` — Current queue depth
+    /// * `node_id`  -  Node identifier
+    /// * `address`  -  Node network address
+    /// * `load`  -  Current queue depth
     ///
     /// # Panics
     /// This function never panics.
@@ -180,7 +180,7 @@ impl ClusterManager {
     /// Updates the node's last-seen timestamp and load.
     ///
     /// # Arguments
-    /// * `heartbeat` — The heartbeat message to process
+    /// * `heartbeat`  -  The heartbeat message to process
     ///
     /// # Panics
     /// This function never panics.
@@ -220,8 +220,8 @@ impl ClusterManager {
     /// Route a request to the least-loaded active node.
     ///
     /// # Returns
-    /// - `Some(node_id)` — the target node to route to
-    /// - `None` — no active nodes available
+    /// - `Some(node_id)`  -  the target node to route to
+    /// - `None`  -  no active nodes available
     ///
     /// # Panics
     /// This function never panics.
@@ -238,11 +238,11 @@ impl ClusterManager {
     /// Get information about a specific node.
     ///
     /// # Arguments
-    /// * `node_id` — The node to query
+    /// * `node_id`  -  The node to query
     ///
     /// # Returns
-    /// - `Some(NodeInfo)` — the node's info
-    /// - `None` — node not found
+    /// - `Some(NodeInfo)`  -  the node's info
+    /// - `None`  -  node not found
     ///
     /// # Panics
     /// This function never panics.
@@ -279,11 +279,11 @@ impl ClusterManager {
     /// Remove a specific node from the topology.
     ///
     /// # Arguments
-    /// * `node_id` — The node to deregister
+    /// * `node_id`  -  The node to deregister
     ///
     /// # Returns
-    /// - `Some(NodeInfo)` — the removed node's info
-    /// - `None` — node was not found
+    /// - `Some(NodeInfo)`  -  the removed node's info
+    /// - `None`  -  node was not found
     ///
     /// # Panics
     /// This function never panics.
@@ -299,12 +299,12 @@ impl ClusterManager {
     /// Update the load for a specific node.
     ///
     /// # Arguments
-    /// * `node_id` — The node to update
-    /// * `load` — New queue depth
+    /// * `node_id`  -  The node to update
+    /// * `load`  -  New queue depth
     ///
     /// # Returns
-    /// - `Ok(())` — load updated
-    /// - `Err(DistributedError::NodeNotFound)` — node not registered
+    /// - `Ok(())`  -  load updated
+    /// - `Err(DistributedError::NodeNotFound)`  -  node not registered
     ///
     /// # Panics
     /// This function never panics.
@@ -339,8 +339,8 @@ impl ClusterManager {
     /// Create a heartbeat message for this node.
     ///
     /// # Arguments
-    /// * `address` — This node's address
-    /// * `load` — Current queue depth
+    /// * `address`  -  This node's address
+    /// * `load`  -  Current queue depth
     ///
     /// # Returns
     /// A `Heartbeat` ready to broadcast.

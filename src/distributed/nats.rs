@@ -74,12 +74,12 @@ impl NatsBus {
     /// Connect to a NATS server.
     ///
     /// # Arguments
-    /// * `nats_url` — NATS server URL (e.g., `nats://localhost:4222`)
-    /// * `node_id` — Identifier of this node (included in outgoing messages)
+    /// * `nats_url`  -  NATS server URL (e.g., `nats://localhost:4222`)
+    /// * `node_id`  -  Identifier of this node (included in outgoing messages)
     ///
     /// # Returns
-    /// - `Ok(NatsBus)` — connected and ready
-    /// - `Err(DistributedError::NatsConnection)` — connection failed
+    /// - `Ok(NatsBus)`  -  connected and ready
+    /// - `Err(DistributedError::NatsConnection)`  -  connection failed
     ///
     /// # Panics
     /// This function never panics.
@@ -102,8 +102,8 @@ impl NatsBus {
     /// Create an unconnected NatsBus (for testing or deferred connection).
     ///
     /// # Arguments
-    /// * `nats_url` — URL to use when connecting later
-    /// * `node_id` — Identifier of this node
+    /// * `nats_url`  -  URL to use when connecting later
+    /// * `node_id`  -  Identifier of this node
     ///
     /// # Returns
     /// A `NatsBus` with no active connection.
@@ -123,14 +123,14 @@ impl NatsBus {
     /// The full subject is `orchestrator.{msg_type}.{role}`.
     ///
     /// # Arguments
-    /// * `msg_type` — Message type category (e.g., "request", "heartbeat")
-    /// * `role` — Target role or topic (e.g., "inference", "all")
-    /// * `payload` — JSON payload string
+    /// * `msg_type`  -  Message type category (e.g., "request", "heartbeat")
+    /// * `role`  -  Target role or topic (e.g., "inference", "all")
+    /// * `payload`  -  JSON payload string
     ///
     /// # Returns
-    /// - `Ok(())` — message published
-    /// - `Err(DistributedError::NatsPublish)` — publish failed
-    /// - `Err(DistributedError::NatsConnection)` — not connected
+    /// - `Ok(())`  -  message published
+    /// - `Err(DistributedError::NatsPublish)`  -  publish failed
+    /// - `Err(DistributedError::NatsConnection)`  -  not connected
     ///
     /// # Panics
     /// This function never panics.
@@ -173,13 +173,13 @@ impl NatsBus {
     /// Returns a NATS subscriber that can be iterated to receive messages.
     ///
     /// # Arguments
-    /// * `msg_type` — Message type category (e.g., "request", "heartbeat", ">")
-    /// * `role` — Target role or topic (e.g., "inference", "*")
+    /// * `msg_type`  -  Message type category (e.g., "request", "heartbeat", ">")
+    /// * `role`  -  Target role or topic (e.g., "inference", "*")
     ///
     /// # Returns
-    /// - `Ok(Subscriber)` — subscription active
-    /// - `Err(DistributedError::NatsSubscribe)` — subscription failed
-    /// - `Err(DistributedError::NatsConnection)` — not connected
+    /// - `Ok(Subscriber)`  -  subscription active
+    /// - `Err(DistributedError::NatsSubscribe)`  -  subscription failed
+    /// - `Err(DistributedError::NatsConnection)`  -  not connected
     ///
     /// # Panics
     /// This function never panics.
@@ -206,15 +206,15 @@ impl NatsBus {
     /// Send a request and wait for a reply (request/reply pattern).
     ///
     /// # Arguments
-    /// * `msg_type` — Message type category
-    /// * `role` — Target role
-    /// * `payload` — JSON payload string
-    /// * `timeout` — Maximum time to wait for a reply
+    /// * `msg_type`  -  Message type category
+    /// * `role`  -  Target role
+    /// * `payload`  -  JSON payload string
+    /// * `timeout`  -  Maximum time to wait for a reply
     ///
     /// # Returns
-    /// - `Ok(NatsMessage)` — the reply message
-    /// - `Err(DistributedError::NatsTimeout)` — no reply within timeout
-    /// - `Err(DistributedError::NatsConnection)` — not connected
+    /// - `Ok(NatsMessage)`  -  the reply message
+    /// - `Err(DistributedError::NatsTimeout)`  -  no reply within timeout
+    /// - `Err(DistributedError::NatsConnection)`  -  not connected
     ///
     /// # Panics
     /// This function never panics.
@@ -265,8 +265,8 @@ impl NatsBus {
     /// Build a subject string for the given message type and role.
     ///
     /// # Arguments
-    /// * `msg_type` — Message type category
-    /// * `role` — Target role
+    /// * `msg_type`  -  Message type category
+    /// * `role`  -  Target role
     ///
     /// # Returns
     /// The full NATS subject string.
@@ -315,11 +315,11 @@ impl NatsBus {
     /// Parse a raw NATS message payload into a [`NatsMessage`].
     ///
     /// # Arguments
-    /// * `data` — Raw bytes from a NATS message
+    /// * `data`  -  Raw bytes from a NATS message
     ///
     /// # Returns
-    /// - `Ok(NatsMessage)` — successfully deserialized
-    /// - `Err(DistributedError::NatsPublish)` — deserialization failed
+    /// - `Ok(NatsMessage)`  -  successfully deserialized
+    /// - `Err(DistributedError::NatsPublish)`  -  deserialization failed
     ///
     /// # Panics
     /// This function never panics.

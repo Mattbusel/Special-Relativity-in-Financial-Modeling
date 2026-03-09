@@ -4,8 +4,8 @@
 //!
 //! ## Environment Variables
 //!
-//! - `LOG_FORMAT=json` — structured JSON output (production)
-//! - `RUST_LOG=info` — log level filter (default: info)
+//! - `LOG_FORMAT=json`  -  structured JSON output (production)
+//! - `RUST_LOG=info`  -  log level filter (default: info)
 
 use std::collections::HashMap;
 use std::sync::Arc;

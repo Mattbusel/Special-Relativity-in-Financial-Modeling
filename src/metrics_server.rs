@@ -71,7 +71,7 @@ use tracing::info;
 pub async fn start_server(addr: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let addr: SocketAddr = addr.parse()?;
 
-    info!("🔧 Starting metrics server on http://{}", addr);
+    info!(" Starting metrics server on http://{}", addr);
 
     let app = Router::new()
         .route("/metrics", get(metrics_handler))
@@ -80,8 +80,8 @@ pub async fn start_server(addr: &str) -> Result<(), Box<dyn std::error::Error + 
 
     let listener = tokio::net::TcpListener::bind(&addr).await?;
 
-    info!("✅ Metrics server ready at http://{}/metrics", addr);
-    info!("✅ Health check at http://{}/health", addr);
+    info!(" Metrics server ready at http://{}/metrics", addr);
+    info!(" Health check at http://{}/health", addr);
 
     axum::serve(listener, app).await?;
 

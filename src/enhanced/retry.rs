@@ -12,7 +12,7 @@
 //! let policy = RetryPolicy::exponential(3, Duration::from_millis(100));
 //!
 //! let result = policy.retry(|| async {
-//!     // Your fallible operation — returns Ok on success, Err on transient failure
+//!     // Your fallible operation  -  returns Ok on success, Err on transient failure
 //!     Ok::<String, std::io::Error>("inference result".to_string())
 //! }).await;
 //!

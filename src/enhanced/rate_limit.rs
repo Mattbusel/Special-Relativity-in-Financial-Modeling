@@ -88,7 +88,7 @@ impl RateLimiter {
     pub fn new_governor(max_requests: u32, _window_secs: u64) -> Result<Self, OrchestratorError> {
         let requests = NonZeroU32::new(max_requests)
             .ok_or_else(|| OrchestratorError::ConfigError("max_requests must be > 0".into()))?;
-        // saturating_mul(2): since max_requests >= 1, burst_count >= 2 — never zero
+        // saturating_mul(2): since max_requests >= 1, burst_count >= 2  -  never zero
         let burst_count = max_requests.saturating_mul(2);
         let burst = NonZeroU32::new(burst_count)
             .ok_or_else(|| OrchestratorError::ConfigError("burst limit overflow".into()))?;
@@ -278,7 +278,7 @@ mod tests {
         assert_eq!(info.remaining, 8);
     }
 
-    // ── Hardening tests ──────────────────────────────────────────────
+    //  Hardening tests 
 
     #[tokio::test]
     async fn test_zero_max_requests_blocks_all() {

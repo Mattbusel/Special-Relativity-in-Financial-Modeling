@@ -14,14 +14,14 @@
 //!
 //! Collect and unify feedback from multiple sources (user ratings, automated
 //! quality checks, latency observations, error reports) into a normalized
-//! feedback stream. Each entry is scored on a 0.0–1.0 scale regardless of
+//! feedback stream. Each entry is scored on a 0.0 - 1.0 scale regardless of
 //! its original source.
 //!
 //! ## Guarantees
 //!
 //! - **Thread-safe**: all operations protected by `Arc<Mutex<_>>`
 //! - **Bounded**: entry history is capped at `max_entries` (FIFO eviction)
-//! - **Normalized**: all scores are on a unified 0.0–1.0 scale
+//! - **Normalized**: all scores are on a unified 0.0 - 1.0 scale
 //! - **Non-blocking**: all operations are O(entries) worst-case
 //!
 //! ## NOT Responsible For
@@ -46,7 +46,7 @@ pub enum FeedbackError {
 /// Source of a feedback entry, indicating how the feedback was generated.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum FeedbackSource {
-    /// Direct user rating (e.g., thumbs up/down, 1–5 stars).
+    /// Direct user rating (e.g., thumbs up/down, 1 - 5 stars).
     UserRating,
     /// Automated quality assessment from the quality estimator.
     AutoQuality,
@@ -84,7 +84,7 @@ pub struct FeedbackEntry {
     pub request_id: String,
     /// Source of the feedback.
     pub source: FeedbackSource,
-    /// Normalized score (0.0–1.0) where 1.0 is best.
+    /// Normalized score (0.0 - 1.0) where 1.0 is best.
     pub score: f64,
     /// Original raw value before normalization.
     pub raw_value: f64,
@@ -125,7 +125,7 @@ impl FeedbackCollector {
     ///
     /// # Arguments
     ///
-    /// * `max_entries` — maximum number of feedback entries to retain (FIFO eviction)
+    /// * `max_entries`  -  maximum number of feedback entries to retain (FIFO eviction)
     ///
     /// # Panics
     ///

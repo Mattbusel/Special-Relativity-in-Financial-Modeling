@@ -1,4 +1,4 @@
-//! # Task — coordination work unit
+//! # Task  -  coordination work unit
 //!
 //! ## Responsibility
 //! Define the Task struct, TaskStatus, and priority ordering for the
@@ -70,12 +70,12 @@ impl TaskStatus {
 ///
 /// # Fields
 ///
-/// * `id` — Unique task identifier (e.g. `"fix-web-api-tests"`)
-/// * `prompt` — The instruction to feed to the agent process
-/// * `priority` — Numeric priority (1 = highest). Lower numbers run first.
-/// * `status` — Current lifecycle status
-/// * `claimed_by` — Agent ID that claimed this task (empty if unclaimed)
-/// * `failure_reason` — Reason for failure (empty if not failed)
+/// * `id`  -  Unique task identifier (e.g. `"fix-web-api-tests"`)
+/// * `prompt`  -  The instruction to feed to the agent process
+/// * `priority`  -  Numeric priority (1 = highest). Lower numbers run first.
+/// * `status`  -  Current lifecycle status
+/// * `claimed_by`  -  Agent ID that claimed this task (empty if unclaimed)
+/// * `failure_reason`  -  Reason for failure (empty if not failed)
 ///
 /// # Panics
 ///
@@ -114,9 +114,9 @@ impl Task {
     ///
     /// # Arguments
     ///
-    /// * `id` — Unique identifier for this task
-    /// * `prompt` — The instruction text for the agent
-    /// * `priority` — Numeric priority (1 = highest)
+    /// * `id`  -  Unique identifier for this task
+    /// * `prompt`  -  The instruction text for the agent
+    /// * `priority`  -  Numeric priority (1 = highest)
     ///
     /// # Panics
     ///
@@ -170,7 +170,7 @@ impl TaskFile {
     ///
     /// # Arguments
     ///
-    /// * `content` — Raw TOML content
+    /// * `content`  -  Raw TOML content
     ///
     /// # Returns
     ///

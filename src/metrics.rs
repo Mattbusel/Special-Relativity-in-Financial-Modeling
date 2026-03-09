@@ -5,7 +5,7 @@
 //! Call [`init_metrics`] once at process startup **before** spawning any pipeline
 //! stages. The helper functions (`record_stage_latency`, `inc_request`, …) are
 //! no-ops if `init_metrics` was never called, so the pipeline is always safe to
-//! run — observability simply degrades gracefully.
+//! run  -  observability simply degrades gracefully.
 //!
 //! ## Metrics Exposed
 //!
@@ -26,7 +26,7 @@ use std::collections::HashMap;
 use std::sync::OnceLock;
 use std::time::Duration;
 
-// ── Internal metrics bundle ────────────────────────────────────────────────
+//  Internal metrics bundle 
 
 /// All Prometheus metrics for the orchestrator, bundled together so they can
 /// be stored in a single [`OnceLock`] and initialised atomically.
@@ -47,7 +47,7 @@ pub struct Metrics {
 
 static METRICS: OnceLock<Metrics> = OnceLock::new();
 
-// ── Initialisation ─────────────────────────────────────────────────────────
+//  Initialisation 
 
 /// Initialise all Prometheus metrics and register them with a private registry.
 ///
@@ -120,7 +120,7 @@ pub fn init_metrics() -> Result<(), OrchestratorError> {
         .register(Box::new(queue_depth.clone()))
         .map_err(|e| OrchestratorError::Other(format!("metrics registration failed: {e}")))?;
 
-    // If another thread raced us, the first one wins — both initializations
+    // If another thread raced us, the first one wins  -  both initializations
     // produce identical metric descriptors, so neither outcome is incorrect.
     let _ = METRICS.set(Metrics {
         registry,
@@ -140,7 +140,7 @@ fn metrics() -> Option<&'static Metrics> {
     METRICS.get()
 }
 
-// ── Public helper functions ────────────────────────────────────────────────
+//  Public helper functions 
 
 /// Record the processing latency for a pipeline stage.
 ///
@@ -284,7 +284,7 @@ pub fn get_metrics_summary() -> MetricsSummary {
                 .iter()
                 .find(|l| l.get_name() == "stage")
                 .map_or("unknown", |l| l.get_value());
-            let value = metric.get_counter().get_value() as u64;
+            let value = metric.get_counter().value.unwrap_or(0.0) as u64;
             summary.requests_total.insert(stage.to_string(), value);
         }
     }
@@ -296,7 +296,7 @@ pub fn get_metrics_summary() -> MetricsSummary {
                 .iter()
                 .find(|l| l.get_name() == "stage")
                 .map_or("unknown", |l| l.get_value());
-            let value = metric.get_counter().get_value() as u64;
+            let value = metric.get_counter().value.unwrap_or(0.0) as u64;
             summary.requests_shed.insert(stage.to_string(), value);
         }
     }
@@ -314,7 +314,7 @@ pub fn get_metrics_summary() -> MetricsSummary {
                 .find(|l| l.get_name() == "err_type")
                 .map_or("unknown", |l| l.get_value());
             let key = format!("{stage}:{err_type}");
-            let value = metric.get_counter().get_value() as u64;
+            let value = metric.get_counter().value.unwrap_or(0.0) as u64;
             summary.errors_total.insert(key, value);
         }
     }
@@ -439,7 +439,7 @@ mod tests {
             .iter()
             .find(|f| f.get_name() == "t_requests_total")
             .expect("family must exist");
-        let value = family.get_metric()[0].get_counter().get_value();
+        let value = family.get_metric()[0].get_counter().value.unwrap_or(0.0);
         assert!(
             (value - 2.0).abs() < f64::EPSILON,
             "counter must be 2.0, got {value}"
@@ -459,7 +459,7 @@ mod tests {
             .iter()
             .find(|f| f.get_name() == "t_requests_shed_total")
             .expect("family must exist");
-        let value = family.get_metric()[0].get_counter().get_value();
+        let value = family.get_metric()[0].get_counter().value.unwrap_or(0.0);
         assert!((value - 1.0).abs() < f64::EPSILON);
     }
 
@@ -476,7 +476,7 @@ mod tests {
             .iter()
             .find(|f| f.get_name() == "t_errors_total")
             .expect("family must exist");
-        let value = family.get_metric()[0].get_counter().get_value();
+        let value = family.get_metric()[0].get_counter().value.unwrap_or(0.0);
         assert!((value - 1.0).abs() < f64::EPSILON);
     }
 
@@ -493,7 +493,7 @@ mod tests {
             .iter()
             .find(|f| f.get_name() == "t_queue_depth")
             .expect("family must exist");
-        let value = family.get_metric()[0].get_gauge().get_value();
+        let value = family.get_metric()[0].get_gauge().value.unwrap_or(0.0);
         assert!(
             (value - 42.0).abs() < f64::EPSILON,
             "gauge must be 42.0, got {value}"

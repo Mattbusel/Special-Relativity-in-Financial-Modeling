@@ -23,7 +23,7 @@
 //! queue.push(Priority::Normal, request2).await.ok();
 //! queue.push(Priority::Low, request3).await.ok();
 //!
-//! // Dequeue by priority — highest priority first
+//! // Dequeue by priority  -  highest priority first
 //! if let Some((_priority, request)) = queue.pop().await {
 //!     println!("{}", request.input);
 //! }
@@ -41,14 +41,14 @@ use crate::PromptRequest;
 /// Request priority levels
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Priority {
-    /// Lowest priority — background / batch work.
+    /// Lowest priority  -  background / batch work.
     Low = 0,
     /// Standard priority for most requests.
     #[default]
     Normal = 1,
     /// Elevated priority, processed before `Normal`.
     High = 2,
-    /// Highest priority — processed immediately ahead of all others.
+    /// Highest priority  -  processed immediately ahead of all others.
     Critical = 3,
 }
 
@@ -345,7 +345,7 @@ mod tests {
         assert_eq!(*stats.by_priority.get(&Priority::Low).unwrap(), 1);
     }
 
-    // ── Hardening tests ──────────────────────────────────────────────
+    //  Hardening tests 
 
     #[tokio::test]
     async fn test_empty_queue_pop_returns_none() {
@@ -497,7 +497,7 @@ mod tests {
             .await
             .unwrap();
 
-        // Pop all — verify FIFO within each priority band
+        // Pop all  -  verify FIFO within each priority band
         assert_eq!(queue.pop().await.unwrap().1.input, "h1");
         assert_eq!(queue.pop().await.unwrap().1.input, "h2");
         assert_eq!(queue.pop().await.unwrap().1.input, "n1");

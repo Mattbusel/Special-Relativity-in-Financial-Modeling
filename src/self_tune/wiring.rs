@@ -1,14 +1,14 @@
 #![allow(missing_docs, dead_code, clippy::duplicated_attributes)]
-//! # Self-Tune Wiring (Task 1.x — Loop Closure)
+//! # Self-Tune Wiring (Task 1.x  -  Loop Closure)
 //!
 //! Connects the telemetry bus, PID controller, and anomaly detector into a
 //! live feedback loop that runs alongside the pipeline.
 //!
 //! ## Loop
 //! ```text
-//! TelemetryBus ──snapshot──► TuningController ──adjustments──► log/apply
-//!                    │
-//!                    └──────► AnomalyDetector  ──anomalies───► warn/rollback
+//! TelemetryBus snapshot TuningController adjustments log/apply
+//!                    
+//!                     AnomalyDetector  anomalies warn/rollback
 //! ```
 //!
 //! ## Usage
@@ -44,7 +44,7 @@ pub struct SelfTuneHandles {
     pub bus: Arc<TelemetryBus>,
     /// Shared pipeline counters (callers can increment these from pipeline code).
     pub counters: Arc<PipelineCounters>,
-    /// Live parameter store — pipeline components read from here.
+    /// Live parameter store  -  pipeline components read from here.
     ///
     /// The controller writes updated values every telemetry tick; components
     /// (circuit breaker, rate limiter, dedup) consult this store before each
@@ -63,12 +63,12 @@ impl SelfTuneHandles {
 /// Start the self-tune feedback loop.
 ///
 /// Spawns two background tasks:
-/// 1. **Controller loop** — reads `TelemetrySnapshot`s, runs PID, logs adjustments.
-/// 2. **Anomaly loop** — reads `TelemetrySnapshot`s, checks for statistical anomalies.
+/// 1. **Controller loop**  -  reads `TelemetrySnapshot`s, runs PID, logs adjustments.
+/// 2. **Anomaly loop**  -  reads `TelemetrySnapshot`s, checks for statistical anomalies.
 ///
 /// # Arguments
-/// * `target_p95_ms` — target 95th-percentile end-to-end latency in milliseconds.
-/// * `target_rps` — target request throughput in requests per second.
+/// * `target_p95_ms`  -  target 95th-percentile end-to-end latency in milliseconds.
+/// * `target_rps`  -  target request throughput in requests per second.
 ///
 /// # Returns
 /// [`SelfTuneHandles`] containing task handles and shared resources.
@@ -84,7 +84,7 @@ pub async fn start_self_tune_loop(target_p95_ms: f64, target_rps: f64) -> SelfTu
     ));
     bus.start();
 
-    // Shared atomic parameter store — the controller writes here; pipeline
+    // Shared atomic parameter store  -  the controller writes here; pipeline
     // components read from here lock-free.
     let live_tuning = LiveTuning::new();
 
@@ -252,7 +252,7 @@ mod tests {
     #[tokio::test]
     async fn test_anomaly_detector_ingests_without_panic() {
         let detector = AnomalyDetector::with_defaults();
-        // Feed some values — first few won't produce anomalies (no window yet).
+        // Feed some values  -  first few won't produce anomalies (no window yet).
         for i in 0..10u64 {
             let _ = detector.ingest("test_metric", i as f64 * 10.0);
         }

@@ -14,7 +14,7 @@
 //! The distributed tier adds a Redis write-through layer behind the same API.
 //!
 //! ## Graceful degradation
-//! All query methods return `None` / empty collections on any internal error —
+//! All query methods return `None` / empty collections on any internal error  - 
 //! agents proceed without memory rather than failing.
 
 use std::{
@@ -26,7 +26,7 @@ use std::{
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-// ─── Error ────────────────────────────────────────────────────────────────────
+//  Error 
 
 /// Errors produced by the memory system.
 #[derive(Debug, Error)]
@@ -48,7 +48,7 @@ pub enum MemoryError {
     Redis(String),
 }
 
-// ─── Modification record ──────────────────────────────────────────────────────
+//  Modification record 
 
 /// Outcome of a past self-modification attempt.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -100,7 +100,7 @@ impl ModificationRecord {
     }
 }
 
-// ─── Code pattern ─────────────────────────────────────────────────────────────
+//  Code pattern 
 
 /// Whether a code pattern is known to succeed or fail.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -130,7 +130,7 @@ pub struct CodePattern {
     pub last_seen_secs: u64,
 }
 
-// ─── Module dependency node ───────────────────────────────────────────────────
+//  Module dependency node 
 
 /// Dependency information for a source module.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -147,7 +147,7 @@ pub struct ModuleNode {
     pub claimed_by: Option<String>,
 }
 
-// ─── Performance baseline ─────────────────────────────────────────────────────
+//  Performance baseline 
 
 /// Performance baseline for a module.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -158,13 +158,13 @@ pub struct PerformanceBaseline {
     pub throughput_rps: f64,
     /// Baseline p95 latency (ms).
     pub p95_latency_ms: f64,
-    /// Baseline error rate (0.0 – 1.0).
+    /// Baseline error rate (0.0  -  1.0).
     pub error_rate: f64,
     /// Unix timestamp when baseline was recorded.
     pub recorded_at_secs: u64,
 }
 
-// ─── Dead end ────────────────────────────────────────────────────────────────
+//  Dead end 
 
 /// An approach that has been tried and failed, to avoid repetition.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -181,7 +181,7 @@ pub struct DeadEnd {
     pub recorded_at_secs: u64,
 }
 
-// ─── Memory store ─────────────────────────────────────────────────────────────
+//  Memory store 
 
 struct MemoryInner {
     modifications: Vec<ModificationRecord>,
@@ -218,7 +218,7 @@ impl AgentMemory {
         }
     }
 
-    // ── Modification records ──────────────────────────────────────────────
+    //  Modification records 
 
     /// Insert a new modification record.
     pub fn insert_modification(&self, record: ModificationRecord) -> Result<(), MemoryError> {
@@ -286,7 +286,7 @@ impl AgentMemory {
             .unwrap_or(false)
     }
 
-    // ── Code patterns ─────────────────────────────────────────────────────
+    //  Code patterns 
 
     /// Record or update a code pattern.
     pub fn record_pattern(&self, pattern: CodePattern) -> Result<(), MemoryError> {
@@ -318,7 +318,7 @@ impl AgentMemory {
             .unwrap_or_default()
     }
 
-    // ── Dependency graph ──────────────────────────────────────────────────
+    //  Dependency graph 
 
     /// Register or update a module node.
     pub fn upsert_module(&self, node: ModuleNode) -> Result<(), MemoryError> {
@@ -347,7 +347,7 @@ impl AgentMemory {
             node.claimed_by = Some(agent_id.to_string());
             return true;
         }
-        // Module not registered — insert minimal node and claim it
+        // Module not registered  -  insert minimal node and claim it
         inner.dependency_graph.insert(
             path.to_string(),
             ModuleNode {
@@ -385,7 +385,7 @@ impl AgentMemory {
             .unwrap_or_default()
     }
 
-    // ── Performance baselines ─────────────────────────────────────────────
+    //  Performance baselines 
 
     /// Record a performance baseline for a module.
     pub fn record_baseline(&self, baseline: PerformanceBaseline) -> Result<(), MemoryError> {
@@ -402,7 +402,7 @@ impl AgentMemory {
             .and_then(|inner| inner.baselines.get(module).cloned())
     }
 
-    // ── Dead ends ─────────────────────────────────────────────────────────
+    //  Dead ends 
 
     /// Record a failed approach to prevent agents retrying it.
     pub fn record_dead_end(&self, dead_end: DeadEnd) -> Result<(), MemoryError> {
@@ -427,7 +427,7 @@ impl AgentMemory {
             .collect()
     }
 
-    // ── Summary ───────────────────────────────────────────────────────────
+    //  Summary 
 
     /// Return a count summary of stored records.
     pub fn summary(&self) -> MemorySummary {
@@ -459,7 +459,7 @@ pub struct MemorySummary {
     pub dead_end_count: usize,
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+//  Helpers 
 
 fn unix_now() -> u64 {
     SystemTime::now()
@@ -468,7 +468,7 @@ fn unix_now() -> u64 {
         .unwrap_or(0)
 }
 
-// ─── Redis-backed memory (distributed feature) ──────────────────────────────
+//  Redis-backed memory (distributed feature) 
 
 #[cfg(feature = "distributed")]
 mod redis_memory {
@@ -485,10 +485,10 @@ mod redis_memory {
     /// degrades gracefully to pure in-memory mode.
     ///
     /// # Redis key layout
-    /// - `agent:modification:{id}` — JSON-serialised [`ModificationRecord`]
-    /// - `agent:pattern:{name}` — JSON-serialised [`CodePattern`]
-    /// - `agent:baseline:{module}` — JSON-serialised [`PerformanceBaseline`]
-    /// - `agent:deadend:{module}:{hash}` — JSON-serialised [`DeadEnd`]
+    /// - `agent:modification:{id}`  -  JSON-serialised [`ModificationRecord`]
+    /// - `agent:pattern:{name}`  -  JSON-serialised [`CodePattern`]
+    /// - `agent:baseline:{module}`  -  JSON-serialised [`PerformanceBaseline`]
+    /// - `agent:deadend:{module}:{hash}`  -  JSON-serialised [`DeadEnd`]
     ///
     /// # Panics
     /// This type never panics.
@@ -505,8 +505,8 @@ mod redis_memory {
         /// to pure in-memory mode (no error is raised).
         ///
         /// # Arguments
-        /// * `max_modifications` — cap on in-memory modification history
-        /// * `redis_url` — Redis connection string (e.g. `"redis://127.0.0.1/"`)
+        /// * `max_modifications`  -  cap on in-memory modification history
+        /// * `redis_url`  -  Redis connection string (e.g. `"redis://127.0.0.1/"`)
         pub async fn new(max_modifications: usize, redis_url: &str) -> Self {
             let redis = Self::try_connect(redis_url).await;
             Self {
@@ -535,14 +535,14 @@ mod redis_memory {
             &self.inner
         }
 
-        // ── Connection helper ────────────────────────────────────────────
+        //  Connection helper 
 
         async fn try_connect(url: &str) -> Option<ConnectionManager> {
             let client = redis::Client::open(url).ok()?;
             ConnectionManager::new(client).await.ok()
         }
 
-        // ── Best-effort Redis helpers ────────────────────────────────────
+        //  Best-effort Redis helpers 
 
         async fn redis_set(&self, key: &str, value: &str) {
             if let Some(mut conn) = self.redis.clone() {
@@ -559,7 +559,7 @@ mod redis_memory {
             None
         }
 
-        // ── Modification records ─────────────────────────────────────────
+        //  Modification records 
 
         /// Insert a new modification record.
         ///
@@ -637,7 +637,7 @@ mod redis_memory {
                 .collect()
         }
 
-        // ── Code patterns ────────────────────────────────────────────────
+        //  Code patterns 
 
         /// Record or update a code pattern.
         ///
@@ -662,7 +662,7 @@ mod redis_memory {
             self.inner.get_pattern(name)
         }
 
-        // ── Performance baselines ────────────────────────────────────────
+        //  Performance baselines 
 
         /// Record a performance baseline for a module.
         ///
@@ -690,7 +690,7 @@ mod redis_memory {
             self.inner.get_baseline(module)
         }
 
-        // ── Dead ends ────────────────────────────────────────────────────
+        //  Dead ends 
 
         /// Record a failed approach to prevent agents retrying it.
         ///
@@ -722,7 +722,7 @@ mod redis_memory {
             self.inner.dead_ends()
         }
 
-        // ── Dependency graph pass-through ────────────────────────────────
+        //  Dependency graph pass-through 
 
         /// Return all modules that are safe to edit in parallel (not claimed).
         pub fn parallelizable_modules(&self) -> Vec<String> {
@@ -749,7 +749,7 @@ mod redis_memory {
             self.inner.summary()
         }
 
-        // ── Internal helpers ─────────────────────────────────────────────
+        //  Internal helpers 
 
         /// Produce a cheap, deterministic hash of a string for use in Redis keys.
         fn simple_hash(s: &str) -> u64 {
@@ -767,7 +767,7 @@ mod redis_memory {
 #[cfg(feature = "distributed")]
 pub use redis_memory::RedisAgentMemory;
 
-// ─── Tests ────────────────────────────────────────────────────────────────────
+//  Tests 
 
 #[cfg(test)]
 mod tests {
@@ -1069,7 +1069,7 @@ mod tests {
     }
 }
 
-// ─── Redis memory tests (distributed feature) ───────────────────────────────
+//  Redis memory tests (distributed feature) 
 
 #[cfg(test)]
 #[cfg(feature = "distributed")]
@@ -1234,11 +1234,11 @@ mod redis_tests {
         })
         .unwrap();
 
-        // Both unclaimed — both parallelizable
+        // Both unclaimed  -  both parallelizable
         let free = mem.parallelizable_modules();
         assert_eq!(free.len(), 2);
 
-        // Claim one — only one left
+        // Claim one  -  only one left
         mem.claim_module("x.rs", "agent-a");
         let free = mem.parallelizable_modules();
         assert_eq!(free.len(), 1);

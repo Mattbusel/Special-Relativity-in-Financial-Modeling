@@ -2,7 +2,7 @@
 //!
 //! ## Responsibility
 //! Watch a TOML config file for changes and broadcast validated new configs
-//! to subscribers. Invalid reloads are logged and rejected — the current
+//! to subscribers. Invalid reloads are logged and rejected  -  the current
 //! config remains unchanged.
 //!
 //! ## Guarantees
@@ -37,7 +37,7 @@ use super::PipelineConfig;
 pub struct ConfigWatcher {
     /// Broadcast sender for config updates.
     _tx: broadcast::Sender<PipelineConfig>,
-    /// Retained watcher handle — dropping this stops file watching.
+    /// Retained watcher handle  -  dropping this stops file watching.
     _watcher: Arc<Mutex<RecommendedWatcher>>,
 }
 
@@ -45,12 +45,12 @@ impl ConfigWatcher {
     /// Create a new [`ConfigWatcher`] for the given config file path.
     ///
     /// Returns the watcher and a receiver for config change notifications.
-    /// The initial config is **not** broadcast — use `loader::load_from_file`
+    /// The initial config is **not** broadcast  -  use `loader::load_from_file`
     /// for the initial load.
     ///
     /// # Arguments
     ///
-    /// * `path` — Path to the TOML config file to watch.
+    /// * `path`  -  Path to the TOML config file to watch.
     ///
     /// # Returns
     ///
@@ -149,14 +149,14 @@ impl ConfigWatcher {
                                 pipeline = %new_config.pipeline.name,
                                 "config reloaded successfully"
                             );
-                            // If no receivers, that's fine — the config was still validated
+                            // If no receivers, that's fine  -  the config was still validated
                             let _ = tx_clone.send(new_config);
                         }
                         Err(e) => {
                             tracing::warn!(
                                 path = %config_path.display(),
                                 error = %e,
-                                "config reload rejected — keeping current config"
+                                "config reload rejected  -  keeping current config"
                             );
                         }
                     }
@@ -242,7 +242,7 @@ log_format = "pretty"
 
         let (watcher, _rx) = ConfigWatcher::new(path).expect("test: create watcher");
         let _rx2 = watcher.subscribe();
-        // Should have two receivers now — no panic
+        // Should have two receivers now  -  no panic
     }
 
     #[tokio::test]

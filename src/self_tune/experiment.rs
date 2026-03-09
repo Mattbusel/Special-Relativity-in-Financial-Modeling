@@ -210,7 +210,7 @@ pub struct ExperimentResult {
 /// Abramowitz & Stegun approximation 26.2.17 for the standard normal CDF.
 ///
 /// # Arguments
-/// * `x` — The input value.
+/// * `x`  -  The input value.
 ///
 /// # Returns
 /// An approximation of Phi(x), the cumulative distribution function of
@@ -266,9 +266,9 @@ fn variance(samples: &[f64]) -> f64 {
 /// approximate p-value, and arm summary statistics.
 ///
 /// # Arguments
-/// * `control` — Samples from the control arm.
-/// * `treatment` — Samples from the treatment arm.
-/// * `significance_level` — The alpha threshold for significance determination.
+/// * `control`  -  Samples from the control arm.
+/// * `treatment`  -  Samples from the treatment arm.
+/// * `significance_level`  -  The alpha threshold for significance determination.
 ///
 /// # Panics
 /// This function never panics.
@@ -359,7 +359,7 @@ impl ExperimentEngine {
     /// Create a new experiment engine with the given configuration.
     ///
     /// # Arguments
-    /// * `config` — Configuration parameters controlling sample sizes and significance levels.
+    /// * `config`  -  Configuration parameters controlling sample sizes and significance levels.
     ///
     /// # Panics
     /// This function never panics.
@@ -385,13 +385,13 @@ impl ExperimentEngine {
     /// Register a new A/B experiment.
     ///
     /// # Arguments
-    /// * `id` — Unique identifier for the experiment.
-    /// * `description` — Human-readable description.
-    /// * `parameter` — The pipeline parameter being tested.
-    /// * `control_value` — Baseline value of the parameter.
-    /// * `treatment_value` — Proposed new value of the parameter.
-    /// * `metric_name` — Which metric to compare (e.g. "p95_latency_ms").
-    /// * `lower_is_better` — If `true`, lower metric values are considered better.
+    /// * `id`  -  Unique identifier for the experiment.
+    /// * `description`  -  Human-readable description.
+    /// * `parameter`  -  The pipeline parameter being tested.
+    /// * `control_value`  -  Baseline value of the parameter.
+    /// * `treatment_value`  -  Proposed new value of the parameter.
+    /// * `metric_name`  -  Which metric to compare (e.g. "p95_latency_ms").
+    /// * `lower_is_better`  -  If `true`, lower metric values are considered better.
     ///
     /// # Errors
     /// - [`ExperimentError::ExperimentAlreadyExists`] if an experiment with this ID is active.
@@ -448,8 +448,8 @@ impl ExperimentEngine {
     /// Returns `Some(ExperimentResult)` if the experiment concluded, `None` otherwise.
     ///
     /// # Arguments
-    /// * `experiment_id` — The experiment to add a sample to.
-    /// * `value` — The observed metric value.
+    /// * `experiment_id`  -  The experiment to add a sample to.
+    /// * `value`  -  The observed metric value.
     ///
     /// # Errors
     /// - [`ExperimentError::ExperimentNotFound`] if no experiment has this ID.
@@ -499,8 +499,8 @@ impl ExperimentEngine {
     /// Returns `Some(ExperimentResult)` if the experiment concluded, `None` otherwise.
     ///
     /// # Arguments
-    /// * `experiment_id` — The experiment to add a sample to.
-    /// * `value` — The observed metric value.
+    /// * `experiment_id`  -  The experiment to add a sample to.
+    /// * `value`  -  The observed metric value.
     ///
     /// # Errors
     /// - [`ExperimentError::ExperimentNotFound`] if no experiment has this ID.
@@ -632,7 +632,7 @@ impl ExperimentEngine {
     /// Run Welch's t-test on the current samples of an experiment.
     ///
     /// # Arguments
-    /// * `experiment_id` — The experiment to test.
+    /// * `experiment_id`  -  The experiment to test.
     ///
     /// # Errors
     /// - [`ExperimentError::ExperimentNotFound`] if no experiment has this ID.
@@ -684,7 +684,7 @@ impl ExperimentEngine {
     /// conclusion is `NoSignificantDifference`.
     ///
     /// # Arguments
-    /// * `experiment_id` — The experiment to conclude.
+    /// * `experiment_id`  -  The experiment to conclude.
     ///
     /// # Errors
     /// - [`ExperimentError::ExperimentNotFound`] if no experiment has this ID.
@@ -773,7 +773,7 @@ impl ExperimentEngine {
     /// Retrieve a clone of an experiment by its ID.
     ///
     /// # Arguments
-    /// * `experiment_id` — The experiment to retrieve.
+    /// * `experiment_id`  -  The experiment to retrieve.
     ///
     /// # Errors
     /// - [`ExperimentError::ExperimentNotFound`] if no experiment has this ID.
@@ -825,7 +825,7 @@ impl ExperimentEngine {
     /// Remove an experiment by its ID (whether running or concluded).
     ///
     /// # Arguments
-    /// * `experiment_id` — The experiment to remove.
+    /// * `experiment_id`  -  The experiment to remove.
     ///
     /// # Errors
     /// - [`ExperimentError::ExperimentNotFound`] if no experiment has this ID.
@@ -1089,7 +1089,7 @@ mod tests {
             for i in 0..50 {
                 match engine.add_treatment_sample("diff", 8.0 + (i % 4) as f64) {
                     Ok(Some(result)) => {
-                        // Experiment auto-concluded with a winner — correct behaviour
+                        // Experiment auto-concluded with a winner  -  correct behaviour
                         assert!(
                             result.conclusion == ExperimentConclusion::ControlWins
                                 || result.conclusion == ExperimentConclusion::TreatmentWins
@@ -1115,7 +1115,7 @@ mod tests {
             assert!(sig.significant, "p={}", sig.p_value_approx);
             assert!(sig.t_statistic > 0.0); // control mean > treatment mean
         }
-        // If auto-concluded, detection happened — test passes.
+        // If auto-concluded, detection happened  -  test passes.
     }
 
     // ------------------------------------------------------------------

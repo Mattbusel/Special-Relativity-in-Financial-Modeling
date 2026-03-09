@@ -1,4 +1,4 @@
-//! # AgentWorker — single agent process manager
+//! # AgentWorker  -  single agent process manager
 //!
 //! ## Responsibility
 //! Spawn and manage a single claude process for task execution.
@@ -54,8 +54,8 @@ impl AgentWorker {
     ///
     /// # Arguments
     ///
-    /// * `agent_id` — Unique identifier for this agent
-    /// * `config` — Shared coordination configuration
+    /// * `agent_id`  -  Unique identifier for this agent
+    /// * `config`  -  Shared coordination configuration
     ///
     /// # Panics
     ///
@@ -82,8 +82,8 @@ impl AgentWorker {
     ///
     /// # Arguments
     ///
-    /// * `task_id` — ID of the task being executed
-    /// * `prompt` — The instruction text to feed to claude
+    /// * `task_id`  -  ID of the task being executed
+    /// * `prompt`  -  The instruction text to feed to claude
     ///
     /// # Returns
     ///
@@ -158,7 +158,7 @@ impl AgentWorker {
                 self.agent_id
             ))),
             Err(_) => {
-                // Timeout — attempt to kill the process
+                // Timeout  -  attempt to kill the process
                 let _ = child.kill().await;
                 Err(CoordinationError::AgentTimeout {
                     agent_id: self.agent_id.clone(),
@@ -261,10 +261,10 @@ mod tests {
                 assert_eq!(timeout_secs, 1);
             }
             Ok(_) => {
-                // sleep may not exist on all platforms — that's fine
+                // sleep may not exist on all platforms  -  that's fine
             }
             Err(CoordinationError::SpawnError(_)) => {
-                // sleep may not exist on Windows — acceptable
+                // sleep may not exist on Windows  -  acceptable
             }
             Err(e) => {
                 assert!(false, "unexpected error: {e}");

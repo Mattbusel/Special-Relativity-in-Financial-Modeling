@@ -26,7 +26,7 @@ pub mod watcher;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-// ── Default value functions ──────────────────────────────────────────────
+//  Default value functions 
 
 /// Default RAG stage timeout: 5000ms.
 fn default_timeout_ms() -> u64 {
@@ -68,7 +68,7 @@ fn default_true() -> bool {
     true
 }
 
-// ── Top-level config ─────────────────────────────────────────────────────
+//  Top-level config 
 
 /// Root configuration for a pipeline instance.
 ///
@@ -104,7 +104,7 @@ pub struct PipelineConfig {
     pub observability: ObservabilityConfig,
 }
 
-// ── Pipeline identity ────────────────────────────────────────────────────
+//  Pipeline identity 
 
 /// Pipeline identity and version metadata.
 ///
@@ -121,7 +121,7 @@ pub struct PipelineSection {
     pub description: Option<String>,
 }
 
-// ── Stage configs ────────────────────────────────────────────────────────
+//  Stage configs 
 
 /// Configuration for all five pipeline stages.
 ///
@@ -216,7 +216,7 @@ pub enum WorkerKind {
     LlamaCpp,
     /// vLLM inference server.
     Vllm,
-    /// Echo worker for testing — returns the prompt as tokens.
+    /// Echo worker for testing  -  returns the prompt as tokens.
     Echo,
 }
 
@@ -250,7 +250,7 @@ pub struct StreamStageConfig {
     pub channel_capacity: usize,
 }
 
-// ── Resilience ───────────────────────────────────────────────────────────
+//  Resilience 
 
 /// Resilience configuration for retries and circuit breaking.
 ///
@@ -271,11 +271,11 @@ pub struct ResilienceConfig {
     pub circuit_breaker_threshold: u32,
     /// Seconds to keep the circuit breaker open before allowing a probe.
     pub circuit_breaker_timeout_s: u64,
-    /// Required success rate (0.0–1.0) over the sliding window.
+    /// Required success rate (0.0 - 1.0) over the sliding window.
     pub circuit_breaker_success_rate: f64,
 }
 
-// ── Deduplication ────────────────────────────────────────────────────────
+//  Deduplication 
 
 /// Deduplication configuration for request coalescing.
 ///
@@ -294,7 +294,7 @@ pub struct DeduplicationConfig {
     pub max_entries: usize,
 }
 
-// ── Observability ────────────────────────────────────────────────────────
+//  Observability 
 
 /// Observability configuration: logging, metrics endpoint, and tracing.
 ///

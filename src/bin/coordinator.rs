@@ -1,4 +1,4 @@
-//! # Coordinator CLI — agent fleet launcher
+//! # Coordinator CLI  -  agent fleet launcher
 //!
 //! Spawns a fleet of agent processes that work through a task queue
 //! defined in a TOML file.

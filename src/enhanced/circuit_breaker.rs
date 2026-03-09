@@ -18,7 +18,7 @@
 //! let breaker = CircuitBreaker::new(5, 0.5, Duration::from_secs(60));
 //!
 //! match breaker.call(|| async {
-//!     // Your operation — replace with a real async call
+//!     // Your operation  -  replace with a real async call
 //!     Ok::<&str, &str>("inference result")
 //! }).await {
 //!     Ok(result) => println!("{result}"), // Success
@@ -70,11 +70,11 @@ struct CircuitState {
 /// Current state of a circuit breaker.
 #[derive(Debug, Clone, PartialEq)]
 pub enum CircuitStatus {
-    /// Circuit is closed — requests flow through normally.
+    /// Circuit is closed  -  requests flow through normally.
     Closed,
-    /// Circuit is open — requests are rejected immediately without calling the operation.
+    /// Circuit is open  -  requests are rejected immediately without calling the operation.
     Open,
-    /// Circuit is half-open — one probe request is allowed through to test recovery.
+    /// Circuit is half-open  -  one probe request is allowed through to test recovery.
     HalfOpen,
 }
 
@@ -128,7 +128,7 @@ impl CircuitBreaker {
                     // Check if timeout elapsed
                     if let Some(last_failure) = state.last_failure_time {
                         if last_failure.elapsed() >= self.config.timeout {
-                            // Try half-open — clear window so success-rate is
+                            // Try half-open  -  clear window so success-rate is
                             // calculated only from post-recovery requests.
                             state.status = CircuitStatus::HalfOpen;
                             state.recent_results.clear();
@@ -295,7 +295,7 @@ pub struct CircuitBreakerStats {
     pub failures: usize,
     /// Total successes recorded in the current window.
     pub successes: usize,
-    /// Fraction of recent requests that succeeded (0.0 – 1.0).
+    /// Fraction of recent requests that succeeded (0.0  -  1.0).
     pub success_rate: f64,
     /// Wall-clock time spent in the current state.
     pub time_in_current_state: Duration,

@@ -102,7 +102,7 @@ impl DistributedConfig {
     /// Create a new configuration with defaults and the given node ID.
     ///
     /// # Arguments
-    /// * `node_id` — Unique identifier for this node
+    /// * `node_id`  -  Unique identifier for this node
     ///
     /// # Returns
     /// A `DistributedConfig` with all defaults applied.
@@ -124,9 +124,9 @@ impl DistributedConfig {
     /// Create a configuration with custom NATS and Redis URLs.
     ///
     /// # Arguments
-    /// * `node_id` — Unique identifier for this node
-    /// * `nats_url` — NATS server URL (e.g., `nats://host:4222`)
-    /// * `redis_url` — Redis server URL (e.g., `redis://host:6379`)
+    /// * `node_id`  -  Unique identifier for this node
+    /// * `nats_url`  -  NATS server URL (e.g., `nats://host:4222`)
+    /// * `redis_url`  -  Redis server URL (e.g., `redis://host:6379`)
     ///
     /// # Returns
     /// A `DistributedConfig` with custom connection URLs and other defaults.
@@ -145,8 +145,8 @@ impl DistributedConfig {
     /// Validate this configuration for semantic correctness.
     ///
     /// # Returns
-    /// - `Ok(())` — if all fields are valid
-    /// - `Err(DistributedError::InvalidConfig)` — if any field violates constraints
+    /// - `Ok(())`  -  if all fields are valid
+    /// - `Err(DistributedError::InvalidConfig)`  -  if any field violates constraints
     ///
     /// # Panics
     /// This function never panics.
