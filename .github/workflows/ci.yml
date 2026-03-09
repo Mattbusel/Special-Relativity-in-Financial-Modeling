@@ -10,17 +10,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check repository structure
-        run: |
-          echo "Repository structure check passed"
-          ls -la
+        run: echo "Repository structure OK" && ls -la
 
   build-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - name: Configure
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+        run: cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
       - name: Build
-        run: cmake --build build
+        run: cmake --build build --config RelWithDebInfo --parallel
       - name: Test
-        run: ctest --test-dir build --output-on-failure
+        run: ctest --test-dir build -C RelWithDebInfo --output-on-failure
