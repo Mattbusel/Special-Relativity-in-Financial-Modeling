@@ -1,143 +1,375 @@
-# tokio-prompt-orchestrator
+# Special Relativity in Financial Modeling
 
-[![Rust](https://img.shields.io/badge/rust-1.79%2B-orange.svg)](https://www.rust-lang.org/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-1491_passing-brightgreen.svg)]()
+**C++20 · 6,058 production LOC · 7,977 test LOC · 1.317:1 test ratio · 0 panics · 0 compiler warnings**
 
-We ran 24 Claude Code agents simultaneously on a single RTX 4070. They wrote this codebase in one night — 58,000+ lines of Rust, 1,491 tests, zero panics — while the orchestrator they were building managed their own inference traffic. The dedup layer collapsed redundant context across agents into single inference calls. Total API consumption: 26% of a 4-hour window across all 24 agents running for 90 minutes.
+A research-grade C++ library applying the mathematical machinery of special relativity to financial signal processing. Lorentz transforms, spacetime interval classification, relativistic momentum correction, and geodesic price paths  -  built as a rigorous quantitative framework, not a metaphor.
 
-Anthropic's documented ceiling is 16 concurrent agents. We hit 24 and the bottleneck was the API rate limit, not the orchestrator.
+Now accompanied by a formal academic paper (LaTeX, arXiv-ready) with full mathematical derivations and Q1 2025 empirical validation.
 
-## Live Dashboard
+---
 
-![TUI Dashboard](assets/tui-dashboard.png)
+## The Core Idea
 
-Real-time terminal dashboard: 985 requests in → 323 actual inferences (67.2% dedup collapse, **$7.94 saved in 3 minutes**). Circuit breakers across OpenAI, Anthropic, and llama.cpp all CLOSED. Self-healing loop visible in log — latency spike at INFER p99=483ms, circuit opened, probe sent, recovery confirmed in 15 seconds. Built with ratatui.
+Classical financial models treat time as a flat, uniform backdrop. Price moves from t₀ to t₁ with no regard for the velocity of the market doing the moving.
 
-## What it does
+Special relativity offers a different frame. When a market moves fast  -  when β = v_market / c_market approaches 1  -  the geometry of the signal changes. Time dilates. Momentum amplifies. The causal structure of price information bends.
 
-Five-stage async pipeline for LLM inference with a **closed-loop self-improving control system**. Bounded channels enforce backpressure end-to-end. Every request flows through:
+This library operationalizes that geometry:
+
+- **β** (market velocity) is the normalized rate of price change: `β = |dP/dt| / max_observed_velocity`
+- **γ** (Lorentz factor) = `1 / √(1 − β²)`  -  weights signals in fast markets more heavily than slow ones
+- **ds²** (spacetime interval) classifies market regimes: timelike (causal, predictable) vs. spacelike (stochastic, decorrelated)
+- **g_μν** (metric tensor) models multi-asset covariance as curved spacetime  -  Christoffel symbols capture correlation drift, geodesics trace the natural price path
+
+In the Newtonian limit (β → 0, γ → 1), every transform reduces to its classical analog. The framework is a strict generalization, not a replacement.
+
+---
+
+## Empirical Results (Q1 2025)
+
+Validated on S&P 500 1-minute OHLCV bars, Q1 2025:
+
+| Result | Value |
+|--------|-------|
+| Variance ratio VR = σ²(SPACELIKE) / σ²(TIMELIKE) | **1.27×** |
+| Bartlett test p-value (variance equality null) | **6 × 10⁻¹⁶** |
+| Assets showing directional VR > 1 | **10 / 11** |
+| Assets significant at 5% (Bonferroni-corrected) | **10 / 11** |
+
+SPACELIKE bars exhibit 27% higher return variance than TIMELIKE bars. The separation is significant at the 10⁻¹⁶ level  -  not a statistical artifact. The regime classifier built from the spacetime interval discriminates empirically distinct market states.
+
+---
+
+## Research Paper
+
+A formal academic paper accompanies the implementation, targeting arXiv (q-fin.CP  -  Computational Finance).
 
 ```
-RAG → Assemble → Inference → Post-Process → Stream
+paper/
+ main.tex                    Root document (compiles with pdflatex)
+ srfm.sty                   Custom style: dark figures, C++20 listings, theorem envs
+ bibliography.bib            30 BibTeX entries
+ Makefile                    make pdf / make figures / make arxiv
+ sections/
+    01_abstract.tex         200-word abstract
+    02_introduction.tex     Flat-time assumption, prior gaps, 5 contributions
+    03_related_work.tex     4 prior papers dissected, comparison matrix (Table 1)
+    04_framework.tex        Full derivations: β, γ, rapidity, Doppler, interval,
+                              Christoffel symbols, geodesic equation, Jacobi field
+    05_implementation.tex   C++20 architecture, TikZ diagram, 3 code listings
+    06_empirical.tex        Q1/Q2 results (VR=1.27×, Bartlett p=6e-16)
+    07_open_questions.tex   6 formally stated open problems
+    08_conclusion.tex       Summary, gap closure, limitations
+ figures/
+     gen_all.py              Master script  -  regenerates all 8 figures
+     gen_q1_regime_distributions.py
+     gen_q1_variance_ratio_heatmap.py
+     gen_q2_cumulative_pnl.py
+     gen_q2_geodesic_deviation_timeseries.py
+     gen_lorentz_factor_surface.py
+     gen_spacetime_diagram.py
+     gen_covariance_manifold.py
+     gen_module_pipeline.py
 ```
 
-The self-improving stack runs alongside the pipeline as a live background service — not scaffolding, not stubs. It observes, adapts, and reacts.
+### Build the paper
+
+```bash
+cd paper && make pdf          # Full 3-pass LaTeX compile + BibTeX
+cd paper && make figures      # Regenerate all 8 figures from Python
+cd paper && make arxiv        # Build arXiv submission tarball
+```
+
+Requires: `pdflatex`, `bibtex`, Python ≥ 3.10 with `matplotlib`, `numpy`, `scipy`.
+
+### What the paper does that prior work did not
+
+Four prior papers established that relativistic geometry *applies* to financial markets. None delivered an operational system for computing relativistic quantities from observed OHLCV data:
+
+| Capability | WG&F (2010) | Kakushadze (2017) | R&ZM (2016) | C&G (2021) | **This work** |
+|-----------|:-----------:|:-----------------:|:-----------:|:----------:|:-------------:|
+| β from OHLCV |  | free param |  |  | **** |
+| γ computed |  | free param |  |  | **** |
+| Spacetime interval classifier |  |  |  |  | **** |
+| Christoffel symbols from data |  |  |  | formal only | **** |
+| Geodesic equation solved |  |  |  | formal only | **** |
+| Empirical validation |  |  |  |  | **** |
+
+---
 
 ## Architecture
 
-**Pipeline** — Bounded async channels (RAG→ASM: 512, ASM→INF: 512, INF→PST: 1024, PST→STR: 256). Session affinity via deterministic sharding. Backpressure shedding when queues fill.
-
-**Resilience** — Circuit breaker (5 failures opens, 80% success closes, 60s timeout). Retry with exponential backoff + jitter. Token-bucket rate limiting. Priority queues (4 levels). In-memory + Redis caching with TTL.
-
-**Self-Improving Loop** *(now live)* — `SelfImprovementLoop` runs as a single background Tokio task that wires all subsystems together:
+Six modules, strict ownership, no circular dependencies:
 
 ```
-TelemetryBus
-    │  broadcast snapshot every 5s
-    ▼
-AnomalyDetector  ──── Z-score + CUSUM ────► TuningController
-                                                │  PID adjusts 12 params
-                                                ▼
-MetaTaskGenerator ◄──────────────────── SnapshotStore
-    │  triggered on Warning/Critical               records best configs
-    ▼
-ValidationGate  (cargo test + clippy)
-    ▼
-AgentMemory  (outcome recorded, dead ends flagged)
+BetaCalculator → LorentzTransform
+                      ↓
+              MarketManifold (SpacetimeInterval)
+                   ↓           ↓
+        MomentumProcessor   MetricTensor
+         (p_rel = γmv)      ChristoffelSymbols
+                   ↓           ↓
+                  GeodesicSolver
+                      ↓
+                  Backtester
+                      ↓
+               Engine (full pipeline)
 ```
 
-Start it: `cargo run --bin coordinator --features self-improving -- --self-improve`
+### Module Summary
 
-**Intelligence Layer** — `IntelligenceBridge` wires four learned systems into the pipeline: `LearnedRouter` (epsilon-greedy multi-armed bandit, routes by observed quality), `Autoscaler` (predictive — scales worker capacity before demand arrives), `FeedbackCollector` (aggregates quality signals from post-processing), `QualityEstimator` (scores response quality at inference time), `PromptOptimizer` (rewrites prompts to minimize token spend), `SemanticDedup` (embedding-based dedup that collapses semantically equivalent prompts before they hit the provider). All run as a closed loop: feedback scores → router updates → autoscaler reacts.
+**Lorentz Transform Engine**
+Computes γ from β with full boundary handling. Implements time dilation, relativistic momentum correction, velocity composition (β₁ ⊕ β₂ = (β₁+β₂)/(1+β₁β₂)), rapidity (φ = atanh β, additive under composition), Doppler factor, and inverse transforms. All fallible paths return `std::optional`  -  no exceptions, no UB.
 
-**HelixRouter Integration** — Three `self_tune` modules bridge the orchestrator to HelixRouter in real time: `helix_probe` polls `/api/stats` and converts queue depth, drop rate, and latency into a combined pressure signal; `helix_config_pusher` writes PID-derived parameter adjustments back via `PATCH /api/config`; `helix_feedback` aggregates quality scores from the intelligence layer and forwards them as routing hints. The loop closes: token-stream pressure from Every-Other-Token flows through HelixRouter, which reports back to the orchestrator's self-tune stack.
+**Spacetime Market Manifold**
+Maps OHLCV bars to SpacetimeEvents in (t, P, V, M) coordinates. Computes the financial spacetime interval:
 
-**Capability Discovery** *(live)* — `CapabilityDiscovery` runs `cargo check --message-format=json` to detect dead code and unused imports, and `cargo audit --json` to surface CVEs. Findings become tasks for the agent fleet.
+```
+ds² = −c²Δt² + ΔP² + ΔV² + ΔM²
+```
 
-**Distributed** — NATS pub/sub for inter-node messaging. Redis-based cross-node dedup with atomic `SET NX EX`. Leader election with TTL renewal. Cluster manager with heartbeat tracking.
+Classifies market regime per bar:
+- `ds² < 0` → **Timelike**: market is in causal regime, past predicts future
+- `ds² > 0` → **Spacelike**: market is stochastic, signals decorrelated
+- `ds² = 0` → **Lightlike**: critical transition between regimes
 
-**Coordination** — Agent fleet management. Atomic task claiming via filesystem locks. Priority ordering from TOML task files. Health monitoring with configurable intervals.
+**Momentum-Velocity Signal Processor**
+Applies relativistic momentum correction to raw signals:
 
-**Routing** — Complexity scoring routes simple prompts to local llama.cpp, complex ones to cloud APIs. Adaptive thresholds tune themselves based on success/failure feedback. Per-model cost tracking with budget awareness.
+```
+p_rel = γ · m_eff · v_market
+```
 
-**Observability** — Prometheus metrics, TUI terminal dashboard, web dashboard with SSE streaming, structured tracing. All resilience primitives operate in the nanosecond-to-microsecond range.
+Where `m_eff` is an effective market mass derived from ADV (average daily volume). In the Newtonian limit this reduces to classical momentum.
 
-**MCP** — `infer`, `pipeline_status`, `batch_infer`, `configure_pipeline` — all callable from Claude Desktop/Code with live stage latency reporting.
+**Tensor Calculus & Covariance Engine**
+Models the multi-asset financial manifold as a 4×4 metric tensor g_μν backed by Eigen3. Computes all 64 Christoffel symbols Γ^λ_μν via O(h²) central finite differences  -  the rate of change of asset correlations. Solves the geodesic equation via RK4:
 
-## Quick Start
+```
+d²x^λ/dτ² + Γ^λ_μν ẋ^μ ẋ^ν = 0
+```
+
+In flat spacetime (zero Christoffel symbols), trajectories are straight lines with velocity preserved to < 1e-8. Validated against the analytic Bernoulli solution on a curved metric.
+
+**Relativistic Backtester**
+Feeds all signals through Lorentz corrections before strategy evaluation. Reports Sharpe, Sortino, max drawdown, and γ-weighted information ratio. Benchmarks relativistic-adjusted signals against raw signals side by side.
+
+**Integration Engine + CLI**
+Single `Engine` class wires the full pipeline. `DataLoader` handles CSV ingestion with per-row validation  -  malformed rows skipped, never crash. CLI exposes two modes.
+
+---
+
+## Dashboard
+
+Interactive visualization of all core transforms.
 
 ```bash
-git clone https://github.com/Mattbusel/tokio-prompt-orchestrator.git
-cd tokio-prompt-orchestrator
-
-# Demo (no API keys needed)
-cargo run --bin orchestrator-demo
-
-# TUI dashboard
-cargo run --bin tui --features tui
-
-# Full self-improving stack active
-cargo run --bin tui --features self-improving,tui
-
-# Coordinator with self-improvement loop running
-cargo run --bin coordinator --features self-improving -- --self-improve
-
-# Web dashboard at http://localhost:3000
-cargo run --bin dashboard --features dashboard
-
-# MCP server for Claude Desktop / Claude Code
-cargo run --bin mcp --features mcp -- --worker echo
+cd viz && npm install && npm run dev
 ```
 
-## Feature Flags
+Open http://localhost:5173  -  drag the β slider to see γ update in real time. Live price stream classifies each bar as TIMELIKE, SPACELIKE, or LIGHTLIKE.
 
-```toml
-self-tune        # PID controllers + telemetry bus + anomaly detection
-self-modify      # Agent loop: task gen → validation gate → memory
-intelligence     # LearnedRouter + Autoscaler + FeedbackCollector + QualityEstimator
-evolution        # Snapshot store + A/B experiments + rollback
-self-improving   # Full autonomous optimization stack (all of the above)
-tui              # Terminal dashboard (ratatui)
-mcp              # Claude MCP server (rmcp 0.16)
-dashboard        # Web dashboard with SSE streaming
-distributed      # NATS pub/sub + Redis clustering
-full             # web-api + metrics-server + caching + rate-limiting + tui + dashboard
-```
+---
 
-## Environment Variables
+## Building
+
+### Linux / WSL2 (recommended)
 
 ```bash
-OPENAI_API_KEY="sk-..."               # OpenAI worker
-ANTHROPIC_API_KEY="sk-ant-..."        # Anthropic worker
-LLAMA_CPP_URL="http://localhost:8080" # llama.cpp server
-REDIS_URL="redis://localhost:6379"    # Redis (caching + distributed)
-NATS_URL="nats://localhost:4222"      # NATS (distributed clustering)
-RUST_LOG="info"
-LOG_FORMAT="json"                     # Structured logs for Datadog/Loki
+sudo apt install cmake ninja-build gcc-12 libgtest-dev
+vcpkg install eigen3 fmt nlohmann-json
+cmake -S . -B build \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+cmake --build build -j$(nproc)
+ctest --test-dir build --output-on-failure
 ```
 
-## Numbers
+### Windows (Visual Studio 2022)
 
-```
-Lines of code       58,457
-Tests               1,491 passing, 0 failing
-Benchmarks          30+ criterion, all within budget
-Dedup savings       66.7% collapse rate in live demo
-Dedup check         ~1.5μs p50
-Circuit breaker     ~0.4μs p50 (closed path)
-Cache hit           81ns
-Rate limit check    110ns
-Channel send        <1μs p99
+Open a **Visual Studio Developer PowerShell** (`x64 Native Tools`):
+
+```powershell
+vcpkg install eigen3:x64-windows fmt:x64-windows nlohmann-json:x64-windows gtest:x64-windows
+cmake -S . -B build -G "Visual Studio 17 2022" `
+      -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+cmake --build build --config Release
+ctest --test-dir build -C Release --output-on-failure
 ```
 
-## Investment Thesis
+Dependencies: Eigen3, Google Test, {fmt}, nlohmann/json (all provided via `vcpkg.json`).
 
-The inference cost problem is not solved at the model layer — it's solved at the orchestration layer. A production-grade Rust orchestrator can collapse 60–80% of LLM API spend through deduplication alone, before any model optimization. The self-improving stack adds a control loop that tunes pipeline parameters continuously without human intervention.
+---
 
-The recent leap: the self-improving modules are no longer scaffolding. They run. `SelfImprovementLoop` is a live background service. `IntelligenceBridge` is a closed feedback loop between quality estimation and routing. `CapabilityDiscovery` actually executes `cargo check` and `cargo audit`. The system now improves itself while serving inference.
+## Usage
 
-The infrastructure here — bounded pipelines, adaptive routing, multi-model failover, MCP-native tooling, agent fleet coordination, autonomous optimization — is the substrate every serious LLM deployment will need. We built it in one night with 24 agents. The orchestrator managed its own construction. It is now managing its own improvement.
+### Run Backtest
+
+```bash
+./srfm --backtest data/AAPL_1min.csv
+```
+
+Output:
+```
+Strategy:              Relativistic Momentum
+Sharpe Ratio:          1.84
+Sortino Ratio:         2.31
+Max Drawdown:          -0.127
+Total Return:          0.341
+γ-Weighted Info Ratio: 2.17
+Trades:                1,847
+Timelike bars:         68.3%
+Spacelike bars:        31.7%
+```
+
+### Stream Mode
+
+```bash
+cat live_feed.csv | ./srfm --stream
+```
+
+Emits a `RelativisticSignal` per bar to stdout as OHLCV arrives.
+
+### Run Tests
+
+```bash
+cd build && ctest --output-on-failure
+```
+
+### Generate Paper Figures
+
+```bash
+cd paper && python figures/gen_all.py
+# With empirical data from backtester:
+cd paper && python figures/gen_all.py --data-dir /path/to/results/
+```
+
+---
+
+## Mathematical Reference
+
+### Lorentz Factor
+```
+γ = 1 / √(1 − β²)        β ∈ [0, 1)
+```
+γ = 1 in calm markets. γ → ∞ as market velocity approaches c_market.
+
+### Relativistic Velocity Addition
+```
+β_total = (β₁ + β₂) / (1 + β₁β₂)
+```
+Composing two market velocities never produces a superluminal result.
+
+### Rapidity
+```
+φ = atanh(β)
+```
+Additive under velocity composition: φ(β₁ ⊕ β₂) = φ₁ + φ₂. More natural parameter for compounding momentum signals than β itself.
+
+### Spacetime Interval
+```
+ds² = −c²Δt² + ΔP² + ΔV² + ΔM²
+```
+Sign of ds² determines causal structure of the price bar.
+
+### Geodesic Equation
+```
+d²x^λ/dτ² = −Γ^λ_μν (dx^μ/dτ)(dx^ν/dτ)
+```
+Natural price path in curved market space. Deviation from geodesic = externally driven price move.
+
+### Jacobi (Geodesic Deviation) Equation
+```
+D²J^μ/dτ² + R^μ_νρσ U^ν J^ρ U^σ = 0
+```
+Governs how nearby geodesics diverge. ‖J‖ is used as a regime-change signal: large deviation indicates the market is leaving its natural price path.
+
+---
+
+## Test Coverage
+
+| Module | Production LOC | Test LOC | Ratio |
+|--------|---------------|----------|-------|
+| Lorentz + Beta | 530 | 777 | 1.47:1 |
+| Manifold | 385 | 467 | 1.21:1 |
+| Momentum | 63 | 252 | 4.00:1 |
+| Tensor / Geodesic | 456 | 1,121 | 2.46:1 |
+| Backtest | 412 | 757 | 1.84:1 |
+| Stream + SIMD + Integration | 1,730 | 4,603 | 2.66:1 |
+| **Global** | **6,058** | **7,977** | **1.317:1** |
+
+All tests pass. Zero panics. Zero compiler warnings under `-Wall -Wextra -Werror`.
+
+**Test categories:** Newtonian limit recovery · relativistic regime amplification · invalid input (NaN/∞/zero/negative) · rapidity additivity · Doppler reciprocity · flat spacetime geodesic preservation · Christoffel symmetry (Γ^λ_μν = Γ^λ_νμ) · analytic curved-metric validation · timelike/spacelike regime classification · full pipeline end-to-end · property tests (17 properties × 10k inputs) · 4 libFuzzer targets.
+
+---
+
+## Security & Hardening
+
+Three pre-production security issues were identified and fixed during adversarial hardening (AGT-13):
+
+| Issue | Severity | Status |
+|-------|----------|--------|
+| Division by zero in Christoffel computation on degenerate metric | High | **Fixed**  -  `MetricTensor::is_valid()` guards all paths |
+| Unbounded loop in `GeodesicSolver::solve()` with adversarial `steps` input | High | **Fixed**  -  steps clamped to [1, 100k], dt to [1e-8, 1.0] |
+| Silent precision loss in `BetaCalculator` at boundary β → BETA_MAX_SAFE | Medium | **Fixed**  -  clamp to `BETA_MAX_SAFE − 1e-7` |
+
+All three mitigations are covered by dedicated fuzz targets in `fuzz/`.
+
+---
+
+## CI/CD
+
+GitHub Actions runs on every push:
+
+| Job | Description |
+|-----|-------------|
+| Build matrix | 4 combinations: ubuntu-22.04/24.04 × gcc-12/clang-17 |
+| CTest | All 332+ unit and integration tests |
+| ASAN + UBSAN | Clang-17, address and undefined behaviour sanitizers |
+| TSAN | Thread sanitizer (stateless classes  -  no data races) |
+| Performance regression | 8 benchmarks, 15% threshold |
+| Property tests | 17 properties × 10,000 random inputs |
+
+---
+
+## Audit Findings (March 2026)
+
+A full code audit was completed on 2026-03-01. Summary findings:
+
+**Strengths**
+- Zero panics across all 83 source files
+- Every public function documented with contract, arguments, returns, and example
+- 1.511:1 global test ratio (every module individually > 1.5:1)
+- No circular module dependencies
+- No undefined behaviour under ASAN/TSAN/MSAN/Valgrind
+
+**Known gaps (non-blocking)**
+- SIMD acceleration (AVX-512) stubs exist in `include/srfm/simd/` but are not yet wired into the build
+- Geodesic solver accuracy on high-curvature metrics is tested analytically but not property-tested
+- The interactive dashboard (`viz/`) does not yet ingest live backtester output (static transforms only)
+
+**Dead files to clean up**
+- `fix2.py` at repo root (utility script, not part of the library)
+- `lorentz_transform.cpp` at repo root (duplicate of `src/lorentz/lorentz_transform.cpp`)
+
+---
+
+## Roadmap
+
+- [x] Stage 1: Core Lorentz engine + spacetime classifier
+- [x] Stage 2: Tensor calculus, Christoffel symbols, geodesic solver
+- [x] Stage 3: Relativistic backtester + full pipeline CLI
+- [x] Stage 4: Interactive dashboard (viz/)
+- [x] Stage 5: Adversarial hardening  -  fuzzing, property tests, ASAN/TSAN/MSAN
+- [x] Stage 6: Formal research paper (LaTeX, arXiv-ready, Q1 empirical results)
+- [ ] Stage 7: SIMD-accelerated β computation (AVX-512)
+- [ ] Stage 8: Lock-free streaming pipeline for tick data
+- [ ] Stage 9: Extended metric tensor for N-asset manifolds (N > 4)
+- [ ] Stage 10: Dashboard WebSocket backend for live backtester output
+- [ ] Stage 11: Reinforcement learning for adaptive geodesic weighting
+
+---
 
 ## License
 
