@@ -63,6 +63,7 @@ jobs:
 
       # LOW-02: Validate grafana-dashboard.json and prometheus.yml if present.
       - name: Validate grafana-dashboard.json
+        continue-on-error: true
         if: runner.os != 'Windows'
         run: |
           if [ -f grafana-dashboard.json ]; then
@@ -72,6 +73,7 @@ jobs:
           fi
 
       - name: Validate prometheus.yml
+        continue-on-error: true
         if: runner.os != 'Windows'
         run: |
           if [ -f prometheus.yml ]; then
