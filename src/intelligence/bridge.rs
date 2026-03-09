@@ -139,9 +139,7 @@ impl IntelligenceBridge {
             min_history_points: config.autoscaler_min_history,
             ..AutoscalerConfig::default()
         };
-        let model_router = config
-            .routing
-            .map(|rc| Arc::new(ModelRouter::new(rc)));
+        let model_router = config.routing.map(|rc| Arc::new(ModelRouter::new(rc)));
         Self {
             learned_router: Arc::new(LearnedRouter::new(config.router)),
             feedback: Arc::new(FeedbackCollector::new(config.max_feedback_entries)),
@@ -436,7 +434,7 @@ mod tests {
         IntelligenceBridge::with_defaults()
     }
 
-    //  construction 
+    //  construction
 
     #[test]
     fn test_bridge_with_defaults_constructs() {
@@ -463,7 +461,7 @@ mod tests {
         assert_eq!(clone.learned_router.model_count(), 1);
     }
 
-    //  register_model 
+    //  register_model
 
     #[test]
     fn test_register_model_once() {
@@ -489,7 +487,7 @@ mod tests {
         assert_eq!(bridge.learned_router.model_count(), 3);
     }
 
-    //  notify_request 
+    //  notify_request
 
     #[test]
     fn test_notify_request_records_rps() {
@@ -515,7 +513,7 @@ mod tests {
         assert_eq!(bridge.autoscaler.current_avg_rps(), 0.0);
     }
 
-    //  advise_model 
+    //  advise_model
 
     #[test]
     fn test_advise_model_no_models_returns_none() {
@@ -576,7 +574,7 @@ mod tests {
         );
     }
 
-    //  notify_completion 
+    //  notify_completion
 
     #[test]
     fn test_notify_completion_success_increments_feedback() {
@@ -672,7 +670,7 @@ mod tests {
         assert!(fast_score.successes >= 10);
     }
 
-    //  autoscale_recommendation 
+    //  autoscale_recommendation
 
     #[test]
     fn test_autoscale_recommendation_none_without_history() {
@@ -710,7 +708,7 @@ mod tests {
         assert!(rec.confidence >= 0.0 && rec.confidence <= 1.0);
     }
 
-    //  best_model_for_category 
+    //  best_model_for_category
 
     #[test]
     fn test_best_model_unknown_category_returns_none() {
@@ -734,7 +732,7 @@ mod tests {
         assert_eq!(best, Some("winner".to_string()));
     }
 
-    //  average_feedback_score 
+    //  average_feedback_score
 
     #[test]
     fn test_average_feedback_score_empty_is_zero() {
@@ -752,7 +750,7 @@ mod tests {
         assert!(avg > 0.0);
     }
 
-    //  estimate helpers 
+    //  estimate helpers
 
     #[test]
     fn test_estimate_tokens_empty_prompt() {
@@ -797,7 +795,7 @@ mod tests {
         assert!(score >= 0.0);
     }
 
-    //  feedback_count 
+    //  feedback_count
 
     #[test]
     fn test_feedback_count_zero_initially() {
@@ -834,7 +832,7 @@ mod tests {
         assert!(bridge.feedback_count() <= 5);
     }
 
-    //  route_prompt / model_router 
+    //  route_prompt / model_router
 
     #[test]
     fn test_route_prompt_without_model_router_short_is_local() {

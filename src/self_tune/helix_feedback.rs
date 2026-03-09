@@ -41,7 +41,7 @@ use std::time::Duration;
 use serde::Serialize;
 use tracing::{debug, info};
 
-//  Wire-format patch 
+//  Wire-format patch
 
 /// Sparse config patch for HelixRouter's `PATCH /api/config`.
 ///
@@ -60,7 +60,7 @@ impl PressurePatch {
     }
 }
 
-//  Pressure tier 
+//  Pressure tier
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum PressureTier {
@@ -69,7 +69,7 @@ enum PressureTier {
     Low,    // ≤ low_threshold: relax HelixRouter
 }
 
-//  Configuration 
+//  Configuration
 
 /// Configuration for [`HelixFeedbackPusher`].
 #[derive(Debug, Clone)]
@@ -105,7 +105,7 @@ impl Default for HelixFeedbackConfig {
     }
 }
 
-//  Pusher 
+//  Pusher
 
 /// Per-tick pressure-driven config pusher.
 ///
@@ -238,7 +238,7 @@ impl HelixFeedbackPusher {
     }
 }
 
-//  Tests 
+//  Tests
 
 #[cfg(test)]
 mod tests {
@@ -248,7 +248,7 @@ mod tests {
         HelixFeedbackPusher::new(HelixFeedbackConfig::default())
     }
 
-    //  Config 
+    //  Config
 
     #[test]
     fn config_default_thresholds() {
@@ -279,7 +279,7 @@ mod tests {
         assert_eq!(cfg.base_url, "http://127.0.0.1:8080");
     }
 
-    //  PressureTier classification 
+    //  PressureTier classification
 
     #[test]
     fn classify_high_threshold() {
@@ -306,7 +306,7 @@ mod tests {
         assert_eq!(p.classify(0.31), PressureTier::Normal);
     }
 
-    //  Patch construction 
+    //  Patch construction
 
     #[test]
     fn tighten_patch_reduces_spawn_threshold() {
@@ -314,7 +314,10 @@ mod tests {
         let patch = p.tighten_patch();
         let baseline = p.config.baseline_spawn_threshold;
         let t = patch.spawn_threshold.expect("spawn_threshold set");
-        assert!(t < baseline, "tighten should reduce spawn_threshold: {t} < {baseline}");
+        assert!(
+            t < baseline,
+            "tighten should reduce spawn_threshold: {t} < {baseline}"
+        );
         // Should be ~90% of baseline
         let expected = (baseline as f64 * 0.90) as u64;
         assert_eq!(t, expected.clamp(10_000, 500_000));
@@ -326,15 +329,24 @@ mod tests {
         let patch = p.tighten_patch();
         let baseline = p.config.baseline_cpu_p95_budget_ms;
         let b = patch.cpu_p95_budget_ms.expect("cpu_p95_budget_ms set");
-        assert!(b > baseline, "tighten should raise cpu_p95_budget_ms: {b} > {baseline}");
+        assert!(
+            b > baseline,
+            "tighten should raise cpu_p95_budget_ms: {b} > {baseline}"
+        );
     }
 
     #[test]
     fn relax_patch_restores_baselines() {
         let p = make_pusher();
         let patch = p.relax_patch();
-        assert_eq!(patch.spawn_threshold, Some(p.config.baseline_spawn_threshold));
-        assert_eq!(patch.cpu_p95_budget_ms, Some(p.config.baseline_cpu_p95_budget_ms));
+        assert_eq!(
+            patch.spawn_threshold,
+            Some(p.config.baseline_spawn_threshold)
+        );
+        assert_eq!(
+            patch.cpu_p95_budget_ms,
+            Some(p.config.baseline_cpu_p95_budget_ms)
+        );
     }
 
     #[test]
@@ -354,7 +366,7 @@ mod tests {
         assert!(PressurePatch::default().is_empty());
     }
 
-    //  Tighten patch spawn_threshold clamping 
+    //  Tighten patch spawn_threshold clamping
 
     #[test]
     fn tighten_clamps_very_low_baseline() {
@@ -377,7 +389,7 @@ mod tests {
         assert!(t <= 500_000, "must not exceed 500_000: {t}");
     }
 
-    //  Hysteresis / idempotency 
+    //  Hysteresis / idempotency
 
     #[tokio::test]
     async fn maybe_push_same_tier_twice_skips_second_push() {
@@ -397,7 +409,10 @@ mod tests {
 
         // Second call at same pressure: same tier → skipped → always Ok(()).
         let second = p.maybe_push(0.9).await;
-        assert!(second.is_ok(), "second same-tier push should be skipped: {second:?}");
+        assert!(
+            second.is_ok(),
+            "second same-tier push should be skipped: {second:?}"
+        );
     }
 
     #[tokio::test]
@@ -408,14 +423,20 @@ mod tests {
         let p = HelixFeedbackPusher::new(cfg);
 
         let result = p.maybe_push(0.5).await;
-        assert!(result.is_ok(), "normal pressure should return Ok without HTTP: {result:?}");
+        assert!(
+            result.is_ok(),
+            "normal pressure should return Ok without HTTP: {result:?}"
+        );
     }
 
-    //  Patch serialisation 
+    //  Patch serialisation
 
     #[test]
     fn pressure_patch_serialises_both_fields() {
-        let patch = PressurePatch { spawn_threshold: Some(54_000), cpu_p95_budget_ms: Some(250) };
+        let patch = PressurePatch {
+            spawn_threshold: Some(54_000),
+            cpu_p95_budget_ms: Some(250),
+        };
         let json = serde_json::to_string(&patch).expect("serialize");
         assert!(json.contains("spawn_threshold"), "json: {json}");
         assert!(json.contains("cpu_p95_budget_ms"), "json: {json}");
@@ -425,12 +446,18 @@ mod tests {
 
     #[test]
     fn pressure_patch_skips_none_fields() {
-        let patch = PressurePatch { spawn_threshold: Some(54_000), cpu_p95_budget_ms: None };
+        let patch = PressurePatch {
+            spawn_threshold: Some(54_000),
+            cpu_p95_budget_ms: None,
+        };
         let json = serde_json::to_string(&patch).expect("serialize");
-        assert!(!json.contains("cpu_p95_budget_ms"), "None field must be absent: {json}");
+        assert!(
+            !json.contains("cpu_p95_budget_ms"),
+            "None field must be absent: {json}"
+        );
     }
 
-    //  Mock-HTTP integration tests 
+    //  Mock-HTTP integration tests
 
     async fn bind_mock_server() -> (u16, tokio::net::TcpListener) {
         let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
@@ -468,7 +495,10 @@ mod tests {
         let p = HelixFeedbackPusher::new(cfg);
         let patch = p.tighten_patch();
         let result = p.push_patch(&patch, PressureTier::High, 0.8).await;
-        assert!(result.is_ok(), "push should succeed on HTTP 200: {result:?}");
+        assert!(
+            result.is_ok(),
+            "push should succeed on HTTP 200: {result:?}"
+        );
     }
 
     #[tokio::test]
@@ -497,7 +527,10 @@ mod tests {
 
         // High pressure should trigger tighten patch.
         let result = p.maybe_push(0.9).await;
-        assert!(result.is_ok(), "high pressure push should succeed: {result:?}");
+        assert!(
+            result.is_ok(),
+            "high pressure push should succeed: {result:?}"
+        );
     }
 
     #[tokio::test]
@@ -511,6 +544,9 @@ mod tests {
 
         // Low pressure should trigger relax patch.
         let result = p.maybe_push(0.1).await;
-        assert!(result.is_ok(), "low pressure push should succeed: {result:?}");
+        assert!(
+            result.is_ok(),
+            "low pressure push should succeed: {result:?}"
+        );
     }
 }

@@ -14,7 +14,7 @@ use thiserror::Error;
 
 pub mod config;
 pub mod coordination;
-pub mod momentum;
+// pub mod momentum; // module removed — C++ SIMD momentum is in crates/
 #[cfg(feature = "distributed")]
 pub mod distributed;
 pub mod enhanced;
@@ -41,7 +41,11 @@ pub mod intelligence;
 #[cfg(feature = "evolution")]
 pub mod evolution;
 
-#[cfg(all(feature = "self-tune", feature = "self-modify", feature = "intelligence"))]
+#[cfg(all(
+    feature = "self-tune",
+    feature = "self-modify",
+    feature = "intelligence"
+))]
 pub mod self_improve;
 
 #[cfg(all(feature = "self-tune", feature = "self-modify"))]
@@ -52,7 +56,9 @@ pub mod tui;
 
 // Re-exports
 pub use stages::{spawn_pipeline, LogSink, OutputSink, PipelineHandles, SinkError};
-pub use worker::{AnthropicWorker, EchoWorker, LlamaCppWorker, ModelWorker, OpenAiWorker, VllmWorker};
+pub use worker::{
+    AnthropicWorker, EchoWorker, LlamaCppWorker, ModelWorker, OpenAiWorker, VllmWorker,
+};
 
 /// Orchestrator-specific errors
 #[derive(Error, Debug)]
@@ -143,17 +149,38 @@ pub fn init_tracing() {
         .try_init();
 }
 
-/// Send with graceful shedding on backpressure
+/// Outcome of a [`send_with_shed`] call.
+///
+/// Distinguishes between successful delivery and a graceful shed so callers
+/// can log/metric them differently.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SendOutcome {
+    /// The item was successfully placed in the channel.
+    Queued,
+    /// The channel was full; the item was dropped to shed load.
+    Shed,
+}
+
+/// Send with graceful shedding on backpressure.
+///
+/// # Returns
+/// - `Ok(SendOutcome::Queued)` — item was accepted by the channel.
+/// - `Ok(SendOutcome::Shed)` — channel was full; item was dropped gracefully.
+/// - `Err(OrchestratorError::ChannelClosed)` — the receiver has been dropped.
+///
+/// # Panics
+///
+/// This function never panics.
 pub async fn send_with_shed<T>(
     tx: &tokio::sync::mpsc::Sender<T>,
     item: T,
     stage: &str,
-) -> Result<(), OrchestratorError> {
+) -> Result<SendOutcome, OrchestratorError> {
     match tx.try_send(item) {
-        Ok(_) => Ok(()),
+        Ok(_) => Ok(SendOutcome::Queued),
         Err(tokio::sync::mpsc::error::TrySendError::Full(_)) => {
             tracing::warn!(stage = stage, "queue full, shedding request");
-            Ok(())
+            Ok(SendOutcome::Shed)
         }
         Err(tokio::sync::mpsc::error::TrySendError::Closed(_)) => {
             Err(OrchestratorError::ChannelClosed)
@@ -165,6 +192,37 @@ pub async fn send_with_shed<T>(
 mod tests {
     use super::*;
 
+    #[tokio::test]
+    async fn test_send_with_shed_returns_shed_outcome_when_channel_full() {
+        // Channel of capacity 1 — fill it, then send again to trigger shed
+        let (tx, _rx) = tokio::sync::mpsc::channel::<u32>(1);
+        // Fill the channel
+        let first = send_with_shed(&tx, 1u32, "test").await.unwrap();
+        assert_eq!(first, SendOutcome::Queued, "first send should be Queued");
+        // Channel is now full — next send must be Shed
+        let second = send_with_shed(&tx, 2u32, "test").await.unwrap();
+        assert_eq!(
+            second,
+            SendOutcome::Shed,
+            "second send on full channel should be Shed"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_send_with_shed_returns_queued_when_space_available() {
+        let (tx, _rx) = tokio::sync::mpsc::channel::<u32>(10);
+        let outcome = send_with_shed(&tx, 42u32, "test").await.unwrap();
+        assert_eq!(outcome, SendOutcome::Queued);
+    }
+
+    #[tokio::test]
+    async fn test_send_with_shed_returns_error_when_channel_closed() {
+        let (tx, rx) = tokio::sync::mpsc::channel::<u32>(10);
+        drop(rx);
+        let result = send_with_shed(&tx, 1u32, "test").await;
+        assert!(matches!(result, Err(OrchestratorError::ChannelClosed)));
+    }
+
     #[test]
     fn test_shard_session_deterministic() {
         let s = SessionId::new("test-session-123");
@@ -174,7 +232,14 @@ mod tests {
     #[test]
     fn test_shard_session_distribution() {
         let sessions: Vec<_> = (0..100).map(|i| SessionId::new(format!("s-{i}"))).collect();
-        let counts: Vec<_> = (0..4usize).map(|sh| sessions.iter().filter(|s| shard_session(s, 4) == sh).count()).collect();
+        let counts: Vec<_> = (0..4usize)
+            .map(|sh| {
+                sessions
+                    .iter()
+                    .filter(|s| shard_session(s, 4) == sh)
+                    .count()
+            })
+            .collect();
         assert!(counts.iter().all(|&c| c > 0));
     }
 }

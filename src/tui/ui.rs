@@ -206,10 +206,7 @@ fn draw_help_overlay(f: &mut Frame, area: Rect) {
             Style::default().fg(Color::DarkGray),
         )),
         Line::from(""),
-        Line::from(Span::styled(
-            "  ",
-            Style::default().fg(Color::DarkGray),
-        )),
+        Line::from(Span::styled("  ", Style::default().fg(Color::DarkGray))),
         Line::from(Span::styled(
             "  --mock  Synthetic 2-min story (default)",
             Style::default().fg(Color::DarkGray),

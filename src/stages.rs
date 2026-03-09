@@ -33,7 +33,7 @@
 
 use crate::{
     enhanced::CircuitBreaker, metrics, send_with_shed, AssembleOutput, InferenceOutput,
-    ModelWorker, PostOutput, PromptRequest, RagOutput, SessionId,
+    ModelWorker, PostOutput, PromptRequest, RagOutput, SendOutcome, SessionId,
 };
 use async_trait::async_trait;
 use std::sync::Arc;
@@ -42,7 +42,7 @@ use tokio::sync::mpsc;
 use tokio::task::JoinHandle;
 use tracing::{info, warn, Span};
 
-//  OutputSink trait 
+//  OutputSink trait
 
 /// Pluggable output sink for the stream stage.
 ///
@@ -108,7 +108,7 @@ impl std::fmt::Display for SinkError {
 
 impl std::error::Error for SinkError {}
 
-//  Default sink: replicate original log-only behaviour 
+//  Default sink: replicate original log-only behaviour
 
 /// Default [`OutputSink`] that logs the output length without logging content.
 ///
@@ -265,16 +265,28 @@ async fn rag_stage(mut rx: mpsc::Receiver<PromptRequest>, tx: mpsc::Sender<RagOu
         Span::current().record("duration_ms", elapsed.as_millis() as u64);
         Span::current().record("outcome", "ok");
 
-        if let Err(e) = send_with_shed(&tx, output, "rag").await {
-            warn!(
-                target: "orchestrator::pipeline",
-                session_id = %session_id,
-                request_id = %request_id,
-                error = ?e,
-                "RAG stage send failed"
-            );
-            metrics::inc_error("rag", "channel_closed");
-            break;
+        match send_with_shed(&tx, output, "rag").await {
+            Ok(SendOutcome::Queued) => {}
+            Ok(SendOutcome::Shed) => {
+                tracing::trace!(
+                    target: "orchestrator::pipeline",
+                    session_id = %session_id,
+                    request_id = %request_id,
+                    "RAG stage: item shed due to backpressure"
+                );
+                metrics::inc_shed("rag");
+            }
+            Err(e) => {
+                warn!(
+                    target: "orchestrator::pipeline",
+                    session_id = %session_id,
+                    request_id = %request_id,
+                    error = ?e,
+                    "RAG stage send failed"
+                );
+                metrics::inc_error("rag", "channel_closed");
+                break;
+            }
         }
     }
 
@@ -328,16 +340,28 @@ async fn assemble_stage(mut rx: mpsc::Receiver<RagOutput>, tx: mpsc::Sender<Asse
         Span::current().record("duration_ms", elapsed.as_millis() as u64);
         Span::current().record("outcome", "ok");
 
-        if let Err(e) = send_with_shed(&tx, output, "assemble").await {
-            warn!(
-                target: "orchestrator::pipeline",
-                session_id = %session_id,
-                request_id = %request_id,
-                error = ?e,
-                "Assemble stage send failed"
-            );
-            metrics::inc_error("assemble", "channel_closed");
-            break;
+        match send_with_shed(&tx, output, "assemble").await {
+            Ok(SendOutcome::Queued) => {}
+            Ok(SendOutcome::Shed) => {
+                tracing::trace!(
+                    target: "orchestrator::pipeline",
+                    session_id = %session_id,
+                    request_id = %request_id,
+                    "Assemble stage: item shed due to backpressure"
+                );
+                metrics::inc_shed("assemble");
+            }
+            Err(e) => {
+                warn!(
+                    target: "orchestrator::pipeline",
+                    session_id = %session_id,
+                    request_id = %request_id,
+                    error = ?e,
+                    "Assemble stage send failed"
+                );
+                metrics::inc_error("assemble", "channel_closed");
+                break;
+            }
         }
     }
 
@@ -402,16 +426,28 @@ async fn inference_stage(
                     tokens,
                 };
 
-                if let Err(e) = send_with_shed(&tx, output, "inference").await {
-                    warn!(
-                        target: "orchestrator::pipeline",
-                        session_id = %session_id,
-                        request_id = %request_id,
-                        error = ?e,
-                        "Inference stage send failed"
-                    );
-                    metrics::inc_error("inference", "channel_closed");
-                    break;
+                match send_with_shed(&tx, output, "inference").await {
+                    Ok(SendOutcome::Queued) => {}
+                    Ok(SendOutcome::Shed) => {
+                        tracing::trace!(
+                            target: "orchestrator::pipeline",
+                            session_id = %session_id,
+                            request_id = %request_id,
+                            "Inference stage: item shed due to backpressure"
+                        );
+                        metrics::inc_shed("inference");
+                    }
+                    Err(e) => {
+                        warn!(
+                            target: "orchestrator::pipeline",
+                            session_id = %session_id,
+                            request_id = %request_id,
+                            error = ?e,
+                            "Inference stage send failed"
+                        );
+                        metrics::inc_error("inference", "channel_closed");
+                        break;
+                    }
                 }
             }
             Err(crate::enhanced::circuit_breaker::CircuitBreakerError::Open) => {
@@ -496,16 +532,28 @@ async fn post_stage(mut rx: mpsc::Receiver<InferenceOutput>, tx: mpsc::Sender<Po
         Span::current().record("duration_ms", elapsed.as_millis() as u64);
         Span::current().record("outcome", "ok");
 
-        if let Err(e) = send_with_shed(&tx, output, "post").await {
-            warn!(
-                target: "orchestrator::pipeline",
-                session_id = %session_id,
-                request_id = %request_id,
-                error = ?e,
-                "Post stage send failed"
-            );
-            metrics::inc_error("post", "channel_closed");
-            break;
+        match send_with_shed(&tx, output, "post").await {
+            Ok(SendOutcome::Queued) => {}
+            Ok(SendOutcome::Shed) => {
+                tracing::trace!(
+                    target: "orchestrator::pipeline",
+                    session_id = %session_id,
+                    request_id = %request_id,
+                    "Post stage: item shed due to backpressure"
+                );
+                metrics::inc_shed("post");
+            }
+            Err(e) => {
+                warn!(
+                    target: "orchestrator::pipeline",
+                    session_id = %session_id,
+                    request_id = %request_id,
+                    error = ?e,
+                    "Post stage send failed"
+                );
+                metrics::inc_error("post", "channel_closed");
+                break;
+            }
         }
     }
 
@@ -578,7 +626,7 @@ async fn stream_stage(
     info!(target: "orchestrator::pipeline", "Stream stage shutting down");
 }
 
-//  Intelligence-wired pipeline variant 
+//  Intelligence-wired pipeline variant
 
 #[cfg(feature = "intelligence")]
 use crate::intelligence::bridge::IntelligenceBridge;
@@ -710,16 +758,28 @@ async fn rag_stage_tracked(
         Span::current().record("duration_ms", elapsed.as_millis() as u64);
         Span::current().record("outcome", "ok");
 
-        if let Err(e) = send_with_shed(&tx, output, "rag").await {
-            warn!(
-                target: "orchestrator::pipeline",
-                session_id = %session_id,
-                request_id = %request_id,
-                error = ?e,
-                "RAG stage (tracked) send failed"
-            );
-            metrics::inc_error("rag", "channel_closed");
-            break;
+        match send_with_shed(&tx, output, "rag").await {
+            Ok(SendOutcome::Queued) => {}
+            Ok(SendOutcome::Shed) => {
+                tracing::trace!(
+                    target: "orchestrator::pipeline",
+                    session_id = %session_id,
+                    request_id = %request_id,
+                    "RAG stage (tracked): item shed due to backpressure"
+                );
+                metrics::inc_shed("rag");
+            }
+            Err(e) => {
+                warn!(
+                    target: "orchestrator::pipeline",
+                    session_id = %session_id,
+                    request_id = %request_id,
+                    error = ?e,
+                    "RAG stage (tracked) send failed"
+                );
+                metrics::inc_error("rag", "channel_closed");
+                break;
+            }
         }
     }
 
@@ -793,16 +853,28 @@ async fn inference_stage_with_intelligence(
                     tokens,
                 };
 
-                if let Err(e) = send_with_shed(&tx, output, "inference").await {
-                    warn!(
-                        target: "orchestrator::pipeline",
-                        session_id = %session_id,
-                        request_id = %request_id,
-                        error = ?e,
-                        "Inference stage (tracked) send failed"
-                    );
-                    metrics::inc_error("inference", "channel_closed");
-                    break;
+                match send_with_shed(&tx, output, "inference").await {
+                    Ok(SendOutcome::Queued) => {}
+                    Ok(SendOutcome::Shed) => {
+                        tracing::trace!(
+                            target: "orchestrator::pipeline",
+                            session_id = %session_id,
+                            request_id = %request_id,
+                            "Inference stage (tracked): item shed due to backpressure"
+                        );
+                        metrics::inc_shed("inference");
+                    }
+                    Err(e) => {
+                        warn!(
+                            target: "orchestrator::pipeline",
+                            session_id = %session_id,
+                            request_id = %request_id,
+                            error = ?e,
+                            "Inference stage (tracked) send failed"
+                        );
+                        metrics::inc_error("inference", "channel_closed");
+                        break;
+                    }
                 }
             }
             Err(crate::enhanced::circuit_breaker::CircuitBreakerError::Open) => {
@@ -862,7 +934,7 @@ mod tests {
     use std::collections::HashMap;
     use std::sync::Mutex;
 
-    //  OutputSink helpers 
+    //  OutputSink helpers
 
     /// Sink that records every emitted text for inspection in tests.
     struct CaptureSink(Mutex<Vec<String>>);
@@ -898,7 +970,7 @@ mod tests {
         }
     }
 
-    //  OutputSink unit tests 
+    //  OutputSink unit tests
 
     #[tokio::test]
     async fn test_log_sink_emit_returns_ok() {

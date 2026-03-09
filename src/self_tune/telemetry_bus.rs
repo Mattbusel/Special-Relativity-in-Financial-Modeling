@@ -40,7 +40,7 @@ use serde::{Deserialize, Serialize};
 use tokio::sync::{broadcast, Mutex, RwLock};
 use tracing::debug;
 
-//  Public types 
+//  Public types
 
 /// A single latency sample with p50 / p95 / p99 breakdowns (ms).
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -183,7 +183,7 @@ impl RollingWindow {
     }
 }
 
-//  Counters supplied by the pipeline 
+//  Counters supplied by the pipeline
 
 /// Atomic counters the pipeline increments; the bus reads them on each tick.
 ///
@@ -231,7 +231,7 @@ impl PipelineCounters {
     }
 }
 
-//  Stage probe 
+//  Stage probe
 
 /// Callback the telemetry bus calls each tick to collect per-stage metrics.
 ///
@@ -245,7 +245,7 @@ pub trait StageProbe: Send + Sync {
     }
 }
 
-//  Bus configuration 
+//  Bus configuration
 
 /// Configuration for [`TelemetryBus`].
 #[derive(Debug, Clone)]
@@ -278,7 +278,7 @@ impl Default for TelemetryBusConfig {
     }
 }
 
-//  Bus 
+//  Bus
 
 /// Handle that lets external code publish ad-hoc circuit-state transitions.
 #[derive(Clone, Debug)]
@@ -496,7 +496,7 @@ impl TelemetryBus {
         milli as f64 / 1000.0
     }
 
-    //  Internal 
+    //  Internal
 
     async fn collect(inner: &Arc<BusInner>) -> TelemetrySnapshot {
         let elapsed_secs = inner.started_at.elapsed().as_secs();
@@ -554,9 +554,7 @@ impl TelemetryBus {
                 .sum();
             (fill_sum / stages.len() as f64).min(1.0)
         };
-        let ext_milli = inner
-            .external_pressure_milli
-            .load(Ordering::Relaxed);
+        let ext_milli = inner.external_pressure_milli.load(Ordering::Relaxed);
         let pressure = if ext_milli > 0 {
             let ext = ext_milli as f64 / 1000.0;
             ((internal_pressure + ext) / 2.0).min(1.0)
@@ -579,7 +577,7 @@ impl TelemetryBus {
     }
 }
 
-//  Latency helpers 
+//  Latency helpers
 
 /// Compute [`LatencyStats`] from a mutable slice of millisecond samples.
 ///
@@ -607,14 +605,14 @@ pub fn compute_latency_stats(samples: &mut [u64]) -> LatencyStats {
     }
 }
 
-//  Tests 
+//  Tests
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::sync::atomic::AtomicUsize;
 
-    //  Helpers 
+    //  Helpers
 
     fn make_bus() -> TelemetryBus {
         let counters = PipelineCounters::new();
@@ -648,7 +646,7 @@ mod tests {
         }
     }
 
-    //  Unit tests 
+    //  Unit tests
 
     #[test]
     fn test_pipeline_counters_cache_hit_rate_zero_with_no_lookups() {
@@ -921,7 +919,7 @@ mod tests {
         assert_eq!(l.sample_count, 0);
     }
 
-    //  External pressure injection (HelixRouter integration) 
+    //  External pressure injection (HelixRouter integration)
 
     #[test]
     fn test_external_pressure_default_is_zero() {
@@ -970,7 +968,10 @@ mod tests {
         bus.set_external_pressure(0.3);
         bus.set_external_pressure(0.9);
         let v = bus.external_pressure();
-        assert!((v - 0.9).abs() < 0.002, "expected ~0.9 after overwrite, got {v}");
+        assert!(
+            (v - 0.9).abs() < 0.002,
+            "expected ~0.9 after overwrite, got {v}"
+        );
     }
 
     #[tokio::test]
@@ -980,8 +981,15 @@ mod tests {
         // Blended = (0.0 + 0.6) / 2 = 0.3.
         bus.set_external_pressure(0.6);
         let snap = bus.tick_now().await;
-        assert!(snap.pressure > 0.0, "blended pressure should be > 0 when external is set");
-        assert!((snap.pressure - 0.3).abs() < 0.002, "expected 0.3, got {}", snap.pressure);
+        assert!(
+            snap.pressure > 0.0,
+            "blended pressure should be > 0 when external is set"
+        );
+        assert!(
+            (snap.pressure - 0.3).abs() < 0.002,
+            "expected 0.3, got {}",
+            snap.pressure
+        );
     }
 
     #[tokio::test]
@@ -998,6 +1006,10 @@ mod tests {
         // External = 1.0, internal = 0.0 → blended = 0.5
         bus.set_external_pressure(1.0);
         let snap = bus.tick_now().await;
-        assert!((snap.pressure - 0.5).abs() < 0.002, "expected 0.5, got {}", snap.pressure);
+        assert!(
+            (snap.pressure - 0.5).abs() < 0.002,
+            "expected 0.5, got {}",
+            snap.pressure
+        );
     }
 }

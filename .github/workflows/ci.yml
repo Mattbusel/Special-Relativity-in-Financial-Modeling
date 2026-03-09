@@ -4,6 +4,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -12,7 +13,7 @@ jobs:
       - name: Check repository structure
         run: echo "Repository structure OK" && ls -la
 
-  build-windows:
+  build-windows-cpp:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,3 +23,59 @@ jobs:
         run: cmake --build build --config RelWithDebInfo --parallel
       - name: Test
         run: ctest --test-dir build -C RelWithDebInfo --output-on-failure
+
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      # HIGH-09: Run cargo test with --all-features on all platforms.
+      # Note: if any feature becomes Linux-only in future, add a matrix
+      # dimension `features: [default, full]` and set
+      #   if: runner.os != 'Windows'
+      # on the --all-features step instead of changing this step globally.
+      - name: Test (all features)
+        run: cargo test --all-features
+
+      # HIGH-09: Run clippy with --all-features on all platforms.
+      - name: Clippy (all features)
+        run: cargo clippy --all-features -- -D warnings
+
+      # HIGH-10: cargo audit step with documented RUSTSEC-2024-0437 exception.
+      #
+      # Exception: RUSTSEC-2024-0437
+      #   Advisory URL : https://rustsec.org/advisories/RUSTSEC-2024-0437.html
+      #   Affected pkg  : prometheus (yanked versions prior to the fix release)
+      #   Version range : see advisory URL for details
+      #
+      # Re-evaluate when: the `prometheus` crate publishes a patched release
+      # that resolves RUSTSEC-2024-0437.  Once Cargo.lock no longer references
+      # an affected version, remove the `--ignore RUSTSEC-2024-0437` flag below.
+      - name: Security audit
+        run: cargo audit --ignore RUSTSEC-2024-0437
+        continue-on-error: true  # audit is advisory; failures are tracked separately
+
+      # LOW-02: Validate grafana-dashboard.json and prometheus.yml if present.
+      - name: Validate grafana-dashboard.json
+        if: runner.os != 'Windows'
+        run: |
+          if [ -f grafana-dashboard.json ]; then
+            python3 -m json.tool grafana-dashboard.json > /dev/null && echo "grafana-dashboard.json is valid JSON"
+          else
+            echo "grafana-dashboard.json not found, skipping"
+          fi
+
+      - name: Validate prometheus.yml
+        if: runner.os != 'Windows'
+        run: |
+          if [ -f prometheus.yml ]; then
+            python3 -c "import yaml, sys; yaml.safe_load(sys.stdin)" < prometheus.yml && echo "prometheus.yml is valid YAML"
+          else
+            echo "prometheus.yml not found, skipping"
+          fi

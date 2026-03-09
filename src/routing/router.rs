@@ -264,7 +264,7 @@ impl ModelRouter {
         &self.scorer
     }
 
-    //  Adaptive threshold adjustment 
+    //  Adaptive threshold adjustment
 
     /// Check whether the adaptive threshold should be adjusted.
     fn maybe_adapt(&self) {
@@ -297,7 +297,7 @@ impl ModelRouter {
     }
 }
 
-//  Tests 
+//  Tests
 
 #[cfg(test)]
 mod tests {

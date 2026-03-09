@@ -30,7 +30,7 @@ use tracing::{error, trace, warn};
 
 use crate::self_tune::telemetry_bus::TelemetryBus;
 
-//  Wire-format mirror of HelixRouter's `/api/stats` response 
+//  Wire-format mirror of HelixRouter's `/api/stats` response
 
 /// Per-strategy routing count from HelixRouter's `/api/stats`.
 #[derive(Debug, Clone, Deserialize, Default)]
@@ -96,7 +96,7 @@ struct HelixStats {
     latency_by_strategy: Vec<HelixLatencyRow>,
 }
 
-//  Configuration 
+//  Configuration
 
 /// Configuration for [`HelixPressureProbe`].
 #[derive(Debug, Clone)]
@@ -125,7 +125,7 @@ impl Default for HelixProbeConfig {
     }
 }
 
-//  Probe 
+//  Probe
 
 /// Polls HelixRouter and feeds its pressure score into the [`TelemetryBus`].
 ///
@@ -166,7 +166,11 @@ impl HelixPressureProbe {
             .build()
             .unwrap_or_default();
 
-        Self { config, bus, client }
+        Self {
+            config,
+            bus,
+            client,
+        }
     }
 
     /// Run the polling loop indefinitely.
@@ -210,19 +214,24 @@ impl HelixPressureProbe {
                     // when pressure_score hasn't caught up yet.
                     let total = dropped + completed;
                     let drop_rate = if total > 0 {
-                        dropped as f64 / total as f64
+                        (dropped as f64 / total as f64).clamp(0.0, 1.0)
                     } else {
+                        // Guard against jobs_completed == 0 to avoid NaN.
                         0.0
                     };
+
+                    // Clamp all sub-signals to [0.0, 1.0] before taking max()
+                    // so that a misbehaving upstream cannot push combined above 1.0
+                    // or below 0.0.
+                    let pressure_clamped = pressure.clamp(0.0, 1.0);
+                    let drop_frac_clamped = strategy_snap.drop_strategy_frac.clamp(0.0, 1.0);
 
                     // Additionally blend in the Drop-strategy fraction: when
                     // HelixRouter is actively routing jobs to the Drop strategy,
                     // that is an unambiguous signal of load shedding that should
                     // immediately raise the combined pressure even if pressure_score
                     // and drop_rate haven't caught up yet.
-                    let combined = pressure
-                        .max(drop_rate)
-                        .max(strategy_snap.drop_strategy_frac);
+                    let combined = pressure_clamped.max(drop_rate).max(drop_frac_clamped);
 
                     trace!(
                         pressure,
@@ -289,15 +298,10 @@ impl HelixPressureProbe {
             return Err(format!("HTTP {}", resp.status().as_u16()));
         }
 
-        let stats: HelixStats = resp
-            .json()
-            .await
-            .map_err(|e| format!("JSON parse: {e}"))?;
+        let stats: HelixStats = resp.json().await.map_err(|e| format!("JSON parse: {e}"))?;
 
-        let strategy_snapshot = Self::build_strategy_snapshot(
-            &stats.routed_by_strategy,
-            &stats.latency_by_strategy,
-        );
+        let strategy_snapshot =
+            Self::build_strategy_snapshot(&stats.routed_by_strategy, &stats.latency_by_strategy);
 
         Ok((
             stats.pressure_score,
@@ -330,16 +334,16 @@ impl HelixPressureProbe {
         };
 
         // Find the strategy with the worst p95 latency.
-        let (max_p95_ms, hottest_strategy) = latency
-            .iter()
-            .filter(|r| r.count > 0)
-            .fold((0u64, None::<String>), |(max_p95, hot), row| {
+        let (max_p95_ms, hottest_strategy) = latency.iter().filter(|r| r.count > 0).fold(
+            (0u64, None::<String>),
+            |(max_p95, hot), row| {
                 if row.p95_ms > max_p95 {
                     (row.p95_ms, Some(row.strategy.clone()))
                 } else {
                     (max_p95, hot)
                 }
-            });
+            },
+        );
 
         HelixStrategySnapshot {
             drop_strategy_frac,
@@ -351,7 +355,7 @@ impl HelixPressureProbe {
     }
 }
 
-//  Tests 
+//  Tests
 
 #[cfg(test)]
 mod tests {
@@ -367,7 +371,7 @@ mod tests {
         HelixPressureProbe::new(HelixProbeConfig::default(), bus)
     }
 
-    //  Config tests 
+    //  Config tests
 
     #[test]
     fn config_default_base_url() {
@@ -408,7 +412,7 @@ mod tests {
         assert_eq!(cfg2.base_url, "http://other:9090");
     }
 
-    //  Probe construction 
+    //  Probe construction
 
     #[test]
     fn probe_new_constructs_without_panic() {
@@ -432,7 +436,7 @@ mod tests {
         assert_eq!(probe.config.error_threshold, 3);
     }
 
-    //  Bus integration: external pressure wiring 
+    //  Bus integration: external pressure wiring
 
     #[test]
     fn probe_bus_starts_with_zero_pressure() {
@@ -475,7 +479,7 @@ mod tests {
         assert!((v - 0.55).abs() < 0.002, "expected ~0.55, got {v}");
     }
 
-    //  HelixStats deserialization 
+    //  HelixStats deserialization
 
     #[test]
     fn helix_stats_deserializes_from_json() {
@@ -506,7 +510,10 @@ mod tests {
         // HelixRouter may add new fields; we must not fail on unknown keys.
         let json = r#"{"pressure_score":0.3,"dropped":1,"completed":10,"extra_field":"ignored"}"#;
         let result = serde_json::from_str::<HelixStats>(json);
-        assert!(result.is_ok(), "unknown fields should be ignored: {result:?}");
+        assert!(
+            result.is_ok(),
+            "unknown fields should be ignored: {result:?}"
+        );
     }
 
     #[test]
@@ -516,7 +523,7 @@ mod tests {
         assert!(result.is_err(), "missing pressure_score should fail");
     }
 
-    //  Blending integration 
+    //  Blending integration
 
     #[tokio::test]
     async fn blended_pressure_visible_in_snapshot_after_probe_tick() {
@@ -525,8 +532,11 @@ mod tests {
         bus.set_external_pressure(0.8);
         let snap = bus.tick_now().await;
         // Internal = 0.0 (no stages), external = 0.8 → blended = 0.4
-        assert!((snap.pressure - 0.4).abs() < 0.002,
-            "expected blended 0.4, got {}", snap.pressure);
+        assert!(
+            (snap.pressure - 0.4).abs() < 0.002,
+            "expected blended 0.4, got {}",
+            snap.pressure
+        );
     }
 
     #[tokio::test]
@@ -535,11 +545,14 @@ mod tests {
         bus.set_external_pressure(0.8);
         bus.set_external_pressure(0.0);
         let snap = bus.tick_now().await;
-        assert_eq!(snap.pressure, 0.0,
-            "cleared external pressure should yield 0.0: {}", snap.pressure);
+        assert_eq!(
+            snap.pressure, 0.0,
+            "cleared external pressure should yield 0.0: {}",
+            snap.pressure
+        );
     }
 
-    //  Combined pressure signal tests 
+    //  Combined pressure signal tests
 
     #[test]
     fn combined_pressure_uses_drop_rate_when_higher_than_pressure_score() {
@@ -598,7 +611,7 @@ mod tests {
         assert!((combined - 0.5).abs() < 1e-9, "combined={combined}");
     }
 
-    //  Mock-HTTP integration tests 
+    //  Mock-HTTP integration tests
     //
     // These tests spin up a minimal tokio TCP listener that speaks just enough
     // HTTP/1.1 to satisfy reqwest, verifying the probe's fetch_pressure() method
@@ -614,11 +627,7 @@ mod tests {
     }
 
     /// Serve a single HTTP request, return the given body with the given status.
-    async fn serve_once(
-        listener: tokio::net::TcpListener,
-        status: u16,
-        body: &'static str,
-    ) {
+    async fn serve_once(listener: tokio::net::TcpListener, status: u16, body: &'static str) {
         use tokio::io::AsyncWriteExt;
         let (mut stream, _) = listener.accept().await.expect("accept");
         // Drain the request bytes (we don't care about the content here).
@@ -682,27 +691,49 @@ mod tests {
 
         assert!(result.is_err(), "expected error for HTTP 500");
         let err = result.unwrap_err();
-        assert!(err.contains("500"), "error should mention status code: {err}");
+        assert!(
+            err.contains("500"),
+            "error should mention status code: {err}"
+        );
     }
 
-    //  Per-strategy snapshot tests 
+    //  Per-strategy snapshot tests
 
     #[test]
     fn build_strategy_snapshot_detects_drop_strategy() {
         let routed = vec![
-            HelixRoutedStrategyCount { strategy: "inline".to_string(), count: 70 },
-            HelixRoutedStrategyCount { strategy: "spawn".to_string(), count: 20 },
-            HelixRoutedStrategyCount { strategy: "drop".to_string(), count: 10 },
+            HelixRoutedStrategyCount {
+                strategy: "inline".to_string(),
+                count: 70,
+            },
+            HelixRoutedStrategyCount {
+                strategy: "spawn".to_string(),
+                count: 20,
+            },
+            HelixRoutedStrategyCount {
+                strategy: "drop".to_string(),
+                count: 10,
+            },
         ];
         let snap = HelixPressureProbe::build_strategy_snapshot(&routed, &[]);
-        assert!((snap.drop_strategy_frac - 0.1).abs() < 1e-9, "drop_frac={}", snap.drop_strategy_frac);
+        assert!(
+            (snap.drop_strategy_frac - 0.1).abs() < 1e-9,
+            "drop_frac={}",
+            snap.drop_strategy_frac
+        );
     }
 
     #[test]
     fn build_strategy_snapshot_zero_drop_when_no_drop_strategy() {
         let routed = vec![
-            HelixRoutedStrategyCount { strategy: "inline".to_string(), count: 80 },
-            HelixRoutedStrategyCount { strategy: "spawn".to_string(), count: 20 },
+            HelixRoutedStrategyCount {
+                strategy: "inline".to_string(),
+                count: 80,
+            },
+            HelixRoutedStrategyCount {
+                strategy: "spawn".to_string(),
+                count: 20,
+            },
         ];
         let snap = HelixPressureProbe::build_strategy_snapshot(&routed, &[]);
         assert_eq!(snap.drop_strategy_frac, 0.0);
@@ -718,9 +749,10 @@ mod tests {
 
     #[test]
     fn build_strategy_snapshot_all_drop() {
-        let routed = vec![
-            HelixRoutedStrategyCount { strategy: "drop".to_string(), count: 100 },
-        ];
+        let routed = vec![HelixRoutedStrategyCount {
+            strategy: "drop".to_string(),
+            count: 100,
+        }];
         let snap = HelixPressureProbe::build_strategy_snapshot(&routed, &[]);
         assert!((snap.drop_strategy_frac - 1.0).abs() < 1e-9);
     }
@@ -728,8 +760,14 @@ mod tests {
     #[test]
     fn build_strategy_snapshot_case_insensitive_drop() {
         let routed = vec![
-            HelixRoutedStrategyCount { strategy: "Drop".to_string(), count: 50 },
-            HelixRoutedStrategyCount { strategy: "inline".to_string(), count: 50 },
+            HelixRoutedStrategyCount {
+                strategy: "Drop".to_string(),
+                count: 50,
+            },
+            HelixRoutedStrategyCount {
+                strategy: "inline".to_string(),
+                count: 50,
+            },
         ];
         let snap = HelixPressureProbe::build_strategy_snapshot(&routed, &[]);
         assert!((snap.drop_strategy_frac - 0.5).abs() < 1e-9);
@@ -738,9 +776,27 @@ mod tests {
     #[test]
     fn build_strategy_snapshot_finds_hottest_strategy() {
         let latency = vec![
-            HelixLatencyRow { strategy: "inline".to_string(), count: 10, avg_ms: 1.0, ema_ms: 1.0, p95_ms: 5 },
-            HelixLatencyRow { strategy: "cpu_pool".to_string(), count: 5, avg_ms: 50.0, ema_ms: 50.0, p95_ms: 250 },
-            HelixLatencyRow { strategy: "spawn".to_string(), count: 8, avg_ms: 20.0, ema_ms: 20.0, p95_ms: 80 },
+            HelixLatencyRow {
+                strategy: "inline".to_string(),
+                count: 10,
+                avg_ms: 1.0,
+                ema_ms: 1.0,
+                p95_ms: 5,
+            },
+            HelixLatencyRow {
+                strategy: "cpu_pool".to_string(),
+                count: 5,
+                avg_ms: 50.0,
+                ema_ms: 50.0,
+                p95_ms: 250,
+            },
+            HelixLatencyRow {
+                strategy: "spawn".to_string(),
+                count: 8,
+                avg_ms: 20.0,
+                ema_ms: 20.0,
+                p95_ms: 80,
+            },
         ];
         let snap = HelixPressureProbe::build_strategy_snapshot(&[], &latency);
         assert_eq!(snap.max_p95_ms, 250);
@@ -750,12 +806,27 @@ mod tests {
     #[test]
     fn build_strategy_snapshot_ignores_zero_count_strategies() {
         let latency = vec![
-            HelixLatencyRow { strategy: "inline".to_string(), count: 0, avg_ms: 0.0, ema_ms: 0.0, p95_ms: 9999 },
-            HelixLatencyRow { strategy: "spawn".to_string(), count: 5, avg_ms: 10.0, ema_ms: 10.0, p95_ms: 40 },
+            HelixLatencyRow {
+                strategy: "inline".to_string(),
+                count: 0,
+                avg_ms: 0.0,
+                ema_ms: 0.0,
+                p95_ms: 9999,
+            },
+            HelixLatencyRow {
+                strategy: "spawn".to_string(),
+                count: 5,
+                avg_ms: 10.0,
+                ema_ms: 10.0,
+                p95_ms: 40,
+            },
         ];
         let snap = HelixPressureProbe::build_strategy_snapshot(&[], &latency);
         // Zero-count strategy should be ignored even if its p95 is high.
-        assert_eq!(snap.max_p95_ms, 40, "zero-count strategy should be excluded");
+        assert_eq!(
+            snap.max_p95_ms, 40,
+            "zero-count strategy should be excluded"
+        );
         assert_eq!(snap.hottest_strategy.as_deref(), Some("spawn"));
     }
 
@@ -851,19 +922,27 @@ mod tests {
         let probe = HelixPressureProbe::new(cfg, bus.clone());
 
         // Execute one poll cycle directly (not via run() which loops forever).
-        let (pressure, dropped, completed, _adaptive_spawn_threshold, strategy_snap) = probe
-            .fetch_pressure()
-            .await
-            .expect("fetch should succeed");
+        let (pressure, dropped, completed, _adaptive_spawn_threshold, strategy_snap) =
+            probe.fetch_pressure().await.expect("fetch should succeed");
 
         let total = dropped + completed;
-        let drop_rate = if total > 0 { dropped as f64 / total as f64 } else { 0.0 };
-        let combined = pressure.max(drop_rate).max(strategy_snap.drop_strategy_frac);
+        let drop_rate = if total > 0 {
+            dropped as f64 / total as f64
+        } else {
+            0.0
+        };
+        let combined = pressure
+            .max(drop_rate)
+            .max(strategy_snap.drop_strategy_frac);
         bus.set_external_pressure(combined);
 
         let snap = bus.tick_now().await;
         // combined = max(0.65, 0.13) = 0.65; blended with internal (0.0) = 0.325
-        assert!(snap.pressure > 0.0, "pressure should be non-zero after probe tick: {}", snap.pressure);
+        assert!(
+            snap.pressure > 0.0,
+            "pressure should be non-zero after probe tick: {}",
+            snap.pressure
+        );
     }
 
     // -----------------------------------------------------------------------
@@ -895,5 +974,71 @@ mod tests {
         let failures: u32 = u32::MAX;
         let factor = (failures as u64).min(5);
         assert_eq!(factor, 5, "saturated failures must clamp to factor 5");
+    }
+
+    // -----------------------------------------------------------------------
+    // MED-14: NaN / division-by-zero guard tests
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_helix_probe_no_nan_when_jobs_completed_zero() {
+        // Reproduce the exact arithmetic from run() with completed == 0.
+        let dropped: u64 = 0;
+        let completed: u64 = 0;
+        let pressure: f64 = 0.0;
+        let drop_strategy_frac: f64 = 0.0;
+
+        let total = dropped + completed;
+        let drop_rate: f64 = if total > 0 {
+            (dropped as f64 / total as f64).clamp(0.0, 1.0)
+        } else {
+            0.0 // guard: completed == 0 must not produce NaN
+        };
+
+        let pressure_clamped = pressure.clamp(0.0, 1.0);
+        let drop_frac_clamped = drop_strategy_frac.clamp(0.0, 1.0);
+        let combined = pressure_clamped.max(drop_rate).max(drop_frac_clamped);
+
+        assert!(
+            !combined.is_nan(),
+            "combined must not be NaN when jobs_completed == 0"
+        );
+        assert_eq!(combined, 0.0, "combined should be 0.0 when no data");
+    }
+
+    #[test]
+    fn test_helix_probe_sub_signals_clamped_to_unit_interval() {
+        // Verify that out-of-range sub-signals cannot push combined outside [0,1].
+        let pressure: f64 = 2.5; // out-of-range high
+        let drop_rate: f64 = -0.1; // out-of-range low
+        let drop_frac: f64 = 1.5; // out-of-range high
+
+        let combined = pressure
+            .clamp(0.0, 1.0)
+            .max(drop_rate.clamp(0.0, 1.0))
+            .max(drop_frac.clamp(0.0, 1.0));
+
+        assert!(
+            combined >= 0.0 && combined <= 1.0,
+            "combined must stay in [0, 1] even with out-of-range inputs: {combined}"
+        );
+    }
+
+    #[test]
+    fn test_helix_probe_drop_rate_only_dropped_gives_one() {
+        // All jobs dropped, none completed → drop_rate must be 1.0 (not NaN).
+        let dropped: u64 = 100;
+        let completed: u64 = 0;
+        let total = dropped + completed;
+        let drop_rate: f64 = if total > 0 {
+            (dropped as f64 / total as f64).clamp(0.0, 1.0)
+        } else {
+            0.0
+        };
+        assert!(!drop_rate.is_nan(), "drop_rate must not be NaN");
+        assert!(
+            (drop_rate - 1.0).abs() < 1e-9,
+            "all-dropped rate should be 1.0: {drop_rate}"
+        );
     }
 }

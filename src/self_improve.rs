@@ -8,7 +8,7 @@
 //! ```text
 //! TelemetryBus  AnomalyDetector  MetaTaskGenerator
 //!                                             
-//!       TuningController  SnapshotStore 
+//!       TuningController  SnapshotStore
 //!                                             
 //!       CostOptimizer             (logged to AgentMemory)
 //!      
@@ -62,10 +62,10 @@ use crate::intelligence::{
     router::{LearnedRouter, RouterConfig},
 };
 
-use crate::self_tune::helix_probe::HelixProbeConfig;
 use crate::self_tune::helix_feedback::{HelixFeedbackConfig, HelixFeedbackPusher};
+use crate::self_tune::helix_probe::HelixProbeConfig;
 
-//  Configuration 
+//  Configuration
 
 /// Configuration for the self-improving control loop.
 #[derive(Debug, Clone)]
@@ -104,7 +104,7 @@ pub struct LoopConfig {
     /// Optional HelixRouter feedback pusher configuration.
     ///
     /// When set, each loop tick examines the current pipeline pressure and pushes
-    /// a `RouterConfigPatch` to HelixRouter's `PATCH /api/config` endpoint  - 
+    /// a `RouterConfigPatch` to HelixRouter's `PATCH /api/config` endpoint  -
     /// tightening thresholds under high pressure, relaxing them when load is low.
     ///
     /// This closes the **two-way** cross-repo feedback loop:
@@ -135,7 +135,7 @@ impl Default for LoopConfig {
     }
 }
 
-//  Subsystem handles 
+//  Subsystem handles
 
 /// Cheaply-cloneable handles to every self-improving subsystem.
 ///
@@ -164,7 +164,7 @@ pub struct SubsystemHandles {
     pub helix_feedback: Option<Arc<HelixFeedbackPusher>>,
 }
 
-//  Main loop 
+//  Main loop
 
 /// The self-improving control plane.
 ///
@@ -184,10 +184,9 @@ impl SelfImprovingLoop {
             cfg.target_throughput_rps,
         )));
         let snapshots = Arc::new(SnapshotStore::new(cfg.max_snapshots));
-        let cost = Arc::new(
-            CostOptimizer::new(cfg.budget.clone())
-                .unwrap_or_else(|_| CostOptimizer::new(BudgetConfig::default()).expect("default budget is valid")),
-        );
+        let cost = Arc::new(CostOptimizer::new(cfg.budget.clone()).unwrap_or_else(|_| {
+            CostOptimizer::new(BudgetConfig::default()).expect("default budget is valid")
+        }));
         let anomaly = Arc::new(AnomalyDetector::new(cfg.anomaly.clone()));
         let task_gen = Arc::new(MetaTaskGenerator::new());
         let gate = Arc::new(ValidationGate::new(cfg.gate.clone()));
@@ -299,7 +298,7 @@ impl SelfImprovingLoop {
         })
     }
 
-    //  Step functions (pub so tests can invoke them directly) 
+    //  Step functions (pub so tests can invoke them directly)
 
     /// Feed aggregate RPS into the autoscaler.
     pub fn step_autoscaler(h: &SubsystemHandles, snap: &TelemetrySnapshot) {
@@ -401,7 +400,10 @@ impl SelfImprovingLoop {
         match h.cost.budget_status() {
             Ok(status) => {
                 if status.budget_fraction > 0.8 {
-                    warn!(fraction = status.budget_fraction, "budget approaching limit");
+                    warn!(
+                        fraction = status.budget_fraction,
+                        "budget approaching limit"
+                    );
                 } else {
                     debug!(
                         spent = status.total_spent,
@@ -457,7 +459,9 @@ impl SelfImprovingLoop {
     ///
     /// This is a best-effort, non-blocking operation.  Failures are soft-logged.
     pub async fn step_helix_feedback(h: &SubsystemHandles, snap: &TelemetrySnapshot) {
-        let Some(pusher) = &h.helix_feedback else { return };
+        let Some(pusher) = &h.helix_feedback else {
+            return;
+        };
         if let Err(e) = pusher.maybe_push(snap.pressure).await {
             debug!(err = %e, "helix_feedback push skipped or failed");
         }
@@ -478,7 +482,10 @@ impl SelfImprovingLoop {
         let mut metrics = HashMap::new();
         metrics.insert("pressure_inv".to_string(), 1.0 - snap.pressure);
         metrics.insert("cache_hit_rate".to_string(), snap.cache_hit_rate);
-        metrics.insert("dedup_collision_rate".to_string(), snap.dedup_collision_rate);
+        metrics.insert(
+            "dedup_collision_rate".to_string(),
+            snap.dedup_collision_rate,
+        );
 
         let avg_error: f64 = if snap.stages.is_empty() {
             0.0
@@ -499,7 +506,7 @@ impl SelfImprovingLoop {
     }
 }
 
-//  Tests 
+//  Tests
 
 #[cfg(test)]
 mod tests {
@@ -511,7 +518,7 @@ mod tests {
         TelemetryBus::new(TelemetryBusConfig::default(), counters)
     }
 
-    //  Construction 
+    //  Construction
 
     #[test]
     fn test_loop_config_default_is_sane() {
@@ -556,7 +563,7 @@ mod tests {
         assert_eq!(cfg.anomaly_task_threshold, 3);
     }
 
-    //  Step functions 
+    //  Step functions
 
     #[tokio::test]
     async fn test_step_anomaly_returns_zero_for_empty_snapshot() {
@@ -579,7 +586,10 @@ mod tests {
         SelfImprovingLoop::step_snapshot(&h, &snap);
 
         let count = h.snapshots.version_count();
-        assert!(count > 0, "expected at least one snapshot after step_snapshot");
+        assert!(
+            count > 0,
+            "expected at least one snapshot after step_snapshot"
+        );
     }
 
     #[tokio::test]
@@ -632,7 +642,7 @@ mod tests {
         SelfImprovingLoop::step_snapshot(&handles, &snap);
     }
 
-    //  Loop lifecycle 
+    //  Loop lifecycle
 
     #[tokio::test]
     async fn test_loop_exits_when_bus_drops() {
@@ -646,8 +656,7 @@ mod tests {
         // Drop the bus  -  broadcast channel closes, loop should exit
         drop(bus);
 
-        let result =
-            tokio::time::timeout(std::time::Duration::from_millis(300), handle).await;
+        let result = tokio::time::timeout(std::time::Duration::from_millis(300), handle).await;
         // Either completes cleanly or times out  -  both are acceptable;
         // the important thing is no panic.
         let _ = result;

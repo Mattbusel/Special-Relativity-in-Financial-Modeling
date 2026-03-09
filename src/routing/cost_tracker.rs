@@ -193,7 +193,7 @@ pub struct CostSnapshot {
     pub savings_percent: f64,
 }
 
-//  Helpers 
+//  Helpers
 
 /// Convert a USD-per-1K-tokens rate to micro-dollars-per-1K-tokens.
 fn f64_to_micro(usd: f64) -> u64 {
@@ -205,7 +205,7 @@ fn micro_to_f64(micro: u64) -> f64 {
     micro as f64 / 1_000_000.0
 }
 
-//  Tests 
+//  Tests
 
 #[cfg(test)]
 mod tests {

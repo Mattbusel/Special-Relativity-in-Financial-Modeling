@@ -26,7 +26,7 @@ pub mod watcher;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-//  Default value functions 
+//  Default value functions
 
 /// Default RAG stage timeout: 5000ms.
 fn default_timeout_ms() -> u64 {
@@ -68,7 +68,7 @@ fn default_true() -> bool {
     true
 }
 
-//  Top-level config 
+//  Top-level config
 
 /// Root configuration for a pipeline instance.
 ///
@@ -104,7 +104,7 @@ pub struct PipelineConfig {
     pub observability: ObservabilityConfig,
 }
 
-//  Pipeline identity 
+//  Pipeline identity
 
 /// Pipeline identity and version metadata.
 ///
@@ -121,7 +121,7 @@ pub struct PipelineSection {
     pub description: Option<String>,
 }
 
-//  Stage configs 
+//  Stage configs
 
 /// Configuration for all five pipeline stages.
 ///
@@ -250,7 +250,7 @@ pub struct StreamStageConfig {
     pub channel_capacity: usize,
 }
 
-//  Resilience 
+//  Resilience
 
 /// Resilience configuration for retries and circuit breaking.
 ///
@@ -275,7 +275,7 @@ pub struct ResilienceConfig {
     pub circuit_breaker_success_rate: f64,
 }
 
-//  Deduplication 
+//  Deduplication
 
 /// Deduplication configuration for request coalescing.
 ///
@@ -294,7 +294,7 @@ pub struct DeduplicationConfig {
     pub max_entries: usize,
 }
 
-//  Observability 
+//  Observability
 
 /// Observability configuration: logging, metrics endpoint, and tracing.
 ///

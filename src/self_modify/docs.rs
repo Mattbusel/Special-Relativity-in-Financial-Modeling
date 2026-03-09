@@ -18,7 +18,7 @@ use std::{
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-//  Error 
+//  Error
 
 /// Errors from the documentation generator.
 #[derive(Debug, Error)]
@@ -32,7 +32,7 @@ pub enum DocsError {
     Io(String),
 }
 
-//  Document types 
+//  Document types
 
 /// A metric value before and after a modification.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -260,7 +260,7 @@ fn collect_dependents(
     }
 }
 
-//  Documentation generator 
+//  Documentation generator
 
 struct DocsInner {
     changelog: Vec<ChangelogEntry>,
@@ -397,7 +397,7 @@ fn unix_now() -> u64 {
         .unwrap_or(0)
 }
 
-//  Tests 
+//  Tests
 
 #[cfg(test)]
 mod tests {

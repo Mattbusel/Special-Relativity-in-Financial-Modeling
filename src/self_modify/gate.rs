@@ -27,7 +27,7 @@ use std::{
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-//  Error 
+//  Error
 
 /// Errors produced by the validation gate.
 #[derive(Debug, Error)]
@@ -45,7 +45,7 @@ pub enum GateError {
     LockPoisoned,
 }
 
-//  Individual gate results 
+//  Individual gate results
 
 /// Outcome of a single gate check.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -111,7 +111,7 @@ pub enum RecommendedAction {
     Reject,
 }
 
-//  Benchmark snapshot 
+//  Benchmark snapshot
 
 /// A single benchmark measurement used for regression detection.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -124,7 +124,7 @@ pub struct BenchmarkSnapshot {
     pub recorded_at_secs: u64,
 }
 
-//  Gate configuration 
+//  Gate configuration
 
 /// Configuration for the validation gate.
 #[derive(Debug, Clone)]
@@ -156,7 +156,7 @@ impl Default for GateConfig {
     }
 }
 
-//  Smoke test runner trait 
+//  Smoke test runner trait
 
 /// Pluggable smoke test runner. Implementations should exercise the pipeline
 /// with synthetic traffic and report whether it handles requests correctly.
@@ -166,7 +166,7 @@ pub trait SmokeTestRunner: Send + Sync {
     fn run_smoke_test(&self) -> Result<(), String>;
 }
 
-//  Gate runner 
+//  Gate runner
 
 struct GateInner {
     cfg: GateConfig,
@@ -230,10 +230,48 @@ impl ValidationGate {
     /// In the current implementation this runs the checks in-process where
     /// possible and spawns child processes for `cargo` commands.
     ///
+    /// ## Production guard
+    /// `ValidationGate` MUST NOT run in production environments.  If
+    /// `RUST_ENV=production` is set the gate logs a warning and returns a
+    /// skipped report without invoking any subprocess.
+    ///
+    /// To disable the gate entirely (e.g. in CI environments that handle
+    /// testing separately) set `SELF_IMPROVE_DISABLE=1` or
+    /// `SELF_IMPROVE_DISABLE=true`.
+    ///
     /// Returns a [`GateReport`]  -  never panics.
     pub async fn evaluate(&self, proposal_id: impl Into<String>) -> GateReport {
         let proposal_id = proposal_id.into();
         let start = std::time::Instant::now();
+
+        // Production guard: refuse to run cargo subprocesses in production.
+        // Running cargo test / clippy on a production host would be dangerous
+        // (it requires rustc/cargo on the host, may recompile code, and consumes
+        // significant CPU/memory).
+        if std::env::var("RUST_ENV").unwrap_or_default() == "production" {
+            tracing::warn!(
+                "ValidationGate::evaluate called with RUST_ENV=production; \
+                 skipping all gate checks to protect the production host"
+            );
+            return self.skipped_report(
+                proposal_id,
+                "gate skipped: RUST_ENV=production",
+                start.elapsed().as_millis() as u64,
+            );
+        }
+
+        // Operator disable flag: SELF_IMPROVE_DISABLE=1 or =true.
+        let disabled = std::env::var("SELF_IMPROVE_DISABLE")
+            .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
+            .unwrap_or(false);
+        if disabled {
+            tracing::warn!("ValidationGate::evaluate skipped: SELF_IMPROVE_DISABLE is set");
+            return self.skipped_report(
+                proposal_id,
+                "gate skipped: SELF_IMPROVE_DISABLE is set",
+                start.elapsed().as_millis() as u64,
+            );
+        }
 
         let (workspace, trust_level, run_benchmarks) = {
             let inner = match self.inner.lock() {
@@ -350,7 +388,7 @@ impl ValidationGate {
             .unwrap_or_default()
     }
 
-    //  Private 
+    //  Private
 
     async fn check_benchmark_regression(&self, workspace: &str) -> GateOutcome {
         use tokio::process::Command;
@@ -478,9 +516,30 @@ impl ValidationGate {
             recommended_action: RecommendedAction::Reject,
         }
     }
+
+    fn skipped_report(&self, proposal_id: String, reason: &str, elapsed_ms: u64) -> GateReport {
+        let mut gates = HashMap::new();
+        for name in &[
+            "cargo_test",
+            "cargo_clippy",
+            "benchmark_regression",
+            "smoke_test",
+        ] {
+            gates.insert(name.to_string(), GateOutcome::Skipped(reason.to_string()));
+        }
+        GateReport {
+            proposal_id,
+            gates,
+            overall_pass: false,
+            summary: format!("Gate skipped: {reason}"),
+            evaluated_at_secs: unix_now(),
+            elapsed_ms,
+            recommended_action: RecommendedAction::AwaitReview,
+        }
+    }
 }
 
-//  Cargo runners 
+//  Cargo runners
 
 async fn run_cargo_test(workspace: &str) -> GateOutcome {
     run_cargo_command(workspace, &["test", "--all-features"]).await
@@ -526,7 +585,7 @@ fn unix_now() -> u64 {
         .unwrap_or(0)
 }
 
-//  Tests 
+//  Tests
 
 #[cfg(test)]
 mod tests {
@@ -797,6 +856,32 @@ mod tests {
         let json = serde_json::to_string(&a).unwrap();
         let back: RecommendedAction = serde_json::from_str(&json).unwrap();
         assert_eq!(back, a);
+    }
+
+    #[tokio::test]
+    async fn test_validation_gate_skips_when_disabled() {
+        // Safety: this test sets an env var; run serially to avoid interference.
+        // env::set_var is unsafe in Rust ≥1.81 (only in multi-threaded contexts)
+        // so we use a scoped approach that restores the previous value.
+        let prev = std::env::var("SELF_IMPROVE_DISABLE").ok();
+        std::env::set_var("SELF_IMPROVE_DISABLE", "1");
+
+        let gate = make_gate(0);
+        let report = gate.evaluate("disabled-test").await;
+
+        // Restore env
+        match prev {
+            Some(v) => std::env::set_var("SELF_IMPROVE_DISABLE", v),
+            None => std::env::remove_var("SELF_IMPROVE_DISABLE"),
+        }
+
+        // All gates should be Skipped, not Fail
+        for (name, outcome) in &report.gates {
+            assert!(
+                matches!(outcome, GateOutcome::Skipped(_)),
+                "gate '{name}' should be Skipped when SELF_IMPROVE_DISABLE=1, got {outcome:?}"
+            );
+        }
     }
 
     #[test]

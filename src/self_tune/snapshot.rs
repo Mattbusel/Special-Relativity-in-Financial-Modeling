@@ -786,8 +786,11 @@ impl RedisSnapshotStore {
         };
 
         let key = Self::redis_key(snapshot.version);
-        let result: Result<(), redis::RedisError> =
-            redis::cmd("SET").arg(&key).arg(&json).query_async(&mut conn).await;
+        let result: Result<(), redis::RedisError> = redis::cmd("SET")
+            .arg(&key)
+            .arg(&json)
+            .query_async(&mut conn)
+            .await;
 
         if let Err(e) = result {
             tracing::warn!(
@@ -863,7 +866,9 @@ impl RedisSnapshotStore {
         source: SnapshotSource,
         description: impl Into<String>,
     ) -> Result<ConfigSnapshot, SnapshotError> {
-        let snapshot = self.inner.create_snapshot(parameters, metric_scores, source, description)?;
+        let snapshot =
+            self.inner
+                .create_snapshot(parameters, metric_scores, source, description)?;
         self.persist_to_redis(&snapshot).await;
         Ok(snapshot)
     }
@@ -1708,6 +1713,56 @@ mod tests {
         let msg = format!("{err}");
         assert!(msg.contains("redis error"));
         assert!(msg.contains("connection refused"));
+    }
+
+    #[test]
+    fn test_snapshot_diff_is_deterministic() {
+        // Build a store with two snapshots that differ in multiple params
+        let store = SnapshotStore::new(64);
+
+        // Snapshot 0: params a,b,c,d,e (in that insertion order via HashMap)
+        let mut p0 = HashMap::new();
+        p0.insert("alpha".to_string(), 1.0);
+        p0.insert("beta".to_string(), 2.0);
+        p0.insert("gamma".to_string(), 3.0);
+        p0.insert("delta".to_string(), 4.0);
+        p0.insert("epsilon".to_string(), 5.0);
+        store
+            .create_snapshot(p0, HashMap::new(), SnapshotSource::Manual, "v0")
+            .unwrap();
+
+        // Snapshot 1: all changed
+        let mut p1 = HashMap::new();
+        p1.insert("alpha".to_string(), 10.0);
+        p1.insert("beta".to_string(), 20.0);
+        p1.insert("gamma".to_string(), 30.0);
+        p1.insert("delta".to_string(), 40.0);
+        p1.insert("epsilon".to_string(), 50.0);
+        store
+            .create_snapshot(p1, HashMap::new(), SnapshotSource::Manual, "v1")
+            .unwrap();
+
+        // Call diff twice and verify the order of changes is identical
+        let diff1 = store.diff(0, 1).unwrap();
+        let diff2 = store.diff(0, 1).unwrap();
+
+        let names1: Vec<&str> = diff1.changes.iter().map(|c| c.name.as_str()).collect();
+        let names2: Vec<&str> = diff2.changes.iter().map(|c| c.name.as_str()).collect();
+        assert_eq!(
+            names1, names2,
+            "diff output must be deterministic (sorted by name)"
+        );
+
+        // Also verify it is sorted by name
+        let sorted: Vec<&str> = {
+            let mut v = names1.clone();
+            v.sort_unstable();
+            v
+        };
+        assert_eq!(
+            names1, sorted,
+            "diff changes must be sorted by parameter name"
+        );
     }
 
     // ========================================================================

@@ -34,7 +34,7 @@ use std::sync::{Arc, Mutex};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-//  Errors 
+//  Errors
 
 /// Errors that can occur during cost optimization operations.
 #[derive(Debug, Error)]
@@ -52,7 +52,7 @@ pub enum CostError {
     InvalidBudget(String),
 }
 
-//  BudgetConfig 
+//  BudgetConfig
 
 /// Configuration for the budget tracking period and alert thresholds.
 ///
@@ -84,7 +84,7 @@ impl Default for BudgetConfig {
     }
 }
 
-//  CostEntry 
+//  CostEntry
 
 /// A single cost observation from an inference request.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -101,7 +101,7 @@ pub struct CostEntry {
     pub timestamp_secs: u64,
 }
 
-//  ModelCostSummary 
+//  ModelCostSummary
 
 /// Aggregated cost summary for a single model.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -122,7 +122,7 @@ pub struct ModelCostSummary {
     pub budget_fraction: f64,
 }
 
-//  BudgetAlert 
+//  BudgetAlert
 
 /// Alert level for the current budget status.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -137,7 +137,7 @@ pub enum BudgetAlert {
     Exceeded,
 }
 
-//  BudgetStatus 
+//  BudgetStatus
 
 /// Current budget status including spend totals, projections, and alerts.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -158,7 +158,7 @@ pub struct BudgetStatus {
     pub per_model: Vec<ModelCostSummary>,
 }
 
-//  CostAction 
+//  CostAction
 
 /// An actionable cost optimization step.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -178,7 +178,7 @@ pub enum CostAction {
     NoAction,
 }
 
-//  CostRecommendation 
+//  CostRecommendation
 
 /// A cost optimization recommendation with rationale and estimated savings.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -195,7 +195,7 @@ pub struct CostRecommendation {
     pub model_to: Option<String>,
 }
 
-//  CostInner 
+//  CostInner
 
 /// Internal mutable state for the cost optimizer, protected by a mutex.
 struct CostInner {
@@ -211,7 +211,7 @@ struct CostInner {
     model_rates: HashMap<String, f64>,
 }
 
-//  CostOptimizer 
+//  CostOptimizer
 
 /// Budget-aware cost optimizer that tracks per-model inference costs and
 /// recommends routing shifts when the budget nears its ceiling.
@@ -562,7 +562,7 @@ impl CostOptimizer {
         Ok(())
     }
 
-    //  Private helpers 
+    //  Private helpers
 
     /// Compute the budget period elapsed fraction and projected total spend.
     fn compute_projection(
@@ -720,7 +720,7 @@ impl CostOptimizer {
     }
 }
 
-//  Tests 
+//  Tests
 
 #[cfg(test)]
 mod tests {

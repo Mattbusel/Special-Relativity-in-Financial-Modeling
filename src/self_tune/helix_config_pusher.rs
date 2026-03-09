@@ -41,7 +41,7 @@ use serde::Serialize;
 use std::time::Duration;
 use tracing::{debug, trace, warn};
 
-//  Wire-format mirror of HelixRouter's `RouterConfigPatch` 
+//  Wire-format mirror of HelixRouter's `RouterConfigPatch`
 //
 // We only declare the fields we actually push; serde(skip_serializing_if) ensures
 // no spurious null fields reach the HelixRouter PATCH endpoint.
@@ -63,7 +63,7 @@ impl ConfigPatch {
     }
 }
 
-//  Configuration 
+//  Configuration
 
 /// Configuration for [`HelixConfigPusher`].
 #[derive(Debug, Clone)]
@@ -95,7 +95,7 @@ impl Default for HelixConfigPusherConfig {
     }
 }
 
-//  Pusher 
+//  Pusher
 
 /// Pushes Tokio Prompt tuning decisions to HelixRouter's `/api/config`.
 ///
@@ -137,7 +137,11 @@ impl HelixConfigPusher {
             .build()
             .unwrap_or_default();
 
-        Self { config, tuning, client }
+        Self {
+            config,
+            tuning,
+            client,
+        }
     }
 
     /// Run the push loop indefinitely.
@@ -199,7 +203,7 @@ impl HelixConfigPusher {
     fn build_patch(&self, last_busy_threshold: &mut Option<usize>) -> ConfigPatch {
         let mut patch = ConfigPatch::default();
 
-        //  BackpressureShedThreshold → backpressure_busy_threshold 
+        //  BackpressureShedThreshold → backpressure_busy_threshold
         //
         // LiveTuning stores a fraction in [0.0, 1.0].
         // HelixRouter's `backpressure_busy_threshold` is a usize counting how
@@ -251,15 +255,15 @@ impl HelixConfigPusher {
     }
 }
 
-//  Stand-alone config (no feature gate needed for tests) 
+//  Stand-alone config (no feature gate needed for tests)
 
-//  Tests 
+//  Tests
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    //  HelixConfigPusherConfig 
+    //  HelixConfigPusherConfig
 
     #[test]
     fn config_default_base_url() {
@@ -287,7 +291,7 @@ mod tests {
         assert_eq!(cfg.base_url, "http://127.0.0.1:8080");
     }
 
-    //  ConfigPatch 
+    //  ConfigPatch
 
     #[test]
     fn patch_default_is_empty() {
@@ -297,13 +301,19 @@ mod tests {
 
     #[test]
     fn patch_with_threshold_is_not_empty() {
-        let patch = ConfigPatch { backpressure_busy_threshold: Some(5), ..Default::default() };
+        let patch = ConfigPatch {
+            backpressure_busy_threshold: Some(5),
+            ..Default::default()
+        };
         assert!(!patch.is_empty());
     }
 
     #[test]
     fn patch_serializes_with_skip_none() {
-        let patch = ConfigPatch { backpressure_busy_threshold: Some(7), ..Default::default() };
+        let patch = ConfigPatch {
+            backpressure_busy_threshold: Some(7),
+            ..Default::default()
+        };
         let json = serde_json::to_string(&patch).expect("serialize");
         assert!(json.contains("backpressure_busy_threshold"));
         assert!(json.contains("7"));
@@ -316,7 +326,7 @@ mod tests {
         assert_eq!(json, "{}");
     }
 
-    //  Parameter mapping math 
+    //  Parameter mapping math
 
     #[test]
     fn shed_frac_to_busy_threshold_mapping() {
@@ -348,7 +358,7 @@ mod tests {
         assert_eq!(t, 20);
     }
 
-    //  Change threshold logic 
+    //  Change threshold logic
 
     #[test]
     fn change_threshold_none_always_pushes() {
@@ -425,7 +435,7 @@ mod tests {
         assert!(!should_push);
     }
 
-    //  Pusher construction 
+    //  Pusher construction
 
     #[cfg(feature = "self-tune")]
     #[test]

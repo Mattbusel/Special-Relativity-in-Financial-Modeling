@@ -32,7 +32,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-//  Errors 
+//  Errors
 
 /// Errors produced by the anomaly detection subsystem.
 #[derive(Debug, Error)]
@@ -57,7 +57,7 @@ pub enum AnomalyError {
     MetricNotFound(String),
 }
 
-//  Enums 
+//  Enums
 
 /// Severity classification for a detected anomaly.
 ///
@@ -83,7 +83,7 @@ pub enum DetectionMethod {
     IsolationScore,
 }
 
-//  Anomaly record 
+//  Anomaly record
 
 /// A single detected anomaly event.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -106,7 +106,7 @@ pub struct Anomaly {
     pub detected_at_secs: u64,
 }
 
-//  Configuration 
+//  Configuration
 
 /// Configuration for the Z-score detection algorithm.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -177,7 +177,7 @@ impl Default for AnomalyDetectorConfig {
     }
 }
 
-//  Internal state 
+//  Internal state
 
 /// Per-metric CUSUM accumulator state.
 #[derive(Debug, Clone)]
@@ -207,7 +207,7 @@ struct DetectorInner {
     max_history: usize,
 }
 
-//  AnomalyDetector 
+//  AnomalyDetector
 
 /// Thread-safe statistical anomaly detector for telemetry streams.
 ///
@@ -543,7 +543,7 @@ impl AnomalyDetector {
         Ok(())
     }
 
-    //  Private helpers 
+    //  Private helpers
 
     /// Core ingestion logic operating on the already-locked inner state.
     fn ingest_inner(inner: &mut DetectorInner, metric: &str, value: f64) -> Vec<Anomaly> {
@@ -627,7 +627,7 @@ impl AnomalyDetector {
     }
 }
 
-//  Free helpers 
+//  Free helpers
 
 /// Compute mean and population standard deviation of a window.
 ///
@@ -651,13 +651,13 @@ fn unix_now() -> u64 {
         .unwrap_or(0)
 }
 
-//  Tests 
+//  Tests
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    //  Construction 
+    //  Construction
 
     #[test]
     fn test_new_creates_detector() {
@@ -677,7 +677,7 @@ mod tests {
         assert!(inner.config.isolation_enabled);
     }
 
-    //  Ingestion / Z-score 
+    //  Ingestion / Z-score
 
     #[test]
     fn test_ingest_no_anomaly_normal_data() {
@@ -849,7 +849,7 @@ mod tests {
         assert!(result.is_none());
     }
 
-    //  CUSUM 
+    //  CUSUM
 
     #[test]
     fn test_cusum_detects_drift() {
@@ -941,7 +941,7 @@ mod tests {
         );
     }
 
-    //  Isolation score 
+    //  Isolation score
 
     #[test]
     fn test_isolation_score_computes() {
@@ -980,7 +980,7 @@ mod tests {
         );
     }
 
-    //  Batch ingestion 
+    //  Batch ingestion
 
     #[test]
     fn test_ingest_batch_processes_all() {
@@ -1000,7 +1000,7 @@ mod tests {
         assert!(inner.windows.contains_key("disk"));
     }
 
-    //  History 
+    //  History
 
     #[test]
     fn test_anomaly_history_records() {
@@ -1118,7 +1118,7 @@ mod tests {
         }
     }
 
-    //  Window stats 
+    //  Window stats
 
     #[test]
     fn test_window_stats_returns_mean_stddev() {
@@ -1142,7 +1142,7 @@ mod tests {
         assert!(det.window_stats("nonexistent").is_none());
     }
 
-    //  Clear history 
+    //  Clear history
 
     #[test]
     fn test_clear_history() {
@@ -1168,7 +1168,7 @@ mod tests {
         assert!(det.anomaly_history().is_empty());
     }
 
-    //  Window bounding 
+    //  Window bounding
 
     #[test]
     fn test_window_bounded_by_max() {
@@ -1195,7 +1195,7 @@ mod tests {
         );
     }
 
-    //  Severity ordering 
+    //  Severity ordering
 
     #[test]
     fn test_severity_ordering() {
@@ -1204,7 +1204,7 @@ mod tests {
         assert!(Severity::Info < Severity::Critical);
     }
 
-    //  Serialization 
+    //  Serialization
 
     #[test]
     fn test_anomaly_serialization() {
@@ -1242,7 +1242,7 @@ mod tests {
         }
     }
 
-    //  Config defaults 
+    //  Config defaults
 
     #[test]
     fn test_config_default_values() {
@@ -1258,7 +1258,7 @@ mod tests {
         assert_eq!(config.max_window_size, 120);
     }
 
-    //  Clone shares state 
+    //  Clone shares state
 
     #[test]
     fn test_clone_shares_state() {
@@ -1272,7 +1272,7 @@ mod tests {
         assert!(inner.windows.contains_key("shared_metric"));
     }
 
-    //  Multiple metrics independent 
+    //  Multiple metrics independent
 
     #[test]
     fn test_multiple_metrics_independent() {
@@ -1297,7 +1297,7 @@ mod tests {
         assert!((beta_mean - 200.0).abs() < f64::EPSILON);
     }
 
-    //  Gradual drift vs spike 
+    //  Gradual drift vs spike
 
     #[test]
     fn test_gradual_drift_detected_by_cusum_not_zscore() {
@@ -1382,7 +1382,7 @@ mod tests {
         assert!(zscore_detected, "Z-score should detect sudden spike");
     }
 
-    //  History cap 
+    //  History cap
 
     #[test]
     fn test_history_capped() {

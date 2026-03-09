@@ -25,7 +25,7 @@ use tokio_prompt_orchestrator::{
     OrchestratorError, PipelineHandles, PostOutput, PromptRequest, SessionId,
 };
 
-//  Parameter types 
+//  Parameter types
 
 /// Parameters for the `infer` tool.
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
@@ -79,7 +79,7 @@ pub struct ConfigureParams {
     pub rate_limit_rps: Option<u32>,
 }
 
-//  Response types 
+//  Response types
 
 /// Structured response from the `infer` tool.
 #[derive(Debug, Serialize)]
@@ -131,7 +131,7 @@ impl Default for PipelineConfig {
     }
 }
 
-//  MCP Server 
+//  MCP Server
 
 /// Map of in-flight request IDs to their oneshot response senders.
 type PendingMap = Arc<tokio::sync::Mutex<HashMap<String, oneshot::Sender<PostOutput>>>>;

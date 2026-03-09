@@ -1,4 +1,4 @@
-//  Lint policy (inherited from crate root) 
+//  Lint policy (inherited from crate root)
 #![cfg(feature = "self-tune")]
 
 //! # Live-Tuning Actuator (Task 1.x  -  Parameter Actuation)
@@ -14,9 +14,9 @@
 //! ```text
 //!  TelemetryBus snapshot TuningController adjustments LiveTuning
 //!                                                                      
-//!               CircuitBreaker  failure_threshold 
-//!               RateLimiter     refill_rate 
-//!               DedupStore      ttl_ms 
+//!               CircuitBreaker  failure_threshold
+//!               RateLimiter     refill_rate
+//!               DedupStore      ttl_ms
 //!               ShedPolicy      shed_threshold -
 //! ```
 //!
@@ -39,7 +39,7 @@ use tracing::{debug, info};
 
 use crate::self_tune::controller::{ParameterId, ParameterSpec};
 
-//  LiveTuning 
+//  LiveTuning
 
 /// Shared atomic parameter store.
 ///
@@ -85,13 +85,10 @@ impl LiveTuning {
     ///
     /// This function never panics.
     pub fn get(&self, id: ParameterId) -> f64 {
-        self.cells
-            .get(&id)
-            .map(|c| c.load())
-            .unwrap_or_else(|| {
-                let spec = ParameterSpec::default_for(id);
-                (spec.min + spec.max) / 2.0
-            })
+        self.cells.get(&id).map(|c| c.load()).unwrap_or_else(|| {
+            let spec = ParameterSpec::default_for(id);
+            (spec.min + spec.max) / 2.0
+        })
     }
 
     /// Update the value for a single parameter, clamping to the allowed range.
@@ -125,7 +122,10 @@ impl LiveTuning {
         if adjustments.is_empty() {
             return;
         }
-        info!(count = adjustments.len(), "LiveTuning: applying controller adjustments");
+        info!(
+            count = adjustments.len(),
+            "LiveTuning: applying controller adjustments"
+        );
         for &(id, value) in adjustments {
             self.set(id, value);
         }
@@ -143,7 +143,7 @@ impl LiveTuning {
             .collect()
     }
 
-    //  Convenience accessors 
+    //  Convenience accessors
 
     /// Circuit-breaker failure threshold (number of consecutive failures).
     ///
@@ -244,7 +244,7 @@ impl std::fmt::Debug for LiveTuning {
     }
 }
 
-//  AtomicF64 
+//  AtomicF64
 
 /// Lock-free `f64` cell backed by an `AtomicU64` bit-cast.
 ///
@@ -267,7 +267,7 @@ impl AtomicF64 {
     }
 }
 
-//  Tests 
+//  Tests
 
 #[cfg(test)]
 mod tests {
@@ -277,7 +277,7 @@ mod tests {
         LiveTuning::new()
     }
 
-    //  AtomicF64 
+    //  AtomicF64
 
     #[test]
     fn test_atomic_f64_roundtrip_zero() {
@@ -311,7 +311,7 @@ mod tests {
         assert_eq!(a.load(), 0.0);
     }
 
-    //  LiveTuning::new 
+    //  LiveTuning::new
 
     #[test]
     fn test_new_initialises_all_params() {
@@ -333,7 +333,7 @@ mod tests {
         }
     }
 
-    //  LiveTuning::set / get 
+    //  LiveTuning::set / get
 
     #[test]
     fn test_set_within_range_accepted() {
@@ -376,7 +376,7 @@ mod tests {
         assert!((lt.get(ParameterId::RateLimiterRefillRate) - spec.max).abs() < f64::EPSILON);
     }
 
-    //  apply_adjustments 
+    //  apply_adjustments
 
     #[test]
     fn test_apply_empty_adjustments_is_noop() {
@@ -421,7 +421,7 @@ mod tests {
         assert!(lt.get(ParameterId::CircuitBreakerSuccessRate) <= spec.max);
     }
 
-    //  snapshot 
+    //  snapshot
 
     #[test]
     fn test_snapshot_contains_all_params() {
@@ -441,7 +441,7 @@ mod tests {
         assert!((snap[&ParameterId::DedupTtlMs] - expected).abs() < f64::EPSILON);
     }
 
-    //  convenience accessors 
+    //  convenience accessors
 
     #[test]
     fn test_circuit_breaker_failure_threshold_in_range() {
@@ -509,14 +509,16 @@ mod tests {
         assert!(v >= spec.min as usize && v <= spec.max as usize);
     }
 
-    //  Clone / Arc sharing 
+    //  Clone / Arc sharing
 
     #[test]
     fn test_clone_shares_state() {
         let a = make();
         let b = a.clone();
         a.set(ParameterId::DedupTtlMs, 77777.0);
-        assert!((b.get(ParameterId::DedupTtlMs) - a.get(ParameterId::DedupTtlMs)).abs() < f64::EPSILON);
+        assert!(
+            (b.get(ParameterId::DedupTtlMs) - a.get(ParameterId::DedupTtlMs)).abs() < f64::EPSILON
+        );
     }
 
     #[test]
@@ -526,7 +528,7 @@ mod tests {
         assert!(s.contains("LiveTuning"));
     }
 
-    //  Concurrency 
+    //  Concurrency
 
     #[test]
     fn test_concurrent_reads_consistent() {

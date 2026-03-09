@@ -66,7 +66,7 @@ pub fn render(f: &mut Frame, area: Rect, app: &App) {
         let connector_y = top_row_y + 2;
         let connector_x = inner.x + estimate_stage_end_x(inner.width, 3, 2);
         let connector = Paragraph::new(Line::from(Span::styled(
-            "\u{2502}", // 
+            "\u{2502}", //
             Style::default().fg(Color::DarkGray),
         )));
         f.render_widget(connector, Rect::new(connector_x, connector_y, 1, 1));
@@ -159,9 +159,9 @@ fn render_stage_row(
         // Draw arrow between stages
         if (i as u16) < count - 1 {
             let arrow = if left_to_right {
-                "\u{2500}\u{2500}\u{25b6}" // 
+                "\u{2500}\u{2500}\u{25b6}" //
             } else {
-                "\u{25c0}\u{2500}\u{2500}" // 
+                "\u{25c0}\u{2500}\u{2500}" //
             };
             let arrow_para = Paragraph::new(Line::from(Span::styled(
                 arrow,

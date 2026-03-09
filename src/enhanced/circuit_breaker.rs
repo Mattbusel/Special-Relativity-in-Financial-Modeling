@@ -365,6 +365,43 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_circuit_breaker_clears_history_on_half_open() {
+        // Open the breaker with 2 failures, then wait for the timeout.
+        let breaker = CircuitBreaker::new(2, 0.8, Duration::from_millis(50));
+
+        for _ in 0..2 {
+            let _: Result<(), CircuitBreakerError<()>> = breaker.call(|| async { Err(()) }).await;
+        }
+        assert_eq!(breaker.status().await, CircuitStatus::Open);
+
+        // The recent_results window should have 2 failures recorded.
+        {
+            let state = breaker.state.read().await;
+            assert!(
+                !state.recent_results.is_empty(),
+                "should have failure history before half-open"
+            );
+        }
+
+        // Wait for the open timeout to elapse.
+        tokio::time::sleep(Duration::from_millis(100)).await;
+
+        // First successful probe transitions to HalfOpen and clears history.
+        let _: Result<(), CircuitBreakerError<()>> = breaker.call(|| async { Ok(()) }).await;
+
+        // After the transition the history must contain only the single probe
+        // result (the success above), not the old failures.
+        {
+            let state = breaker.state.read().await;
+            assert!(
+                !state.recent_results.contains(&false),
+                "old failures must be cleared on half-open transition; results: {:?}",
+                state.recent_results
+            );
+        }
+    }
+
+    #[tokio::test]
     async fn test_stats() {
         let breaker = CircuitBreaker::new(5, 0.8, Duration::from_secs(60));
 

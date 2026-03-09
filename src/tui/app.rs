@@ -339,9 +339,9 @@ impl CircuitState {
     /// Returns the display symbol for this circuit state.
     pub fn symbol(&self) -> &'static str {
         match self {
-            Self::Closed => "\u{25cf}",   // 
-            Self::HalfOpen => "\u{25d0}", // 
-            Self::Open => "\u{25cb}",     // 
+            Self::Closed => "\u{25cf}",   //
+            Self::HalfOpen => "\u{25d0}", //
+            Self::Open => "\u{25cb}",     //
         }
     }
 

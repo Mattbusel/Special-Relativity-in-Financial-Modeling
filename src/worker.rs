@@ -691,7 +691,7 @@ mod tests {
     /// Serialise all tests that read/write environment variables so they don't race.
     static ENV_MUTEX: Mutex<()> = Mutex::new(());
 
-    //  Helpers 
+    //  Helpers
 
     /// Create an `OpenAiWorker` that points at `base_url`.
     /// Must be called while `ENV_MUTEX` is held.
@@ -731,7 +731,7 @@ mod tests {
         serde_json::json!({"text": ["hello world response"]})
     }
 
-    //  EchoWorker 
+    //  EchoWorker
 
     #[tokio::test]
     async fn test_echo_worker_infer_splits_on_whitespace() {
@@ -788,7 +788,7 @@ mod tests {
         assert!(worker.infer("anything").await.is_ok());
     }
 
-    //  OpenAiWorker  -  constructor 
+    //  OpenAiWorker  -  constructor
 
     #[test]
     fn test_openai_worker_new_missing_key_returns_config_error() {
@@ -819,7 +819,7 @@ mod tests {
         assert!(result.is_ok(), "Expected Ok when OPENAI_API_KEY is set");
     }
 
-    //  OpenAiWorker  -  inference 
+    //  OpenAiWorker  -  inference
 
     #[tokio::test]
     async fn test_openai_infer_success_parses_response_correctly() {
@@ -1009,7 +1009,7 @@ mod tests {
         );
     }
 
-    //  AnthropicWorker  -  constructor 
+    //  AnthropicWorker  -  constructor
 
     #[test]
     fn test_anthropic_worker_new_missing_key_returns_config_error() {
@@ -1040,7 +1040,7 @@ mod tests {
         assert!(result.is_ok(), "Expected Ok when ANTHROPIC_API_KEY is set");
     }
 
-    //  AnthropicWorker  -  inference 
+    //  AnthropicWorker  -  inference
 
     #[tokio::test]
     async fn test_anthropic_infer_success_returns_tokens() {
@@ -1219,7 +1219,7 @@ mod tests {
         );
     }
 
-    //  LlamaCppWorker 
+    //  LlamaCppWorker
 
     #[test]
     fn test_llamacpp_default_constructor_builds_worker() {
@@ -1345,7 +1345,7 @@ mod tests {
         );
     }
 
-    //  VllmWorker 
+    //  VllmWorker
 
     #[test]
     fn test_vllm_default_constructor_builds_worker() {

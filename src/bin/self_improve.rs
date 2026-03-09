@@ -18,12 +18,12 @@ use tokio_prompt_orchestrator::{
 async fn main() {
     tokio_prompt_orchestrator::init_tracing();
 
-    //  Build pipeline 
+    //  Build pipeline
     let worker = std::sync::Arc::new(EchoWorker::new());
     let pipeline = spawn_pipeline(worker);
     let counters = PipelineCounters::new();
 
-    //  Start telemetry bus 
+    //  Start telemetry bus
     let bus_cfg = TelemetryBusConfig {
         sample_interval: Duration::from_secs(5),
         ..TelemetryBusConfig::default()
@@ -33,7 +33,7 @@ async fn main() {
 
     tracing::info!("telemetry bus started");
 
-    //  Start self-improving loop 
+    //  Start self-improving loop
     let loop_cfg = LoopConfig {
         snapshot_every_n_ticks: 6, // snapshot every ~30 s
         target_p95_ms: 150.0,
@@ -52,9 +52,9 @@ async fn main() {
         "subsystems ready"
     );
 
-    //  Send demo requests 
-    use tokio_prompt_orchestrator::{PromptRequest, SessionId};
+    //  Send demo requests
     use std::collections::HashMap;
+    use tokio_prompt_orchestrator::{PromptRequest, SessionId};
 
     for i in 0u64..50 {
         let req = PromptRequest {
@@ -91,7 +91,7 @@ async fn main() {
     // Let the loop process remaining telemetry ticks
     tokio::time::sleep(Duration::from_secs(12)).await;
 
-    //  Final report 
+    //  Final report
     let snap_count = handles.snapshots.version_count();
     let tasks = handles.task_gen.task_count();
     let avg_rps = handles.autoscaler.current_avg_rps();

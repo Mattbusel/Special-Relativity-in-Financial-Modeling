@@ -23,3 +23,7 @@ target-*/
 .claude/
 target-agent/
 target-agent1/
+
+# Claude desktop config — may contain local paths or personal settings.
+# Use claude_desktop_config.example.json as the template.
+claude_desktop_config.json
