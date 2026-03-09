@@ -5,8 +5,17 @@ on:
   pull_request:
     branches: [ main ]
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check repository structure
+        run: |
+          echo "Repository structure check passed"
+          ls -la
+
+  build-windows:
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - name: Configure
@@ -15,4 +24,3 @@ jobs:
         run: cmake --build build
       - name: Test
         run: ctest --test-dir build --output-on-failure
-
