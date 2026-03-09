@@ -160,6 +160,7 @@ endif()
 #   include/ — new public SIMD headers  (srfm/simd/cpu_features.hpp, …)
 #   .        — project root, so bench/ and tests/ can use relative paths
 set(SRFM_SIMD_INCLUDE_DIRS
+    ${CMAKE_SOURCE_DIR}/src/simd
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}
