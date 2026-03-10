@@ -27,3 +27,24 @@ target-agent1/
 # Claude desktop config — may contain local paths or personal settings.
 # Use claude_desktop_config.example.json as the template.
 claude_desktop_config.json
+
+# Node / viz dashboard
+node_modules/
+viz/node_modules/
+
+# C++ build artifacts
+*.obj
+*.o
+*.a
+build/
+
+# LaTeX build artifacts
+paper/*.bbl
+paper/*.blg
+paper/*.toc
+paper/*.aux
+paper/*.out
+
+# Logs and misc
+*.log
+--help
