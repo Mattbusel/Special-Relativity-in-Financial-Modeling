@@ -114,7 +114,7 @@ public:
      */
     [[nodiscard]] double normalise(double close) const noexcept {
         if (count_ < window_) return 0.0;
-        const double variance = m2_ / static_cast<double>(window_);
+        const double variance = m2_ / static_cast<double>(window_ - 1);
         const double sigma    = std::sqrt(variance);
         if (sigma < 1e-15) return 0.0;
         return (close - mean_) / sigma;
@@ -125,10 +125,10 @@ public:
     /// Rolling mean of the window.  0.0 if window not yet full.
     [[nodiscard]] double mean()  const noexcept { return mean_; }
 
-    /// Rolling population standard deviation.  0.0 if window not yet full.
+    /// Rolling sample standard deviation.  0.0 if window not yet full.
     [[nodiscard]] double sigma() const noexcept {
         if (count_ < window_) return 0.0;
-        const double v = m2_ / static_cast<double>(window_);
+        const double v = m2_ / static_cast<double>(window_ - 1);
         return v < 0.0 ? 0.0 : std::sqrt(v);
     }
 

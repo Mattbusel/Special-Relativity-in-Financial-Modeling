@@ -105,9 +105,11 @@ Engine::process(std::string_view data) const noexcept {
     momentum::RelativisticSignalProcessor proc;
     auto bv = momentum::BetaVelocity::make(beta_result->beta);
     if (!bv) return std::nullopt;
-    auto meff = momentum::EffectiveMass::make(beta_result->gamma); // use γ as m_eff proxy
+    // Use mean_price as the effective-mass proxy (a natural liquidity-weighted
+    // scale factor).  γ was incorrect: it is dimensionless and already applied
+    // inside RelativisticSignalProcessor, so using it here caused γ²·price output.
+    auto meff = momentum::EffectiveMass::make(mean_price > 0.0 ? mean_price : 1.0);
     if (!meff) {
-        // gamma is always >= 1.0, so this shouldn't fail; but be safe
         meff = momentum::EffectiveMass::make(1.0);
         if (!meff) return std::nullopt;
     }

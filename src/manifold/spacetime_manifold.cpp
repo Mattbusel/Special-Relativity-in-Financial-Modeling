@@ -69,7 +69,7 @@ SpacetimeManifold::process(const SpacetimeEvent& event) const noexcept {
 
     // Map x-coordinate to a proxy β ∈ [0, 1) via smooth saturation
     const double abs_x    = std::abs(event.x);
-    const double beta_proxy = std::tanh(abs_x / (abs_x + 1.0 + 1e-15));
+    const double beta_proxy = std::tanh(abs_x);
 
     if (!std::isfinite(beta_proxy)) return std::nullopt;
 

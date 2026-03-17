@@ -94,7 +94,11 @@ LorentzTransform::composeVelocities(BetaVelocity beta1,
     // magnitude, so there is no risk of division by zero here.
     const double num   = beta1.value + beta2.value;
     const double denom = 1.0 + beta1.value * beta2.value;
-    return BetaVelocity{num / denom};
+    // denom > 0 when both inputs are valid (|β| < 1), but clamp the result to
+    // guard against floating-point drift accumulating over many compositions.
+    constexpr double kMaxBeta = 1.0 - 1e-9;
+    const double raw = num / denom;
+    return BetaVelocity{std::max(-kMaxBeta, std::min(kMaxBeta, raw))};
 }
 
 std::optional<double>
