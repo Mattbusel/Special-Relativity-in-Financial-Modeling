@@ -309,6 +309,139 @@ srfm::simd::batch_gamma(betas.data(), gammas.data(), betas.size());
 
 ---
 
+## Rust Orchestrator — Quick Start (zero config)
+
+The `tokio-prompt-orchestrator` crate sits above the C++ signal-processing
+library and coordinates LLM inference workers. It compiles and runs with no
+external services needed (mock mode).
+
+### 1. Build
+
+```bash
+# Library + CLI (no optional features required)
+cargo build --release
+
+# With the Terminal UI dashboard
+cargo build --release --features tui
+
+# With the HTTP/WebSocket API server
+cargo build --release --features web-api
+```
+
+### 2. Run the TUI dashboard (mock data, no API keys needed)
+
+```bash
+cargo run --release --features tui -- --mock
+```
+
+The dashboard shows a 2-minute scripted story: warmup → load ramp → failure →
+circuit half-open → recovery → steady state, then loops.
+
+### 3. Start the HTTP API server
+
+```bash
+# Optional: set an API key (omit for open access, development only)
+export API_KEY=my-secret-token
+
+cargo run --release --features web-api -- --web --port 8080
+```
+
+### 4. Send a test inference request
+
+```bash
+curl -s -X POST http://localhost:8080/api/v1/infer \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer my-secret-token" \
+  -d '{"prompt": "Explain Lorentz contraction in one sentence."}' | jq .
+```
+
+### 5. Use the EchoWorker in your own code (no keys required)
+
+```rust
+use tokio_prompt_orchestrator::{EchoWorker, ModelWorker};
+
+#[tokio::main]
+async fn main() {
+    let worker = EchoWorker;
+    let tokens = worker.infer("Hello, world!").await.unwrap();
+    println!("{}", tokens.join(""));
+}
+```
+
+---
+
+## HTTP API Endpoint Reference
+
+> Requires the `web-api` feature.
+> All inference endpoints require `Authorization: Bearer <API_KEY>` when
+> `API_KEY` is set. Public endpoints (`/health`, `/metrics`, `/api/v1/schema`)
+> are always unauthenticated.
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `POST` | `/api/v1/infer` | Yes | Submit an inference request; returns a `request_id` immediately |
+| `POST` | `/api/v1/stream` | Yes | SSE token stream; events: `start`, `token`, `done` |
+| `GET`  | `/api/v1/status/{id}` | Yes | Poll request status (`pending`, `processing`, `completed`, `failed`, `timeout`) |
+| `GET`  | `/api/v1/result/{id}` | Yes | Block until the result is ready (or timeout) |
+| `GET`  | `/api/v1/ws` | Yes | WebSocket upgrade — bidirectional streaming; 1 MB message limit, 30 s ping |
+| `GET`  | `/api/v1/schema` | No | OpenAPI 3.0 JSON schema |
+| `GET`  | `/health` | No | `{"status":"healthy","version":"…"}` |
+| `GET`  | `/metrics` | No | Prometheus text-format metrics |
+
+### Request body (`POST /api/v1/infer` and `/api/v1/stream`)
+
+```json
+{
+  "prompt": "string (required)",
+  "session_id": "string (optional, generated if absent)",
+  "metadata": { "key": "value" },
+  "stream": false
+}
+```
+
+### Response body
+
+```json
+{
+  "request_id": "uuid",
+  "status": "processing",
+  "result": "string (present when completed)",
+  "error": "string (present when failed)"
+}
+```
+
+### Environment variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `API_KEY` | *(none)* | Bearer token; unset = auth disabled (warning logged) |
+| `ALLOWED_ORIGINS` | *(wildcard)* | Comma-separated CORS origins |
+| `OPENAI_API_KEY` | — | Required for `OpenAiWorker` |
+| `ANTHROPIC_API_KEY` | — | Required for `AnthropicWorker` |
+| `LLAMA_CPP_URL` | `http://localhost:8080` | llama.cpp server URL |
+| `VLLM_URL` | `http://localhost:8000` | vLLM server URL |
+| `RUST_LOG` | `info` | Tracing log filter (e.g. `debug`, `tokio_prompt_orchestrator=trace`) |
+
+### WebSocket message format
+
+Send JSON matching the `POST /api/v1/infer` body. The server replies with:
+
+```json
+{ "request_id": "uuid", "status": "processing" }
+// ... then when complete:
+{ "request_id": "uuid", "status": "completed", "result": "…" }
+```
+
+Rate limit: 60 messages per minute per connection.
+
+---
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for the full version history.
+
+---
+
 ## Testing
 
 ```bash

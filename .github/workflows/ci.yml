@@ -438,6 +438,50 @@ jobs:
         run: pytest --tb=short -v
 
   # ─────────────────────────────────────────────────────────────────────────────
+  # Rust orchestrator — cargo test, clippy, fmt, doc
+  # ─────────────────────────────────────────────────────────────────────────────
+  rust:
+    name: "Rust orchestrator"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install stable Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.toml', 'Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: cargo fmt --check
+        run: cargo fmt --check
+
+      - name: cargo clippy (all features, warnings as errors)
+        run: cargo clippy --all-features -- -D warnings
+
+      - name: cargo test (lib, default features)
+        run: cargo test --lib
+
+      - name: cargo test (lib, all features)
+        run: cargo test --lib --all-features
+
+      - name: cargo doc (no-deps, all features)
+        env:
+          RUSTDOCFLAGS: "-D warnings"
+        run: cargo doc --no-deps --all-features
+
+  # ─────────────────────────────────────────────────────────────────────────────
   # Final gate — all required jobs must pass
   # ─────────────────────────────────────────────────────────────────────────────
   all-checks:
@@ -451,6 +495,7 @@ jobs:
       - sanitizers
       - clang-tidy
       - fuzz
+      - rust
     steps:
       - name: Success
         run: echo "All CI jobs passed."
