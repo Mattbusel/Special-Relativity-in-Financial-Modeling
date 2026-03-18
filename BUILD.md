@@ -1,286 +1,201 @@
-# Build & Verification Guide
+# Build & Verification Guide — SRFM (Special Relativity in Financial Modeling)
 
 ## Prerequisites
 
-Ensure you have Rust 1.79+ installed:
+| Tool | Minimum version |
+|------|-----------------|
+| CMake | 3.25 |
+| C++ compiler | GCC 12 / Clang 16 / Clang 17 / MSVC 2022 (C++20 required) |
+| vcpkg | any recent |
+| fmt | via `vcpkg install fmt` |
+| GTest | via `vcpkg install gtest` (optional, for tests) |
+| RapidCheck | via `vcpkg install rapidcheck` (optional, for property tests) |
+| Doxygen | 1.9+ (optional, for API docs) |
+
+Set the `VCPKG_ROOT` environment variable to your vcpkg installation directory.
+
+---
+
+## Build (Linux / macOS)
 
 ```bash
-rustc --version
-# Should show: rustc 1.79.0 or higher
+git clone https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling
+cd Special-Relativity-in-Financial-Modeling
+
+# Configure (Release)
+cmake -S . -B build -G Ninja \
+      -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+      -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+
+# Build all targets
+cmake --build build --parallel
+
+# Run CLI
+./build/srfm --help
+./build/srfm --backtest data/sample_btc_ohlcv.csv
 ```
 
-If not installed:
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source $HOME/.cargo/env
+## Build (Windows, MSVC)
+
+```powershell
+cmake -S . -B build `
+      -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts/buildsystems/vcpkg.cmake"
+cmake --build build --config RelWithDebInfo --parallel
+
+.\build\RelWithDebInfo\srfm.exe --help
 ```
 
-## Build Steps
+---
 
-### 1. Navigate to Project
-```bash
-cd tokio-prompt-orchestrator
-```
+## Run Tests
 
-### 2. Check Dependencies
 ```bash
-cargo check
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug \
+      -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+cmake --build build --parallel
+ctest --test-dir build --output-on-failure
 ```
 
 Expected output:
-```
-    Checking tokio v1.40.0
-    Checking tracing v0.1.x
-    Checking tokio-prompt-orchestrator v0.1.0
-    Finished dev [unoptimized + debuginfo] target(s) in X.XXs
-```
 
-### 3. Run Tests
-```bash
-cargo test
 ```
-
-Expected output:
-```
-running 3 tests
-test tests::test_shard_session_deterministic ... ok
-test tests::test_shard_session_distribution ... ok
-test tests::test_echo_worker ... ok
-
-test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured
-```
-
-### 4. Build Release Binary
-```bash
-cargo build --release
-```
-
-Binary will be at: `target/release/orchestrator-demo`
-
-### 5. Run Demo
-```bash
-cargo run --bin orchestrator-demo
-```
-
-Expected output:
-```
-INFO tokio_prompt_orchestrator: 🚀 Starting tokio-prompt-orchestrator demo
-INFO tokio_prompt_orchestrator: ✅ Pipeline stages spawned
-INFO tokio_prompt_orchestrator::stages: RAG stage started
-INFO tokio_prompt_orchestrator::stages: Assemble stage started
-INFO tokio_prompt_orchestrator::stages: Inference stage started
-INFO tokio_prompt_orchestrator::stages: Post stage started
-INFO tokio_prompt_orchestrator::stages: Stream stage started
-INFO tokio_prompt_orchestrator: 📨 Sending 10 demo requests
-INFO tokio_prompt_orchestrator::stages: 📤 STREAM OUTPUT: CONTEXT: Retrieved documents for 'What is the capital of France?' User Query: What is the capital of France? Assistant: What is the capital of France?
+Test project .../build
+      Start  1: MomentumTests
+ 1/12 Test  #1: MomentumTests ...................... Passed
+      Start  2: ManifoldTests
+ 2/12 Test  #2: ManifoldTests ...................... Passed
 ...
-INFO tokio_prompt_orchestrator: ✅ All requests sent
-INFO tokio_prompt_orchestrator: ⏳ Waiting for pipeline to drain...
-INFO tokio_prompt_orchestrator: 🏁 Demo complete - shutting down
+100% tests passed, 0 tests failed out of 12
 ```
+
+---
+
+## Run Benchmarks
+
+```bash
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+      -DSRFM_BUILD_BENCH=ON \
+      -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+cmake --build build --parallel
+./build/bench/bench_beta_gamma
+```
+
+---
 
 ## Code Quality Checks
 
-### Linting
-```bash
-cargo clippy -- -D warnings
-```
+### clang-format
 
-Should show no warnings.
-
-### Formatting
 ```bash
-cargo fmt --check
+find src include -name "*.cpp" -o -name "*.hpp" | xargs clang-format --dry-run -Werror
 ```
 
 To auto-format:
-```bash
-cargo fmt
-```
-
-### Documentation
-```bash
-cargo doc --no-deps --open
-```
-
-Opens generated API docs in browser.
-
-## Performance Profiling
-
-### Build with Debug Info
-```bash
-cargo build --release --profile=release-with-debug
-```
-
-### Run with Tokio Console (if needed)
-```toml
-# Add to Cargo.toml
-[dependencies]
-console-subscriber = "0.1"
-```
-
-```rust
-// In main.rs
-console_subscriber::init();
-```
 
 ```bash
-tokio-console
+find src include -name "*.cpp" -o -name "*.hpp" | xargs clang-format -i
 ```
 
-## Troubleshooting
+### clang-tidy
 
-### Issue: `cargo` command not found
-**Solution**: Install Rust toolchain (see Prerequisites)
-
-### Issue: Compilation errors
-**Solution**: Ensure Rust 1.79+
 ```bash
-rustup update
-rustup default stable
+cmake -S . -B build-tidy -G Ninja -DCMAKE_BUILD_TYPE=Debug \
+      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+      -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+clang-tidy -p build-tidy src/**/*.cpp
 ```
 
-### Issue: Tests fail
-**Solution**: Check test output for specific failures
+### cppcheck
+
 ```bash
-cargo test -- --nocapture
+cppcheck --enable=all --std=c++20 --error-exitcode=1 src/
 ```
 
-### Issue: Demo runs but no output
-**Solution**: Increase log level
+---
+
+## Generate API Documentation
+
 ```bash
-RUST_LOG=debug cargo run --bin orchestrator-demo
+doxygen Doxyfile
+# Open docs/api/html/index.html in a browser
+xdg-open docs/api/html/index.html   # Linux
+open docs/api/html/index.html       # macOS
 ```
+
+---
+
+## Sanitizer Builds
+
+```bash
+# Address Sanitizer
+cmake -S . -B build-asan -G Ninja -DCMAKE_BUILD_TYPE=Debug \
+      -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined" \
+      -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+cmake --build build-asan && ctest --test-dir build-asan --output-on-failure
+
+# Thread Sanitizer
+cmake -S . -B build-tsan -G Ninja -DCMAKE_BUILD_TYPE=Debug \
+      -DCMAKE_CXX_FLAGS="-fsanitize=thread" \
+      -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+cmake --build build-tsan && ctest --test-dir build-tsan --output-on-failure
+```
+
+The CI scripts in `ci/` also wrap ASAN, MSAN, TSAN, and Valgrind.
+
+---
+
+## Install as CMake Package
+
+```bash
+cmake --install build --prefix /usr/local
+```
+
+Downstream `CMakeLists.txt`:
+
+```cmake
+find_package(srfm REQUIRED)
+target_link_libraries(my_target PRIVATE srfm::srfm_engine)
+```
+
+---
 
 ## Verification Checklist
 
-- [ ] `cargo check` passes
-- [ ] `cargo test` passes (3/3 tests)
-- [ ] `cargo clippy` shows no warnings
-- [ ] `cargo build --release` succeeds
-- [ ] Demo runs and shows 10 requests processed
-- [ ] All 5 stages start and complete
-- [ ] No panics or errors in output
+- [ ] `cmake -S . -B build` succeeds with no errors
+- [ ] `cmake --build build` succeeds
+- [ ] `ctest --test-dir build --output-on-failure` — all tests pass
+- [ ] `./build/srfm --help` prints usage
+- [ ] `./build/srfm --backtest data/sample_btc_ohlcv.csv` produces a backtest report
+- [ ] `clang-format --dry-run` passes (no style violations)
+- [ ] Doxygen generates without `WARN_IF_UNDOCUMENTED` warnings
 
-## Project Structure Verification
+---
 
-Ensure all files exist:
+## Troubleshooting
 
-```bash
-# Core files
-ls -1 | grep -E '(Cargo.toml|README.md|LICENSE)'
+### `fmt/core.h: No such file or directory`
 
-# Documentation
-ls -1 | grep -E '(ARCHITECTURE|QUICKSTART|SUMMARY)'
-
-# Source files
-ls -1 src/ | grep -E '(lib|main|metrics|stages|worker).rs'
-```
-
-Expected file count:
-- 8 markdown/toml files
-- 5 Rust source files
-- Total: 13 files
-
-## Size Check
+Install fmt via vcpkg:
 
 ```bash
-find . -name "*.rs" -exec wc -l {} + | tail -1
+$VCPKG_ROOT/vcpkg install fmt
 ```
 
-Expected: ~600-800 lines of Rust code
+Confirm `CMAKE_TOOLCHAIN_FILE` points to your vcpkg installation.
+
+### `error: no matching function for call to 'BetaCalculator::...'`
+
+Ensure you are on the `main` branch and headers in `include/` match the implementation in `src/`.
+
+### Tests fail with `BETA_MAX_SAFE` boundary errors
+
+The test fixture uses the value from `include/srfm/constants.hpp`. If you changed `BETA_MAX_SAFE`, update the test baseline in `tests/beta_calculator/`.
+
+### `ctest` cannot find test executables
+
+Ensure you built with `-DCMAKE_BUILD_TYPE=Debug` and that `GTest_FOUND` is true:
 
 ```bash
-du -sh .
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=... \
+      -DCMAKE_VERBOSE_MAKEFILE=ON
 ```
-
-Expected: ~100KB total (excluding target/)
-
-## Integration Testing
-
-### Test 1: Single Request
-```rust
-#[tokio::test]
-async fn test_single_request() {
-    let worker = Arc::new(EchoWorker::new());
-    let handles = spawn_pipeline(worker);
-    
-    let request = PromptRequest {
-        session: SessionId::new("test"),
-        input: "test".to_string(),
-        meta: HashMap::new(),
-    };
-    
-    handles.input_tx.send(request).await.unwrap();
-    drop(handles.input_tx);
-    
-    tokio::time::sleep(Duration::from_millis(200)).await;
-    // Pipeline should complete without errors
-}
-```
-
-### Test 2: High Load
-```rust
-#[tokio::test]
-async fn test_high_load() {
-    let worker = Arc::new(EchoWorker::with_delay(1));
-    let handles = spawn_pipeline(worker);
-    
-    for i in 0..1000 {
-        let request = PromptRequest {
-            session: SessionId::new(format!("test-{}", i)),
-            input: "test".to_string(),
-            meta: HashMap::new(),
-        };
-        handles.input_tx.try_send(request).ok();
-    }
-    
-    drop(handles.input_tx);
-    tokio::time::sleep(Duration::from_secs(2)).await;
-}
-```
-
-## Deployment Checklist
-
-Before production deployment:
-
-- [ ] All tests pass
-- [ ] No clippy warnings
-- [ ] Documentation complete
-- [ ] Metrics backend configured (not just tracing)
-- [ ] Error handling reviewed
-- [ ] Load testing completed
-- [ ] Resource limits set (channel sizes tuned)
-- [ ] Monitoring/alerting configured
-- [ ] Rollback plan prepared
-- [ ] Real ModelWorker implementation (not EchoWorker)
-
-## Next Steps
-
-1. **Implement Real Worker**
-   - Replace EchoWorker with vLLM/llama.cpp/OpenAI
-   - Test with actual model inference
-
-2. **Add Metrics Backend**
-   - Enable Prometheus feature
-   - Configure scrape endpoint
-   - Set up Grafana dashboards
-
-3. **Production Deploy**
-   - Containerize with Docker
-   - Deploy to Kubernetes
-   - Configure auto-scaling
-
-4. **Monitor & Tune**
-   - Watch queue depths
-   - Adjust channel sizes
-   - Optimize worker pool
-
-## Support
-
-For issues or questions:
-- Read ARCHITECTURE.md for design details
-- Check QUICKSTART.md for usage examples
-- Review PROJECT_SUMMARY.md for complete features
-- Consult inline code comments for TODOs
-
