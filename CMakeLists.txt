@@ -20,6 +20,7 @@ endif()
 # ── Optional dependencies ─────────────────────────────────────────────────────
 find_package(RapidCheck CONFIG QUIET)
 find_package(Eigen3 QUIET)
+find_package(fmt QUIET)
 
 # If Eigen3 was not found via find_package, fall back to the vendored copy.
 if(NOT (Eigen3_FOUND OR TARGET Eigen3::Eigen))
@@ -60,8 +61,13 @@ find_package(GTest CONFIG QUIET)
 
 add_library(srfm_momentum STATIC
     src/momentum/momentum.cpp
+    src/momentum/momentum_processor.cpp
+    src/momentum/relativistic_signal.cpp
 )
-target_include_directories(srfm_momentum PUBLIC src)
+target_include_directories(srfm_momentum PUBLIC src include)
+if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
+    target_link_libraries(srfm_momentum PUBLIC Eigen3::Eigen)
+endif()
 
 add_library(srfm_beta_calculator STATIC
     src/beta_calculator/beta_calculator.cpp
@@ -74,6 +80,10 @@ endif()
 
 add_library(srfm_manifold STATIC
     src/manifold/spacetime_manifold.cpp
+    src/manifold/spacetime_interval.cpp
+    src/manifold/market_manifold.cpp
+    src/manifold/n_asset_interval.cpp
+    src/manifold/normalizer.cpp
 )
 target_include_directories(srfm_manifold PUBLIC src include)
 target_link_libraries(srfm_manifold PUBLIC srfm_momentum)
@@ -89,6 +99,9 @@ target_link_libraries(srfm_geodesic PUBLIC srfm_manifold)
 
 add_library(srfm_engine STATIC
     src/engine/engine.cpp
+    src/engine/n_asset_engine.cpp
+    src/validation/backtest_runner.cpp
+    src/validation/regime_validator.cpp
 )
 target_include_directories(srfm_engine PUBLIC src include)
 target_link_libraries(srfm_engine PUBLIC
@@ -134,6 +147,9 @@ add_library(srfm_backtest STATIC
 )
 target_include_directories(srfm_backtest PUBLIC src include)
 target_link_libraries(srfm_backtest PUBLIC srfm_engine srfm_lorentz)
+if(fmt_FOUND OR TARGET fmt::fmt)
+    target_link_libraries(srfm_backtest PUBLIC fmt::fmt)
+endif()
 
 add_library(srfm_stream STATIC
     src/engine/stream_engine.cpp
@@ -254,27 +270,39 @@ target_link_libraries(test_metrics_precision PRIVATE
 add_test(NAME MetricsPrecisionTests COMMAND test_metrics_precision)
 
 # ── Integration tests ─────────────────────────────────────────────────────────
-add_executable(test_full_pipeline
-    tests/integration/test_full_pipeline.cpp
-)
-target_include_directories(test_full_pipeline PRIVATE src include)
-target_link_libraries(test_full_pipeline PRIVATE
-    srfm_backtest
-    srfm_lorentz
-    GTest::gtest_main
-)
-add_test(NAME FullPipelineIntegrationTests COMMAND test_full_pipeline)
+# NOTE: test_full_pipeline and test_error_handling reference srfm::core::Engine
+# (declared in include/srfm/engine.hpp) which currently has no implementation
+# .cpp file. These tests are excluded from the default build until the core
+# engine implementation is provided in src/core/engine.cpp.
+# To include them: cmake -DSRFM_BUILD_INTEGRATION_TESTS=ON ...
+option(SRFM_BUILD_INTEGRATION_TESTS
+    "Build integration tests that require srfm::core::Engine implementation" ON)
 
-add_executable(test_error_handling
-    tests/integration/test_error_handling.cpp
-)
-target_include_directories(test_error_handling PRIVATE src include)
-target_link_libraries(test_error_handling PRIVATE
-    srfm_backtest
-    srfm_lorentz
-    GTest::gtest_main
-)
-add_test(NAME ErrorHandlingIntegrationTests COMMAND test_error_handling)
+if(SRFM_BUILD_INTEGRATION_TESTS)
+    add_executable(test_full_pipeline
+        tests/integration/test_full_pipeline.cpp
+    )
+    target_include_directories(test_full_pipeline PRIVATE src include)
+    target_link_libraries(test_full_pipeline PRIVATE
+        srfm_backtest
+        srfm_lorentz
+        srfm_tensor
+        GTest::gtest_main
+    )
+    add_test(NAME FullPipelineIntegrationTests COMMAND test_full_pipeline)
+
+    add_executable(test_error_handling
+        tests/integration/test_error_handling.cpp
+    )
+    target_include_directories(test_error_handling PRIVATE src include)
+    target_link_libraries(test_error_handling PRIVATE
+        srfm_backtest
+        srfm_lorentz
+        srfm_tensor
+        GTest::gtest_main
+    )
+    add_test(NAME ErrorHandlingIntegrationTests COMMAND test_error_handling)
+endif()
 
 # ── Tensor / geodesic unit tests ──────────────────────────────────────────────
 add_executable(test_metric_tensor
@@ -307,21 +335,20 @@ target_link_libraries(test_geodesic PRIVATE
 )
 add_test(NAME GeodesicTests COMMAND test_geodesic)
 
-# ── N-asset tests ─────────────────────────────────────────────────────────────
-add_executable(test_n_asset
-    tests/n_asset/test_n_asset_interval.cpp
-    tests/n_asset/test_n_asset_manifold.cpp
-    tests/n_asset/test_christoffel_n.cpp
-    tests/n_asset/test_geodesic_n.cpp
-    tests/n_asset/test_n_asset_engine.cpp
+# ── N-asset tests (each file has its own main()) ─────────────────────────────
+set(_NASSET_TESTS
+    test_n_asset_interval
+    test_n_asset_manifold
+    test_christoffel_n
+    test_geodesic_n
+    test_n_asset_engine
 )
-target_include_directories(test_n_asset PRIVATE src include tests/n_asset)
-target_link_libraries(test_n_asset PRIVATE
-    srfm_tensor
-    srfm_engine
-    GTest::gtest_main
-)
-add_test(NAME NAssetTests COMMAND test_n_asset)
+foreach(_nat IN LISTS _NASSET_TESTS)
+    add_executable(${_nat} tests/n_asset/${_nat}.cpp)
+    target_include_directories(${_nat} PRIVATE src include tests/n_asset)
+    target_link_libraries(${_nat} PRIVATE srfm_tensor srfm_engine)
+    add_test(NAME ${_nat} COMMAND ${_nat})
+endforeach()
 
 # ── Stream processing tests (each file has its own main()) ───────────────────
 set(_STREAM_TESTS

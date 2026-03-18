@@ -82,7 +82,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             -DCMAKE_CXX_STANDARD=20 \
             -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-            -DSRFM_WARNINGS_AS_ERRORS=ON
+            -DSRFM_WARNINGS_AS_ERRORS=ON \
+            -DSRFM_BUILD_INTEGRATION_TESTS=ON
 
       - name: Build
         run: |
@@ -211,7 +212,8 @@ jobs:
         run: |
           cmake -S . -B build-msvc-${{ matrix.build_type }} `
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} `
-            -DSRFM_WARNINGS_AS_ERRORS=ON
+            -DSRFM_WARNINGS_AS_ERRORS=ON `
+            -DSRFM_BUILD_INTEGRATION_TESTS=ON
 
       - name: Build
         run: |
