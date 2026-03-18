@@ -236,8 +236,8 @@ static void test_beta_calculator_rolling_window() {
     // Valid minimum window of 2
     auto r2 = BetaCalculator::fromRollingWindow(prices, 2, 10.0, 1.0);
     SRFM_HAS_VALUE(r2);
-    SRFM_CHECK(r2->value() >= 0.0);
-    SRFM_CHECK(r2->value() < BETA_MAX_SAFE);
+    SRFM_CHECK(r2->value >= 0.0);
+    SRFM_CHECK(r2->value < BETA_MAX_SAFE);
 }
 
 // =============================================================================

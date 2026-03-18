@@ -114,6 +114,169 @@ target_link_libraries(test_lorentz_invariants PRIVATE
 )
 add_test(NAME LorentzInvariantTests COMMAND test_lorentz_invariants)
 
+# ── Lorentz transform and beta calculator unit tests ─────────────────────────
+add_executable(test_lorentz_transform
+    tests/lorentz/test_lorentz_transform.cpp
+)
+target_include_directories(test_lorentz_transform PRIVATE src include)
+target_link_libraries(test_lorentz_transform PRIVATE
+    srfm_momentum
+    srfm_beta_calculator
+    GTest::gtest_main
+)
+add_test(NAME LorentzTransformTests COMMAND test_lorentz_transform)
+
+add_executable(test_beta_calculator
+    tests/lorentz/test_beta_calculator.cpp
+)
+target_include_directories(test_beta_calculator PRIVATE src include)
+target_link_libraries(test_beta_calculator PRIVATE
+    srfm_momentum
+    srfm_beta_calculator
+    GTest::gtest_main
+)
+add_test(NAME BetaCalculatorTests COMMAND test_beta_calculator)
+
+add_executable(test_online_beta
+    tests/lorentz/test_online_beta.cpp
+)
+target_include_directories(test_online_beta PRIVATE src include)
+target_link_libraries(test_online_beta PRIVATE
+    srfm_momentum
+    srfm_beta_calculator
+    GTest::gtest_main
+)
+add_test(NAME OnlineBetaTests COMMAND test_online_beta)
+
+# ── Backtest unit tests ───────────────────────────────────────────────────────
+add_executable(test_backtester
+    tests/backtest/test_backtester.cpp
+)
+target_include_directories(test_backtester PRIVATE src include)
+target_link_libraries(test_backtester PRIVATE
+    srfm_engine
+    GTest::gtest_main
+)
+add_test(NAME BacktesterTests COMMAND test_backtester)
+
+add_executable(test_performance_metrics
+    tests/backtest/test_performance_metrics.cpp
+)
+target_include_directories(test_performance_metrics PRIVATE src include)
+target_link_libraries(test_performance_metrics PRIVATE
+    srfm_engine
+    GTest::gtest_main
+)
+add_test(NAME PerformanceMetricsTests COMMAND test_performance_metrics)
+
+add_executable(test_gamma_sizing
+    tests/backtest/test_gamma_sizing.cpp
+)
+target_include_directories(test_gamma_sizing PRIVATE src include)
+target_link_libraries(test_gamma_sizing PRIVATE
+    srfm_engine
+    GTest::gtest_main
+)
+add_test(NAME GammaSizingTests COMMAND test_gamma_sizing)
+
+add_executable(test_metrics_precision
+    tests/backtest/test_metrics_precision.cpp
+)
+target_include_directories(test_metrics_precision PRIVATE src include)
+target_link_libraries(test_metrics_precision PRIVATE
+    srfm_engine
+    GTest::gtest_main
+)
+add_test(NAME MetricsPrecisionTests COMMAND test_metrics_precision)
+
+# ── Integration tests ─────────────────────────────────────────────────────────
+add_executable(test_full_pipeline
+    tests/integration/test_full_pipeline.cpp
+)
+target_include_directories(test_full_pipeline PRIVATE src include)
+target_link_libraries(test_full_pipeline PRIVATE
+    srfm_engine
+    GTest::gtest_main
+)
+add_test(NAME FullPipelineIntegrationTests COMMAND test_full_pipeline)
+
+add_executable(test_error_handling
+    tests/integration/test_error_handling.cpp
+)
+target_include_directories(test_error_handling PRIVATE src include)
+target_link_libraries(test_error_handling PRIVATE
+    srfm_engine
+    GTest::gtest_main
+)
+add_test(NAME ErrorHandlingIntegrationTests COMMAND test_error_handling)
+
+# ── Tensor / geodesic unit tests ──────────────────────────────────────────────
+add_executable(test_metric_tensor
+    tests/tensor/test_metric_tensor.cpp
+)
+target_include_directories(test_metric_tensor PRIVATE src include)
+target_link_libraries(test_metric_tensor PRIVATE
+    srfm_manifold
+    GTest::gtest_main
+)
+add_test(NAME MetricTensorTests COMMAND test_metric_tensor)
+
+add_executable(test_christoffel
+    tests/tensor/test_christoffel.cpp
+)
+target_include_directories(test_christoffel PRIVATE src include)
+target_link_libraries(test_christoffel PRIVATE
+    srfm_manifold
+    srfm_geodesic
+    GTest::gtest_main
+)
+add_test(NAME ChristoffelTests COMMAND test_christoffel)
+
+add_executable(test_geodesic
+    tests/tensor/test_geodesic.cpp
+)
+target_include_directories(test_geodesic PRIVATE src include)
+target_link_libraries(test_geodesic PRIVATE
+    srfm_manifold
+    srfm_geodesic
+    GTest::gtest_main
+)
+add_test(NAME GeodesicTests COMMAND test_geodesic)
+
+# ── N-asset tests ─────────────────────────────────────────────────────────────
+add_executable(test_n_asset
+    tests/n_asset/test_n_asset_interval.cpp
+    tests/n_asset/test_n_asset_manifold.cpp
+    tests/n_asset/test_christoffel_n.cpp
+    tests/n_asset/test_geodesic_n.cpp
+    tests/n_asset/test_n_asset_engine.cpp
+)
+target_include_directories(test_n_asset PRIVATE src include tests/n_asset)
+target_link_libraries(test_n_asset PRIVATE
+    srfm_engine
+    GTest::gtest_main
+)
+add_test(NAME NAssetTests COMMAND test_n_asset)
+
+# ── Stream processing tests ───────────────────────────────────────────────────
+add_executable(test_stream
+    tests/stream/test_beta_calculator.cpp
+    tests/stream/test_coordinate_normalizer.cpp
+    tests/stream/test_lorentz_manifold.cpp
+    tests/stream/test_pipeline_invariants.cpp
+    tests/stream/test_signal_chain.cpp
+    tests/stream/test_spsc_ring.cpp
+    tests/stream/test_spsc_stress.cpp
+    tests/stream/test_stream_engine.cpp
+    tests/stream/test_tick_validation.cpp
+)
+target_include_directories(test_stream PRIVATE src include tests/stream)
+target_link_libraries(test_stream PRIVATE
+    srfm_engine
+    GTest::gtest_main
+)
+add_test(NAME StreamTests COMMAND test_stream)
+
 # ── Interval gap tests (symmetry, numerical stability, Lorentz invariance) ───
 if(GTest_FOUND)
     add_executable(test_interval_gaps
