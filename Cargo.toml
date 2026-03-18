@@ -1,0 +1,63 @@
+[package]
+name = "tokio-prompt-orchestrator"
+version = "0.1.0"
+edition = "2021"
+description = "Async LLM prompt orchestration layer for the Special Relativity in Financial Modeling pipeline"
+license = "MIT"
+repository = "https://github.com/your-org/Special-Relativity-in-Financial-Modeling"
+readme = "README.md"
+keywords = ["llm", "orchestration", "async", "tokio", "financial"]
+categories = ["asynchronous", "finance"]
+
+[lib]
+name = "tokio_prompt_orchestrator"
+path = "src/lib.rs"
+
+[[bin]]
+name = "srfm-orchestrator"
+path = "src/main.rs"
+required-features = []
+
+[features]
+default = []
+web-api = ["axum", "tower", "tower-http"]
+mcp = ["serde_json"]
+tui = ["ratatui", "crossterm"]
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+async-trait = "0.1"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", optional = true }
+toml = "0.8"
+thiserror = "1"
+anyhow = "1"
+uuid = { version = "1", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+prometheus = { version = "0.13", features = ["process"] }
+reqwest = { version = "0.11", features = ["json", "rustls-tls"], default-features = false }
+
+# Web API dependencies (optional)
+axum = { version = "0.7", optional = true }
+tower = { version = "0.4", optional = true }
+tower-http = { version = "0.5", features = ["cors", "trace"], optional = true }
+
+# TUI dependencies (optional)
+ratatui = { version = "0.26", optional = true }
+crossterm = { version = "0.27", optional = true }
+
+[dev-dependencies]
+tokio-test = "0.4"
+tempfile = "3"
+mockall = "0.12"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+
+[profile.dev]
+opt-level = 0
+debug = true

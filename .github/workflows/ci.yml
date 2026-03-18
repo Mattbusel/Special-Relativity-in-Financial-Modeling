@@ -31,7 +31,7 @@ jobs:
         if: matrix.compiler == 'gcc-12'
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y gcc-12 g++-12 cmake ninja-build clang-format cppcheck
+          sudo apt-get install -y gcc-12 g++-12 cmake ninja-build clang-format cppcheck valgrind doxygen
 
       - name: Install Clang-17
         if: matrix.compiler == 'clang-17'
@@ -123,6 +123,40 @@ jobs:
           fi
           echo "All files pass clang-format."
 
+      - name: Valgrind memory check
+        if: matrix.compiler == 'gcc-12'
+        run: |
+          # Run the unit-test executables under Valgrind to detect leaks and
+          # invalid memory accesses.  The build was already done above.
+          valgrind \
+            --error-exitcode=1 \
+            --leak-check=full \
+            --show-leak-kinds=definite,indirect \
+            --track-origins=yes \
+            --suppressions=/usr/lib/valgrind/debian.supp \
+            build/test_momentum 2>&1 | tee valgrind-momentum.txt
+          valgrind \
+            --error-exitcode=1 \
+            --leak-check=full \
+            --show-leak-kinds=definite,indirect \
+            --track-origins=yes \
+            build/test_edge_cases 2>&1 | tee valgrind-edge.txt
+          echo "Valgrind checks passed."
+
+      - name: Generate Doxygen documentation
+        if: matrix.compiler == 'gcc-12'
+        run: |
+          doxygen Doxyfile
+          echo "Doxygen docs generated at docs/api/html/index.html"
+
+      - name: Upload Doxygen documentation
+        if: matrix.compiler == 'gcc-12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: doxygen-api-docs
+          path: docs/api/html/
+          retention-days: 14
+
       - name: Upload analysis reports on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -132,6 +166,8 @@ jobs:
             build/Testing/
             clang-tidy-report.txt
             cppcheck-report.txt
+            valgrind-momentum.txt
+            valgrind-edge.txt
 
   # ---------------------------------------------------------------------------
   # Windows: configure, build (C++20), run tests

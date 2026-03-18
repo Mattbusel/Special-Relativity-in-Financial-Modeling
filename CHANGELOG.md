@@ -9,7 +9,53 @@ Version numbers follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+---
+
+## [0.2.0] - 2026-03-17
+
 ### Added
+- Production-readiness pass: `[[nodiscard]]` on all public functions whose
+  return values must not be discarded.
+- `noexcept` specifications verified and documented on all
+  performance-critical paths.
+- Doxygen doc comments added to every public function and class across all
+  headers (`@brief`, `@param`, `@return`).
+- Doxyfile updated to version 0.2.0 and wired into CI (doxygen generation
+  step in the `linux` workflow).
+- CI: Valgrind memory-check step added to the `linux (gcc-12)` matrix cell.
+- New test suite `test_lorentz_invariants.cpp` covering:
+  - Lorentz interval invariance (`ds²` preserved under boosts).
+  - Spacetime norm invariance (`u^μ u_μ` conserved along geodesics).
+  - Velocity composition subluminality for the full parameter grid.
+  - Rapidity additivity with tight tolerance.
+  - Round-trip boost identity `Λ(β)·Λ(−β) = I`.
+  - Numerical edge cases: subnormal inputs, very large/small financial values,
+    `std::numeric_limits` boundary probes.
+- CMakeLists.txt version bumped to 0.2.0; `test_lorentz_invariants` wired
+  into CTest.
+- CHANGELOG.md entry for 0.2.0.
+- README.md: expanded Architecture section, Quickstart command block,
+  Mathematical Background section, Contributing section, and paper reference.
+
+### Changed
+- CMakeLists.txt `VERSION` updated from `0.1.0` to `0.2.0`.
+- Doxyfile `PROJECT_NUMBER` updated from `0.1.0` to `0.2.0`.
+
+---
+
+## [0.1.0-unreleased-items]
+
+### Added
+- CMake install targets and package config files (`srfmConfig.cmake`,
+  `srfmConfigVersion.cmake`, `srfmTargets.cmake`) so library targets can be
+  consumed downstream via `find_package(srfm)`.
+- `cmake/srfmConfig.cmake.in` template for package configuration.
+- CI: clang-tidy-17 static analysis step (clang-17 matrix cell).
+- CI: cppcheck static analysis step (gcc-12 matrix cell).
+- CI: `actions/cache@v4` caching of CMake build artifacts keyed on source hash
+  for both Linux and Windows jobs.
+- CI: upgraded runner images from `ubuntu-22.04` to `ubuntu-latest`.
+- Fixed badge URLs in README.md: replaced `username` placeholder with `Mattbusel`.
 - `CONTRIBUTING.md`: full build requirements, build/test/sanitizer/fuzz instructions,
   step-by-step guide for adding a new manifold geometry, LaTeX paper build instructions.
 - `VERSION` file at the repo root containing `1.0.0`.

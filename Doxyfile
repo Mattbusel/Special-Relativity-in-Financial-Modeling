@@ -7,7 +7,7 @@
 # Project identity
 #---------------------------------------------------------------------------
 PROJECT_NAME           = "SRFM -- Special Relativity in Financial Modeling"
-PROJECT_NUMBER         = 0.1.0
+PROJECT_NUMBER         = 0.2.0
 PROJECT_BRIEF          = "C++20 library applying Lorentz geometry to financial signal processing"
 PROJECT_LOGO           =
 OUTPUT_DIRECTORY       = docs/api

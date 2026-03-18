@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="R:\workspaces\Special-Relativity-in-Financial-Modeling\tests\momentum\test_simd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="R:\workspaces\Special-Relativity-in-Financial-Modeling\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{E352E181-A725-3B0C-AD48-7138B22A9385}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

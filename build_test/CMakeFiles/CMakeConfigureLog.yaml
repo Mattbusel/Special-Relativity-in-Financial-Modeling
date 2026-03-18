@@ -1,0 +1,2117 @@
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineSystem.cmake:212 (message)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      The system is: Windows - 10.0.26200 - AMD64
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Git\\mingw64\\bin"
+        - "C:\\Program Files\\Git\\usr\\bin"
+        - "C:\\Users\\Matthew\\bin"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Users\\Matthew\\.cargo\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Python\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\"
+        - "C:\\Users\\Matthew\\AppData\\Roaming\\npm"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+      Compiler:  
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      MSBuild version 17.14.23+b0019275e for .NET Framework
+      Build started 3/17/2026 11:56:01 PM.
+      
+      Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\4.2.3\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
+      PrepareForBuild:
+        Creating directory "Debug\\".
+        Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+        Creating directory "Debug\\CompilerIdCXX.tlog\\".
+      InitializeBuildStatus:
+        Creating "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        Touching "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild".
+      ClCompile:
+        C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /nologo /W0 /WX- /diagnostics:column /Od /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\\\" /Fd"Debug\\vc143.pdb" /external:W0 /Gd /TP /FC /errorReport:queue CMakeCXXCompilerId.cpp
+        CMakeCXXCompilerId.cpp
+      Link:
+        C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdCXX.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdCXX.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdCXX.lib" /MACHINE:X64 Debug\\CMakeCXXCompilerId.obj
+        CompilerIdCXX.vcxproj -> R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\4.2.3\\CompilerIdCXX\\CompilerIdCXX.exe
+      PostBuildEvent:
+        for %%i in (cl.exe) do @echo CMAKE_CXX_COMPILER=%%~$PATH:i
+        :VCEnd
+        CMAKE_CXX_COMPILER=C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe
+      FinalizeBuildStatus:
+        Deleting file "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild".
+        Touching "Debug\\CompilerIdCXX.tlog\\CompilerIdCXX.lastbuildstate".
+      Done Building Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\4.2.3\\CompilerIdCXX\\CompilerIdCXX.vcxproj" (default targets).
+      
+      Build succeeded.
+          0 Warning(s)
+          0 Error(s)
+      
+      Time Elapsed 00:00:01.00
+      
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.vcxproj"
+      
+      The CXX compiler identification is MSVC, found in:
+        R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/4.2.3/CompilerIdCXX/CompilerIdCXX.exe
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:37 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:65 (__resolve_tool_path)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:103 (__resolve_linker_path)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "_CMAKE_TOOL_WITH_PATH"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "link"
+    candidate_directories:
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/"
+      - "C:/Program Files/Git/mingw64/bin/"
+      - "C:/Program Files/Git/usr/bin/"
+      - "C:/Users/Matthew/bin/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/Users/Matthew/.cargo/bin/"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/"
+      - "C:/Users/Matthew/AppData/Roaming/npm/"
+    searched_directories:
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/link.com"
+    found: "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/link.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Git\\mingw64\\bin"
+        - "C:\\Program Files\\Git\\usr\\bin"
+        - "C:\\Users\\Matthew\\bin"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Users\\Matthew\\.cargo\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Python\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\"
+        - "C:\\Users\\Matthew\\AppData\\Roaming\\npm"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:37 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:65 (__resolve_tool_path)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:104 (__resolve_linker_path)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "_CMAKE_TOOL_WITH_PATH"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "lld-link"
+    candidate_directories:
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/"
+      - "C:/Program Files/Git/mingw64/bin/"
+      - "C:/Program Files/Git/usr/bin/"
+      - "C:/Users/Matthew/bin/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/Users/Matthew/.cargo/bin/"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/"
+      - "C:/Users/Matthew/AppData/Roaming/npm/"
+    searched_directories:
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lld-link.com"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lld-link.exe"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lld-link"
+      - "C:/Program Files/Git/mingw64/bin/lld-link.com"
+      - "C:/Program Files/Git/mingw64/bin/lld-link.exe"
+      - "C:/Program Files/Git/mingw64/bin/lld-link"
+      - "C:/Program Files/Git/usr/bin/lld-link.com"
+      - "C:/Program Files/Git/usr/bin/lld-link.exe"
+      - "C:/Program Files/Git/usr/bin/lld-link"
+      - "C:/Users/Matthew/bin/lld-link.com"
+      - "C:/Users/Matthew/bin/lld-link.exe"
+      - "C:/Users/Matthew/bin/lld-link"
+      - "C:/Program Files/Python312/Scripts/lld-link.com"
+      - "C:/Program Files/Python312/Scripts/lld-link.exe"
+      - "C:/Program Files/Python312/Scripts/lld-link"
+      - "C:/Program Files/Python312/lld-link.com"
+      - "C:/Program Files/Python312/lld-link.exe"
+      - "C:/Program Files/Python312/lld-link"
+      - "C:/Windows/System32/lld-link.com"
+      - "C:/Windows/System32/lld-link.exe"
+      - "C:/Windows/System32/lld-link"
+      - "C:/Windows/lld-link.com"
+      - "C:/Windows/lld-link.exe"
+      - "C:/Windows/lld-link"
+      - "C:/Windows/System32/wbem/lld-link.com"
+      - "C:/Windows/System32/wbem/lld-link.exe"
+      - "C:/Windows/System32/wbem/lld-link"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link"
+      - "C:/Windows/System32/OpenSSH/lld-link.com"
+      - "C:/Windows/System32/OpenSSH/lld-link.exe"
+      - "C:/Windows/System32/OpenSSH/lld-link"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/lld-link.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/lld-link.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/lld-link"
+      - "C:/Program Files/Git/cmd/lld-link.com"
+      - "C:/Program Files/Git/cmd/lld-link.exe"
+      - "C:/Program Files/Git/cmd/lld-link"
+      - "C:/Program Files/nodejs/lld-link.com"
+      - "C:/Program Files/nodejs/lld-link.exe"
+      - "C:/Program Files/nodejs/lld-link"
+      - "C:/Program Files/dotnet/lld-link.com"
+      - "C:/Program Files/dotnet/lld-link.exe"
+      - "C:/Program Files/dotnet/lld-link"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/lld-link.com"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/lld-link.exe"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/lld-link"
+      - "C:/Program Files/CMake/bin/lld-link.com"
+      - "C:/Program Files/CMake/bin/lld-link.exe"
+      - "C:/Program Files/CMake/bin/lld-link"
+      - "C:/Program Files/GitHub CLI/lld-link.com"
+      - "C:/Program Files/GitHub CLI/lld-link.exe"
+      - "C:/Program Files/GitHub CLI/lld-link"
+      - "C:/Users/Matthew/.cargo/bin/lld-link.com"
+      - "C:/Users/Matthew/.cargo/bin/lld-link.exe"
+      - "C:/Users/Matthew/.cargo/bin/lld-link"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/lld-link.com"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/lld-link.exe"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/lld-link"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/lld-link.com"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/lld-link.exe"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/lld-link"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/lld-link.com"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/lld-link.exe"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/lld-link"
+      - "C:/Users/Matthew/AppData/Roaming/npm/lld-link.com"
+      - "C:/Users/Matthew/AppData/Roaming/npm/lld-link.exe"
+      - "C:/Users/Matthew/AppData/Roaming/npm/lld-link"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Git\\mingw64\\bin"
+        - "C:\\Program Files\\Git\\usr\\bin"
+        - "C:\\Users\\Matthew\\bin"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Users\\Matthew\\.cargo\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Python\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\"
+        - "C:\\Users\\Matthew\\AppData\\Roaming\\npm"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_LINKER"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "link"
+    candidate_directories:
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/"
+      - "C:/Program Files/Git/mingw64/bin/"
+      - "C:/Program Files/Git/usr/bin/"
+      - "C:/Users/Matthew/bin/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/Users/Matthew/.cargo/bin/"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/"
+      - "C:/Users/Matthew/AppData/Roaming/npm/"
+    searched_directories:
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/link.com"
+    found: "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/link.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Git\\mingw64\\bin"
+        - "C:\\Program Files\\Git\\usr\\bin"
+        - "C:\\Users\\Matthew\\bin"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Users\\Matthew\\.cargo\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Python\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\"
+        - "C:\\Users\\Matthew\\AppData\\Roaming\\npm"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_MT"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "mt"
+    candidate_directories:
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/"
+      - "C:/Program Files/Git/mingw64/bin/"
+      - "C:/Program Files/Git/usr/bin/"
+      - "C:/Users/Matthew/bin/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/Users/Matthew/.cargo/bin/"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/"
+      - "C:/Users/Matthew/AppData/Roaming/npm/"
+    searched_directories:
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/mt.com"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/mt.exe"
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/mt"
+      - "C:/Program Files/Git/mingw64/bin/mt.com"
+      - "C:/Program Files/Git/mingw64/bin/mt.exe"
+      - "C:/Program Files/Git/mingw64/bin/mt"
+      - "C:/Program Files/Git/usr/bin/mt.com"
+      - "C:/Program Files/Git/usr/bin/mt.exe"
+      - "C:/Program Files/Git/usr/bin/mt"
+      - "C:/Users/Matthew/bin/mt.com"
+      - "C:/Users/Matthew/bin/mt.exe"
+      - "C:/Users/Matthew/bin/mt"
+      - "C:/Program Files/Python312/Scripts/mt.com"
+      - "C:/Program Files/Python312/Scripts/mt.exe"
+      - "C:/Program Files/Python312/Scripts/mt"
+      - "C:/Program Files/Python312/mt.com"
+      - "C:/Program Files/Python312/mt.exe"
+      - "C:/Program Files/Python312/mt"
+      - "C:/Windows/System32/mt.com"
+      - "C:/Windows/System32/mt.exe"
+      - "C:/Windows/System32/mt"
+      - "C:/Windows/mt.com"
+      - "C:/Windows/mt.exe"
+      - "C:/Windows/mt"
+      - "C:/Windows/System32/wbem/mt.com"
+      - "C:/Windows/System32/wbem/mt.exe"
+      - "C:/Windows/System32/wbem/mt"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/mt.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/mt.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/mt"
+      - "C:/Windows/System32/OpenSSH/mt.com"
+      - "C:/Windows/System32/OpenSSH/mt.exe"
+      - "C:/Windows/System32/OpenSSH/mt"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/mt.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/mt.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/mt"
+      - "C:/Program Files/Git/cmd/mt.com"
+      - "C:/Program Files/Git/cmd/mt.exe"
+      - "C:/Program Files/Git/cmd/mt"
+      - "C:/Program Files/nodejs/mt.com"
+      - "C:/Program Files/nodejs/mt.exe"
+      - "C:/Program Files/nodejs/mt"
+      - "C:/Program Files/dotnet/mt.com"
+      - "C:/Program Files/dotnet/mt.exe"
+      - "C:/Program Files/dotnet/mt"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/mt.com"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/mt.exe"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/mt"
+      - "C:/Program Files/CMake/bin/mt.com"
+      - "C:/Program Files/CMake/bin/mt.exe"
+      - "C:/Program Files/CMake/bin/mt"
+      - "C:/Program Files/GitHub CLI/mt.com"
+      - "C:/Program Files/GitHub CLI/mt.exe"
+      - "C:/Program Files/GitHub CLI/mt"
+      - "C:/Users/Matthew/.cargo/bin/mt.com"
+      - "C:/Users/Matthew/.cargo/bin/mt.exe"
+      - "C:/Users/Matthew/.cargo/bin/mt"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/mt.com"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/mt.exe"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/mt"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/mt.com"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/mt.exe"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/mt"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/mt.com"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/mt.exe"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/mt"
+      - "C:/Users/Matthew/AppData/Roaming/npm/mt.com"
+      - "C:/Users/Matthew/AppData/Roaming/npm/mt.exe"
+      - "C:/Users/Matthew/AppData/Roaming/npm/mt"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Git\\mingw64\\bin"
+        - "C:\\Program Files\\Git\\usr\\bin"
+        - "C:\\Users\\Matthew\\bin"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Users\\Matthew\\.cargo\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Python\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\"
+        - "C:\\Users\\Matthew\\AppData\\Roaming\\npm"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_AR"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "lib"
+    candidate_directories:
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/"
+      - "C:/Program Files/Git/mingw64/bin/"
+      - "C:/Program Files/Git/usr/bin/"
+      - "C:/Users/Matthew/bin/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/Users/Matthew/.cargo/bin/"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/"
+      - "C:/Users/Matthew/AppData/Roaming/npm/"
+    searched_directories:
+      - "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lib.com"
+    found: "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/lib.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Git\\mingw64\\bin"
+        - "C:\\Program Files\\Git\\usr\\bin"
+        - "C:\\Users\\Matthew\\bin"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Users\\Matthew\\.cargo\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Python\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\"
+        - "C:\\Users\\Matthew\\AppData\\Roaming\\npm"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineRCCompiler.cmake:40 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/Platform/Windows-MSVC.cmake:580 (enable_language)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/Platform/Windows-MSVC.cmake:553 (__windows_compiler_msvc_enable_rc)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/Platform/Windows-MSVC-CXX.cmake:6 (__windows_compiler_msvc)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCXXInformation.cmake:48 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_RC_COMPILER"
+    description: "RC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "rc"
+    candidate_directories:
+      - "C:/Program Files/Git/mingw64/bin/"
+      - "C:/Program Files/Git/usr/bin/"
+      - "C:/Users/Matthew/bin/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/Users/Matthew/.cargo/bin/"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/"
+      - "C:/Users/Matthew/AppData/Roaming/npm/"
+      - "C:/Program Files/bin/"
+      - "C:/Program Files/sbin/"
+      - "C:/Program Files/"
+      - "C:/Program Files (x86)/bin/"
+      - "C:/Program Files (x86)/sbin/"
+      - "C:/Program Files (x86)/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/CMake/sbin/"
+      - "C:/Program Files/CMake/"
+      - "C:/Program Files (x86)/srfm_cpp/bin/"
+      - "C:/Program Files (x86)/srfm_cpp/sbin/"
+      - "C:/Program Files (x86)/srfm_cpp/"
+    searched_directories:
+      - "C:/Program Files/Git/mingw64/bin/rc.com"
+      - "C:/Program Files/Git/mingw64/bin/rc.exe"
+      - "C:/Program Files/Git/mingw64/bin/rc"
+      - "C:/Program Files/Git/usr/bin/rc.com"
+      - "C:/Program Files/Git/usr/bin/rc.exe"
+      - "C:/Program Files/Git/usr/bin/rc"
+      - "C:/Users/Matthew/bin/rc.com"
+      - "C:/Users/Matthew/bin/rc.exe"
+      - "C:/Users/Matthew/bin/rc"
+      - "C:/Program Files/Python312/Scripts/rc.com"
+      - "C:/Program Files/Python312/Scripts/rc.exe"
+      - "C:/Program Files/Python312/Scripts/rc"
+      - "C:/Program Files/Python312/rc.com"
+      - "C:/Program Files/Python312/rc.exe"
+      - "C:/Program Files/Python312/rc"
+      - "C:/Windows/System32/rc.com"
+      - "C:/Windows/System32/rc.exe"
+      - "C:/Windows/System32/rc"
+      - "C:/Windows/rc.com"
+      - "C:/Windows/rc.exe"
+      - "C:/Windows/rc"
+      - "C:/Windows/System32/wbem/rc.com"
+      - "C:/Windows/System32/wbem/rc.exe"
+      - "C:/Windows/System32/wbem/rc"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/rc.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/rc.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/rc"
+      - "C:/Windows/System32/OpenSSH/rc.com"
+      - "C:/Windows/System32/OpenSSH/rc.exe"
+      - "C:/Windows/System32/OpenSSH/rc"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/rc.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/rc.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/rc"
+      - "C:/Program Files/Git/cmd/rc.com"
+      - "C:/Program Files/Git/cmd/rc.exe"
+      - "C:/Program Files/Git/cmd/rc"
+      - "C:/Program Files/nodejs/rc.com"
+      - "C:/Program Files/nodejs/rc.exe"
+      - "C:/Program Files/nodejs/rc"
+      - "C:/Program Files/dotnet/rc.com"
+      - "C:/Program Files/dotnet/rc.exe"
+      - "C:/Program Files/dotnet/rc"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/rc.com"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/rc.exe"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/rc"
+      - "C:/Program Files/CMake/bin/rc.com"
+      - "C:/Program Files/CMake/bin/rc.exe"
+      - "C:/Program Files/CMake/bin/rc"
+      - "C:/Program Files/GitHub CLI/rc.com"
+      - "C:/Program Files/GitHub CLI/rc.exe"
+      - "C:/Program Files/GitHub CLI/rc"
+      - "C:/Users/Matthew/.cargo/bin/rc.com"
+      - "C:/Users/Matthew/.cargo/bin/rc.exe"
+      - "C:/Users/Matthew/.cargo/bin/rc"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/rc.com"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/rc.exe"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/rc"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/rc.com"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/rc.exe"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/rc"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/rc.com"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/rc.exe"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/rc"
+      - "C:/Users/Matthew/AppData/Roaming/npm/rc.com"
+      - "C:/Users/Matthew/AppData/Roaming/npm/rc.exe"
+      - "C:/Users/Matthew/AppData/Roaming/npm/rc"
+      - "C:/Program Files/bin/rc.com"
+      - "C:/Program Files/bin/rc.exe"
+      - "C:/Program Files/bin/rc"
+      - "C:/Program Files/sbin/rc.com"
+      - "C:/Program Files/sbin/rc.exe"
+      - "C:/Program Files/sbin/rc"
+      - "C:/Program Files/rc.com"
+      - "C:/Program Files/rc.exe"
+      - "C:/Program Files/rc"
+      - "C:/Program Files (x86)/bin/rc.com"
+      - "C:/Program Files (x86)/bin/rc.exe"
+      - "C:/Program Files (x86)/bin/rc"
+      - "C:/Program Files (x86)/sbin/rc.com"
+      - "C:/Program Files (x86)/sbin/rc.exe"
+      - "C:/Program Files (x86)/sbin/rc"
+      - "C:/Program Files (x86)/rc.com"
+      - "C:/Program Files (x86)/rc.exe"
+      - "C:/Program Files (x86)/rc"
+      - "C:/Program Files/CMake/bin/rc.com"
+      - "C:/Program Files/CMake/bin/rc.exe"
+      - "C:/Program Files/CMake/bin/rc"
+      - "C:/Program Files/CMake/sbin/rc.com"
+      - "C:/Program Files/CMake/sbin/rc.exe"
+      - "C:/Program Files/CMake/sbin/rc"
+      - "C:/Program Files/CMake/rc.com"
+      - "C:/Program Files/CMake/rc.exe"
+      - "C:/Program Files/CMake/rc"
+      - "C:/Program Files (x86)/srfm_cpp/bin/rc.com"
+      - "C:/Program Files (x86)/srfm_cpp/bin/rc.exe"
+      - "C:/Program Files (x86)/srfm_cpp/bin/rc"
+      - "C:/Program Files (x86)/srfm_cpp/sbin/rc.com"
+      - "C:/Program Files (x86)/srfm_cpp/sbin/rc.exe"
+      - "C:/Program Files (x86)/srfm_cpp/sbin/rc"
+      - "C:/Program Files (x86)/srfm_cpp/rc.com"
+      - "C:/Program Files (x86)/srfm_cpp/rc.exe"
+      - "C:/Program Files (x86)/srfm_cpp/rc"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Git\\mingw64\\bin"
+        - "C:\\Program Files\\Git\\usr\\bin"
+        - "C:\\Users\\Matthew\\bin"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Users\\Matthew\\.cargo\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Python\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\"
+        - "C:\\Users\\Matthew\\AppData\\Roaming\\npm"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/srfm_cpp"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/srfm_cpp"
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    checks:
+      - "Detecting CXX compiler ABI info"
+    directories:
+      source: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-qbm1em"
+      binary: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-qbm1em"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
+      CMAKE_CXX_SCAN_FOR_MODULES: "OFF"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+    buildResult:
+      variable: "CMAKE_CXX_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: 'R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-qbm1em'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_f51e5.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.23+b0019275e for .NET Framework
+        Build started 3/17/2026 11:56:03 PM.
+        
+        Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-qbm1em\\cmTC_f51e5.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-qbm1em\\Debug\\".
+          Creating directory "cmTC_f51e5.dir\\Debug\\cmTC_f51e5.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_f51e5.dir\\Debug\\cmTC_f51e5.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_f51e5.dir\\Debug\\cmTC_f51e5.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_f51e5.dir\\Debug\\\\" /Fd"cmTC_f51e5.dir\\Debug\\vc143.pdb" /external:W1 /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.2\\Modules\\CMakeCXXCompilerABI.cpp"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_f51e5.dir\\Debug\\\\" /Fd"cmTC_f51e5.dir\\Debug\\vc143.pdb" /external:W1 /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.2\\Modules\\CMakeCXXCompilerABI.cpp"
+          CMakeCXXCompilerABI.cpp
+        Link:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-qbm1em\\Debug\\cmTC_f51e5.exe" /INCREMENTAL /ILK:"cmTC_f51e5.dir\\Debug\\cmTC_f51e5.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-qbm1em/Debug/cmTC_f51e5.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-qbm1em/Debug/cmTC_f51e5.lib" /MACHINE:X64  /machine:x64 cmTC_f51e5.dir\\Debug\\CMakeCXXCompilerABI.obj
+          cmTC_f51e5.vcxproj -> R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-qbm1em\\Debug\\cmTC_f51e5.exe
+        FinalizeBuildStatus:
+          Deleting file "cmTC_f51e5.dir\\Debug\\cmTC_f51e5.tlog\\unsuccessfulbuild".
+          Touching "cmTC_f51e5.dir\\Debug\\cmTC_f51e5.tlog\\cmTC_f51e5.lastbuildstate".
+        Done Building Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-qbm1em\\cmTC_f51e5.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:00.82
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerABI.cmake:253 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Parsed CXX implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|"|[0-9]+>[ 	-]*Build:[ 	0-9]+ ms[ 	]*)?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
+        linker tool for 'CXX': C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/HostX64/x64/link.exe
+        implicit libs: []
+        implicit objs: []
+        implicit dirs: []
+        implicit fwks: []
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/Internal/CMakeDetermineLinkerId.cmake:38 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerABI.cmake:299 (cmake_determine_linker_id)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Running the CXX compiler's linker: "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/HostX64/x64/link.exe" "-v"
+      Microsoft (R) Incremental Linker Version 14.44.35219.0
+      Copyright (C) Microsoft Corporation.  All rights reserved.
+  -
+    kind: "find_package-v1"
+    backtrace:
+      - "CMakeLists.txt:21 (find_package)"
+    name: "RapidCheck"
+    configs:
+      -
+        filename: "RapidCheckConfig.cmake"
+        kind: "cmake"
+      -
+        filename: "rapidcheck-config.cmake"
+        kind: "cmake"
+    version_request:
+      exact: false
+    settings:
+      required: "optional"
+      quiet: true
+      global: false
+      policy_scope: true
+      bypass_provider: false
+      names:
+        - "RapidCheck"
+      path_suffixes:
+        - ""
+      paths:
+        CMAKE_FIND_USE_CMAKE_PATH: true
+        CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+        CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+        CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+        CMAKE_FIND_USE_INSTALL_PREFIX: true
+        CMAKE_FIND_USE_PACKAGE_ROOT_PATH: true
+        CMAKE_FIND_USE_CMAKE_PACKAGE_REGISTRY: true
+        CMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY: true
+        CMAKE_FIND_ROOT_PATH_MODE: "BOTH"
+    candidates:
+      -
+        path: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/pkgRedirects/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/pkgRedirects/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/mingw64/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/mingw64/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/usr/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/usr/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Python312/Scripts/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Python312/Scripts/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Python312/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Python312/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/wbem/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/wbem/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/WindowsPowerShell/v1.0/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/WindowsPowerShell/v1.0/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/OpenSSH/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/OpenSSH/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/cmd/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/cmd/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/nodejs/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/nodejs/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/dotnet/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/dotnet/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/CMake/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/CMake/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/GitHub CLI/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/GitHub CLI/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/.cargo/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/.cargo/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/AppData/Roaming/npm/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/AppData/Roaming/npm/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/CMake/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/CMake/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files (x86)/RapidCheckConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files (x86)/rapidcheck-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+    found: null
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Git\\mingw64\\bin"
+        - "C:\\Program Files\\Git\\usr\\bin"
+        - "C:\\Users\\Matthew\\bin"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Users\\Matthew\\.cargo\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Python\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\"
+        - "C:\\Users\\Matthew\\AppData\\Roaming\\npm"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/srfm_cpp"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/srfm_cpp"
+  -
+    kind: "find_package-v1"
+    backtrace:
+      - "CMakeLists.txt:242 (find_package)"
+    name: "benchmark"
+    configs:
+      -
+        filename: "benchmarkConfig.cmake"
+        kind: "cmake"
+      -
+        filename: "benchmark-config.cmake"
+        kind: "cmake"
+    version_request:
+      exact: false
+    settings:
+      required: "optional"
+      quiet: true
+      global: false
+      policy_scope: true
+      bypass_provider: false
+      names:
+        - "benchmark"
+      path_suffixes:
+        - ""
+      paths:
+        CMAKE_FIND_USE_CMAKE_PATH: true
+        CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+        CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+        CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+        CMAKE_FIND_USE_INSTALL_PREFIX: true
+        CMAKE_FIND_USE_PACKAGE_ROOT_PATH: true
+        CMAKE_FIND_USE_CMAKE_PACKAGE_REGISTRY: true
+        CMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY: true
+        CMAKE_FIND_ROOT_PATH_MODE: "BOTH"
+    candidates:
+      -
+        path: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/pkgRedirects/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/pkgRedirects/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/mingw64/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/mingw64/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/usr/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/usr/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Python312/Scripts/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Python312/Scripts/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Python312/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Python312/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/wbem/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/wbem/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/WindowsPowerShell/v1.0/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/WindowsPowerShell/v1.0/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/OpenSSH/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/OpenSSH/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/cmd/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/cmd/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/nodejs/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/nodejs/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/dotnet/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/dotnet/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/CMake/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/CMake/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/GitHub CLI/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/GitHub CLI/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/.cargo/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/.cargo/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/AppData/Roaming/npm/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Matthew/AppData/Roaming/npm/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/CMake/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/CMake/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files (x86)/benchmarkConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files (x86)/benchmark-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+    found: null
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Git\\mingw64\\bin"
+        - "C:\\Program Files\\Git\\usr\\bin"
+        - "C:\\Users\\Matthew\\bin"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Users\\Matthew\\.cargo\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Python\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\"
+        - "C:\\Users\\Matthew\\AppData\\Roaming\\npm"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/srfm_cpp"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/srfm_cpp"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/FindGit.cmake:111 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/FetchContent.cmake:1884 (find_package)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/FetchContent.cmake:1619 (__FetchContent_populateSubbuild)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/FetchContent.cmake:2155:EVAL:2 (__FetchContent_doPopulation)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/FetchContent.cmake:2155 (cmake_language)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/FetchContent.cmake:2394 (__FetchContent_Populate)"
+      - "CMakeLists.txt:253 (FetchContent_MakeAvailable)"
+    mode: "program"
+    variable: "GIT_EXECUTABLE"
+    description: "Git command line client"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "git.cmd"
+      - "git"
+    candidate_directories:
+      - "C:/Program Files/Git/mingw64/bin/"
+      - "C:/Program Files/Git/usr/bin/"
+      - "C:/Users/Matthew/bin/"
+      - "C:/Program Files/Python312/Scripts/"
+      - "C:/Program Files/Python312/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files/dotnet/"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/GitHub CLI/"
+      - "C:/Users/Matthew/.cargo/bin/"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/"
+      - "C:/Users/Matthew/AppData/Roaming/npm/"
+      - "C:/Program Files/bin/"
+      - "C:/Program Files/sbin/"
+      - "C:/Program Files/"
+      - "C:/Program Files (x86)/bin/"
+      - "C:/Program Files (x86)/sbin/"
+      - "C:/Program Files (x86)/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/CMake/sbin/"
+      - "C:/Program Files/CMake/"
+      - "C:/Program Files (x86)/srfm_cpp/bin/"
+      - "C:/Program Files (x86)/srfm_cpp/sbin/"
+      - "C:/Program Files (x86)/srfm_cpp/"
+      - "C:/Users/Matthew/AppData/Local/Atlassian/SourceTree/git_local/bin/"
+    searched_directories:
+      - "C:/Program Files/Git/mingw64/bin/git.cmd.com"
+      - "C:/Program Files/Git/mingw64/bin/git.cmd.exe"
+      - "C:/Program Files/Git/mingw64/bin/git.cmd"
+      - "C:/Program Files/Git/usr/bin/git.cmd.com"
+      - "C:/Program Files/Git/usr/bin/git.cmd.exe"
+      - "C:/Program Files/Git/usr/bin/git.cmd"
+      - "C:/Users/Matthew/bin/git.cmd.com"
+      - "C:/Users/Matthew/bin/git.cmd.exe"
+      - "C:/Users/Matthew/bin/git.cmd"
+      - "C:/Program Files/Python312/Scripts/git.cmd.com"
+      - "C:/Program Files/Python312/Scripts/git.cmd.exe"
+      - "C:/Program Files/Python312/Scripts/git.cmd"
+      - "C:/Program Files/Python312/git.cmd.com"
+      - "C:/Program Files/Python312/git.cmd.exe"
+      - "C:/Program Files/Python312/git.cmd"
+      - "C:/Windows/System32/git.cmd.com"
+      - "C:/Windows/System32/git.cmd.exe"
+      - "C:/Windows/System32/git.cmd"
+      - "C:/Windows/git.cmd.com"
+      - "C:/Windows/git.cmd.exe"
+      - "C:/Windows/git.cmd"
+      - "C:/Windows/System32/wbem/git.cmd.com"
+      - "C:/Windows/System32/wbem/git.cmd.exe"
+      - "C:/Windows/System32/wbem/git.cmd"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/git.cmd.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/git.cmd.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/git.cmd"
+      - "C:/Windows/System32/OpenSSH/git.cmd.com"
+      - "C:/Windows/System32/OpenSSH/git.cmd.exe"
+      - "C:/Windows/System32/OpenSSH/git.cmd"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/git.cmd.com"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/git.cmd.exe"
+      - "C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common/git.cmd"
+      - "C:/Program Files/Git/cmd/git.cmd.com"
+      - "C:/Program Files/Git/cmd/git.cmd.exe"
+      - "C:/Program Files/Git/cmd/git.cmd"
+      - "C:/Program Files/nodejs/git.cmd.com"
+      - "C:/Program Files/nodejs/git.cmd.exe"
+      - "C:/Program Files/nodejs/git.cmd"
+      - "C:/Program Files/dotnet/git.cmd.com"
+      - "C:/Program Files/dotnet/git.cmd.exe"
+      - "C:/Program Files/dotnet/git.cmd"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/git.cmd.com"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/git.cmd.exe"
+      - "C:/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR/git.cmd"
+      - "C:/Program Files/CMake/bin/git.cmd.com"
+      - "C:/Program Files/CMake/bin/git.cmd.exe"
+      - "C:/Program Files/CMake/bin/git.cmd"
+      - "C:/Program Files/GitHub CLI/git.cmd.com"
+      - "C:/Program Files/GitHub CLI/git.cmd.exe"
+      - "C:/Program Files/GitHub CLI/git.cmd"
+      - "C:/Users/Matthew/.cargo/bin/git.cmd.com"
+      - "C:/Users/Matthew/.cargo/bin/git.cmd.exe"
+      - "C:/Users/Matthew/.cargo/bin/git.cmd"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/git.cmd.com"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/git.cmd.exe"
+      - "C:/Users/Matthew/AppData/Local/Microsoft/WindowsApps/git.cmd"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/git.cmd.com"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/git.cmd.exe"
+      - "C:/Users/Matthew/AppData/Local/Python/bin/git.cmd"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/git.cmd.com"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/git.cmd.exe"
+      - "C:/Users/Matthew/AppData/Local/Programs/MiKTeX/miktex/bin/x64/git.cmd"
+      - "C:/Users/Matthew/AppData/Roaming/npm/git.cmd.com"
+      - "C:/Users/Matthew/AppData/Roaming/npm/git.cmd.exe"
+      - "C:/Users/Matthew/AppData/Roaming/npm/git.cmd"
+      - "C:/Program Files/bin/git.cmd.com"
+      - "C:/Program Files/bin/git.cmd.exe"
+      - "C:/Program Files/bin/git.cmd"
+      - "C:/Program Files/sbin/git.cmd.com"
+      - "C:/Program Files/sbin/git.cmd.exe"
+      - "C:/Program Files/sbin/git.cmd"
+      - "C:/Program Files/git.cmd.com"
+      - "C:/Program Files/git.cmd.exe"
+      - "C:/Program Files/git.cmd"
+      - "C:/Program Files (x86)/bin/git.cmd.com"
+      - "C:/Program Files (x86)/bin/git.cmd.exe"
+      - "C:/Program Files (x86)/bin/git.cmd"
+      - "C:/Program Files (x86)/sbin/git.cmd.com"
+      - "C:/Program Files (x86)/sbin/git.cmd.exe"
+      - "C:/Program Files (x86)/sbin/git.cmd"
+      - "C:/Program Files (x86)/git.cmd.com"
+      - "C:/Program Files (x86)/git.cmd.exe"
+      - "C:/Program Files (x86)/git.cmd"
+      - "C:/Program Files/CMake/bin/git.cmd.com"
+      - "C:/Program Files/CMake/bin/git.cmd.exe"
+      - "C:/Program Files/CMake/bin/git.cmd"
+      - "C:/Program Files/CMake/sbin/git.cmd.com"
+      - "C:/Program Files/CMake/sbin/git.cmd.exe"
+      - "C:/Program Files/CMake/sbin/git.cmd"
+      - "C:/Program Files/CMake/git.cmd.com"
+      - "C:/Program Files/CMake/git.cmd.exe"
+      - "C:/Program Files/CMake/git.cmd"
+      - "C:/Program Files (x86)/srfm_cpp/bin/git.cmd.com"
+      - "C:/Program Files (x86)/srfm_cpp/bin/git.cmd.exe"
+      - "C:/Program Files (x86)/srfm_cpp/bin/git.cmd"
+      - "C:/Program Files (x86)/srfm_cpp/sbin/git.cmd.com"
+      - "C:/Program Files (x86)/srfm_cpp/sbin/git.cmd.exe"
+      - "C:/Program Files (x86)/srfm_cpp/sbin/git.cmd"
+      - "C:/Program Files (x86)/srfm_cpp/git.cmd.com"
+      - "C:/Program Files (x86)/srfm_cpp/git.cmd.exe"
+      - "C:/Program Files (x86)/srfm_cpp/git.cmd"
+      - "C:/Users/Matthew/AppData/Local/Atlassian/SourceTree/git_local/bin/git.cmd.com"
+      - "C:/Users/Matthew/AppData/Local/Atlassian/SourceTree/git_local/bin/git.cmd.exe"
+      - "C:/Users/Matthew/AppData/Local/Atlassian/SourceTree/git_local/bin/git.cmd"
+      - "C:/Program Files/Git/mingw64/bin/git.com"
+    found: "C:/Program Files/Git/mingw64/bin/git.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\Program Files\\Git\\mingw64\\bin"
+        - "C:\\Program Files\\Git\\usr\\bin"
+        - "C:\\Users\\Matthew\\bin"
+        - "C:\\Program Files\\Python312\\Scripts\\"
+        - "C:\\Program Files\\Python312\\"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA App\\NvDLISR"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Program Files\\GitHub CLI\\"
+        - "C:\\Users\\Matthew\\.cargo\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Python\\bin"
+        - "C:\\Users\\Matthew\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\"
+        - "C:\\Users\\Matthew\\AppData\\Roaming\\npm"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/srfm_cpp"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/srfm_cpp"
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CheckLibraryExists.cmake:154 (try_compile)"
+      - "build_test/_deps/googlebenchmark-src/CMakeLists.txt:125 (check_library_exists)"
+    checks:
+      - "Looking for shm_open in rt"
+    directories:
+      source: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-n4sglo"
+      binary: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-n4sglo"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake/Modules;R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake"
+    buildResult:
+      variable: "HAVE_LIB_RT"
+      cached: true
+      stdout: |
+        Change Dir: 'R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-n4sglo'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_d14c6.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.23+b0019275e for .NET Framework
+        Build started 3/17/2026 11:56:15 PM.
+        
+        Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-n4sglo\\cmTC_d14c6.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-n4sglo\\Debug\\".
+          Creating directory "cmTC_d14c6.dir\\Debug\\cmTC_d14c6.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_d14c6.dir\\Debug\\cmTC_d14c6.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_d14c6.dir\\Debug\\cmTC_d14c6.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=shm_open /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /Fo"cmTC_d14c6.dir\\Debug\\\\" /Fd"cmTC_d14c6.dir\\Debug\\vc143.pdb" /external:W1 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-n4sglo\\CheckFunctionExists.cxx"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=shm_open /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /Fo"cmTC_d14c6.dir\\Debug\\\\" /Fd"cmTC_d14c6.dir\\Debug\\vc143.pdb" /external:W1 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-n4sglo\\CheckFunctionExists.cxx"
+          CheckFunctionExists.cxx
+        Link:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-n4sglo\\Debug\\cmTC_d14c6.exe" /INCREMENTAL /ILK:"cmTC_d14c6.dir\\Debug\\cmTC_d14c6.ilk" /NOLOGO rt.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-n4sglo/Debug/cmTC_d14c6.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-n4sglo/Debug/cmTC_d14c6.lib" /MACHINE:X64  /machine:x64 cmTC_d14c6.dir\\Debug\\CheckFunctionExists.obj
+        LINK : fatal error LNK1104: cannot open file 'rt.lib' [R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-n4sglo\\cmTC_d14c6.vcxproj]
+        Done Building Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-n4sglo\\cmTC_d14c6.vcxproj" (default targets) -- FAILED.
+        
+        Build FAILED.
+        
+        "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-n4sglo\\cmTC_d14c6.vcxproj" (default target) (1) ->
+        (Link target) -> 
+          LINK : fatal error LNK1104: cannot open file 'rt.lib' [R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-n4sglo\\cmTC_d14c6.vcxproj]
+        
+            0 Warning(s)
+            1 Error(s)
+        
+        Time Elapsed 00:00:00.68
+        
+      exitCode: 1
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "build_test/_deps/googlebenchmark-src/cmake/CXXFeatureCheck.cmake:57 (try_run)"
+      - "build_test/_deps/googlebenchmark-src/CMakeLists.txt:297 (cxx_feature_check)"
+    directories:
+      source: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp"
+      binary: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc /W4"
+      CMAKE_CXX_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake/Modules;R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake"
+    buildResult:
+      variable: "COMPILE_HAVE_STD_REGEX"
+      cached: true
+      stdout: |
+        Change Dir: 'R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_f6518.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.23+b0019275e for .NET Framework
+        Build started 3/17/2026 11:56:16 PM.
+        
+        Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_f6518.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\Debug\\".
+          Creating directory "cmTC_f6518.dir\\Debug\\cmTC_f6518.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_f6518.dir\\Debug\\cmTC_f6518.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_f6518.dir\\Debug\\cmTC_f6518.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_f6518.dir\\Debug\\\\" /Fd"cmTC_f6518.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\std_regex.cpp"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_f6518.dir\\Debug\\\\" /Fd"cmTC_f6518.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\std_regex.cpp"
+          std_regex.cpp
+        Link:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_f6518.exe" /INCREMENTAL /ILK:"cmTC_f6518.dir\\Debug\\cmTC_f6518.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp/Debug/cmTC_f6518.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp/Debug/cmTC_f6518.lib" /MACHINE:X64  /machine:x64 cmTC_f6518.dir\\Debug\\std_regex.obj
+          cmTC_f6518.vcxproj -> R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_f6518.exe
+        FinalizeBuildStatus:
+          Deleting file "cmTC_f6518.dir\\Debug\\cmTC_f6518.tlog\\unsuccessfulbuild".
+          Touching "cmTC_f6518.dir\\Debug\\cmTC_f6518.tlog\\cmTC_f6518.lastbuildstate".
+        Done Building Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_f6518.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:01.42
+        
+      exitCode: 0
+    runResult:
+      variable: "RUN_HAVE_STD_REGEX"
+      cached: true
+      stdout: |
+      exitCode: 0
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "build_test/_deps/googlebenchmark-src/cmake/CXXFeatureCheck.cmake:57 (try_run)"
+      - "build_test/_deps/googlebenchmark-src/CMakeLists.txt:298 (cxx_feature_check)"
+    directories:
+      source: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp"
+      binary: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc /W4"
+      CMAKE_CXX_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake/Modules;R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake"
+    buildResult:
+      variable: "COMPILE_HAVE_GNU_POSIX_REGEX"
+      cached: true
+      stdout: |
+        Change Dir: 'R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_33b37.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.23+b0019275e for .NET Framework
+        Build started 3/17/2026 11:56:18 PM.
+        
+        Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_33b37.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\Debug\\".
+          Creating directory "cmTC_33b37.dir\\Debug\\cmTC_33b37.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_33b37.dir\\Debug\\cmTC_33b37.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_33b37.dir\\Debug\\cmTC_33b37.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_33b37.dir\\Debug\\\\" /Fd"cmTC_33b37.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\gnu_posix_regex.cpp"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_33b37.dir\\Debug\\\\" /Fd"cmTC_33b37.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\gnu_posix_regex.cpp"
+          gnu_posix_regex.cpp
+        R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\gnu_posix_regex.cpp(1,10): error C1083: Cannot open include file: 'gnuregex.h': No such file or directory [R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_33b37.vcxproj]
+        Done Building Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_33b37.vcxproj" (default targets) -- FAILED.
+        
+        Build FAILED.
+        
+        "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_33b37.vcxproj" (default target) (1) ->
+        (ClCompile target) -> 
+          R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\gnu_posix_regex.cpp(1,10): error C1083: Cannot open include file: 'gnuregex.h': No such file or directory [R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_33b37.vcxproj]
+        
+            0 Warning(s)
+            1 Error(s)
+        
+        Time Elapsed 00:00:00.41
+        
+      exitCode: 1
+    runResult:
+      variable: "RUN_HAVE_GNU_POSIX_REGEX"
+      cached: true
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "build_test/_deps/googlebenchmark-src/cmake/CXXFeatureCheck.cmake:57 (try_run)"
+      - "build_test/_deps/googlebenchmark-src/CMakeLists.txt:299 (cxx_feature_check)"
+    directories:
+      source: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp"
+      binary: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc /W4"
+      CMAKE_CXX_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake/Modules;R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake"
+    buildResult:
+      variable: "COMPILE_HAVE_POSIX_REGEX"
+      cached: true
+      stdout: |
+        Change Dir: 'R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_70648.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.23+b0019275e for .NET Framework
+        Build started 3/17/2026 11:56:19 PM.
+        
+        Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_70648.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\Debug\\".
+          Creating directory "cmTC_70648.dir\\Debug\\cmTC_70648.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_70648.dir\\Debug\\cmTC_70648.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_70648.dir\\Debug\\cmTC_70648.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_70648.dir\\Debug\\\\" /Fd"cmTC_70648.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\posix_regex.cpp"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_70648.dir\\Debug\\\\" /Fd"cmTC_70648.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\posix_regex.cpp"
+          posix_regex.cpp
+        R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\posix_regex.cpp(1,10): error C1083: Cannot open include file: 'regex.h': No such file or directory [R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_70648.vcxproj]
+        Done Building Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_70648.vcxproj" (default targets) -- FAILED.
+        
+        Build FAILED.
+        
+        "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_70648.vcxproj" (default target) (1) ->
+        (ClCompile target) -> 
+          R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\posix_regex.cpp(1,10): error C1083: Cannot open include file: 'regex.h': No such file or directory [R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_70648.vcxproj]
+        
+            0 Warning(s)
+            1 Error(s)
+        
+        Time Elapsed 00:00:00.37
+        
+      exitCode: 1
+    runResult:
+      variable: "RUN_HAVE_POSIX_REGEX"
+      cached: true
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "build_test/_deps/googlebenchmark-src/cmake/CXXFeatureCheck.cmake:57 (try_run)"
+      - "build_test/_deps/googlebenchmark-src/CMakeLists.txt:308 (cxx_feature_check)"
+    directories:
+      source: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp"
+      binary: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc /W4"
+      CMAKE_CXX_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake/Modules;R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake"
+    buildResult:
+      variable: "COMPILE_HAVE_STEADY_CLOCK"
+      cached: true
+      stdout: |
+        Change Dir: 'R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_1107d.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.23+b0019275e for .NET Framework
+        Build started 3/17/2026 11:56:19 PM.
+        
+        Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_1107d.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\Debug\\".
+          Creating directory "cmTC_1107d.dir\\Debug\\cmTC_1107d.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_1107d.dir\\Debug\\cmTC_1107d.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_1107d.dir\\Debug\\cmTC_1107d.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_1107d.dir\\Debug\\\\" /Fd"cmTC_1107d.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\steady_clock.cpp"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_1107d.dir\\Debug\\\\" /Fd"cmTC_1107d.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\steady_clock.cpp"
+          steady_clock.cpp
+        Link:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_1107d.exe" /INCREMENTAL /ILK:"cmTC_1107d.dir\\Debug\\cmTC_1107d.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp/Debug/cmTC_1107d.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp/Debug/cmTC_1107d.lib" /MACHINE:X64  /machine:x64 cmTC_1107d.dir\\Debug\\steady_clock.obj
+          cmTC_1107d.vcxproj -> R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_1107d.exe
+        FinalizeBuildStatus:
+          Deleting file "cmTC_1107d.dir\\Debug\\cmTC_1107d.tlog\\unsuccessfulbuild".
+          Touching "cmTC_1107d.dir\\Debug\\cmTC_1107d.tlog\\cmTC_1107d.lastbuildstate".
+        Done Building Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_1107d.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:00.81
+        
+      exitCode: 0
+    runResult:
+      variable: "RUN_HAVE_STEADY_CLOCK"
+      cached: true
+      stdout: |
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/Internal/CheckSourceCompiles.cmake:104 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CheckCXXSourceCompiles.cmake:103 (cmake_check_source_compiles)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/FindThreads.cmake:162 (check_cxx_source_compiles)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/FindThreads.cmake:226 (_threads_check_libc)"
+      - "build_test/_deps/googlebenchmark-src/CMakeLists.txt:311 (find_package)"
+    checks:
+      - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
+    directories:
+      source: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-zomnni"
+      binary: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-zomnni"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc /W4"
+      CMAKE_CXX_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake/Modules;R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake"
+    buildResult:
+      variable: "CMAKE_HAVE_LIBC_PTHREAD"
+      cached: true
+      stdout: |
+        Change Dir: 'R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-zomnni'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_7fdff.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.23+b0019275e for .NET Framework
+        Build started 3/17/2026 11:56:21 PM.
+        
+        Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-zomnni\\cmTC_7fdff.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-zomnni\\Debug\\".
+          Creating directory "cmTC_7fdff.dir\\Debug\\cmTC_7fdff.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_7fdff.dir\\Debug\\cmTC_7fdff.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_7fdff.dir\\Debug\\cmTC_7fdff.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++14 /Fo"cmTC_7fdff.dir\\Debug\\\\" /Fd"cmTC_7fdff.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-zomnni\\src.cxx"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++14 /Fo"cmTC_7fdff.dir\\Debug\\\\" /Fd"cmTC_7fdff.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-zomnni\\src.cxx"
+          src.cxx
+        R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-zomnni\\src.cxx(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-zomnni\\cmTC_7fdff.vcxproj]
+        Done Building Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-zomnni\\cmTC_7fdff.vcxproj" (default targets) -- FAILED.
+        
+        Build FAILED.
+        
+        "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-zomnni\\cmTC_7fdff.vcxproj" (default target) (1) ->
+        (ClCompile target) -> 
+          R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-zomnni\\src.cxx(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-zomnni\\cmTC_7fdff.vcxproj]
+        
+            0 Warning(s)
+            1 Error(s)
+        
+        Time Elapsed 00:00:00.33
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CheckLibraryExists.cmake:154 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/FindThreads.cmake:175 (check_library_exists)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/FindThreads.cmake:238 (_threads_check_lib)"
+      - "build_test/_deps/googlebenchmark-src/CMakeLists.txt:311 (find_package)"
+    checks:
+      - "Looking for pthread_create in pthreads"
+    directories:
+      source: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-7i2t74"
+      binary: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-7i2t74"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc /W4"
+      CMAKE_CXX_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake/Modules;R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake"
+    buildResult:
+      variable: "CMAKE_HAVE_PTHREADS_CREATE"
+      cached: true
+      stdout: |
+        Change Dir: 'R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-7i2t74'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_c76e9.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.23+b0019275e for .NET Framework
+        Build started 3/17/2026 11:56:21 PM.
+        
+        Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-7i2t74\\cmTC_c76e9.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-7i2t74\\Debug\\".
+          Creating directory "cmTC_c76e9.dir\\Debug\\cmTC_c76e9.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_c76e9.dir\\Debug\\cmTC_c76e9.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_c76e9.dir\\Debug\\cmTC_c76e9.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++14 /Fo"cmTC_c76e9.dir\\Debug\\\\" /Fd"cmTC_c76e9.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-7i2t74\\CheckFunctionExists.cxx"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++14 /Fo"cmTC_c76e9.dir\\Debug\\\\" /Fd"cmTC_c76e9.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-7i2t74\\CheckFunctionExists.cxx"
+          CheckFunctionExists.cxx
+        Link:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-7i2t74\\Debug\\cmTC_c76e9.exe" /INCREMENTAL /ILK:"cmTC_c76e9.dir\\Debug\\cmTC_c76e9.ilk" /NOLOGO pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-7i2t74/Debug/cmTC_c76e9.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-7i2t74/Debug/cmTC_c76e9.lib" /MACHINE:X64  /machine:x64 cmTC_c76e9.dir\\Debug\\CheckFunctionExists.obj
+        LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-7i2t74\\cmTC_c76e9.vcxproj]
+        Done Building Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-7i2t74\\cmTC_c76e9.vcxproj" (default targets) -- FAILED.
+        
+        Build FAILED.
+        
+        "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-7i2t74\\cmTC_c76e9.vcxproj" (default target) (1) ->
+        (Link target) -> 
+          LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-7i2t74\\cmTC_c76e9.vcxproj]
+        
+            0 Warning(s)
+            1 Error(s)
+        
+        Time Elapsed 00:00:00.72
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CheckLibraryExists.cmake:154 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/FindThreads.cmake:175 (check_library_exists)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/FindThreads.cmake:239 (_threads_check_lib)"
+      - "build_test/_deps/googlebenchmark-src/CMakeLists.txt:311 (find_package)"
+    checks:
+      - "Looking for pthread_create in pthread"
+    directories:
+      source: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-y455l1"
+      binary: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-y455l1"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc /W4"
+      CMAKE_CXX_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake/Modules;R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake"
+    buildResult:
+      variable: "CMAKE_HAVE_PTHREAD_CREATE"
+      cached: true
+      stdout: |
+        Change Dir: 'R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-y455l1'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_cc44b.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.23+b0019275e for .NET Framework
+        Build started 3/17/2026 11:56:22 PM.
+        
+        Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-y455l1\\cmTC_cc44b.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-y455l1\\Debug\\".
+          Creating directory "cmTC_cc44b.dir\\Debug\\cmTC_cc44b.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_cc44b.dir\\Debug\\cmTC_cc44b.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_cc44b.dir\\Debug\\cmTC_cc44b.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++14 /Fo"cmTC_cc44b.dir\\Debug\\\\" /Fd"cmTC_cc44b.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-y455l1\\CheckFunctionExists.cxx"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++14 /Fo"cmTC_cc44b.dir\\Debug\\\\" /Fd"cmTC_cc44b.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-y455l1\\CheckFunctionExists.cxx"
+          CheckFunctionExists.cxx
+        Link:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-y455l1\\Debug\\cmTC_cc44b.exe" /INCREMENTAL /ILK:"cmTC_cc44b.dir\\Debug\\cmTC_cc44b.ilk" /NOLOGO pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-y455l1/Debug/cmTC_cc44b.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeScratch/TryCompile-y455l1/Debug/cmTC_cc44b.lib" /MACHINE:X64  /machine:x64 cmTC_cc44b.dir\\Debug\\CheckFunctionExists.obj
+        LINK : fatal error LNK1104: cannot open file 'pthread.lib' [R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-y455l1\\cmTC_cc44b.vcxproj]
+        Done Building Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-y455l1\\cmTC_cc44b.vcxproj" (default targets) -- FAILED.
+        
+        Build FAILED.
+        
+        "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-y455l1\\cmTC_cc44b.vcxproj" (default target) (1) ->
+        (Link target) -> 
+          LINK : fatal error LNK1104: cannot open file 'pthread.lib' [R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeScratch\\TryCompile-y455l1\\cmTC_cc44b.vcxproj]
+        
+            0 Warning(s)
+            1 Error(s)
+        
+        Time Elapsed 00:00:00.71
+        
+      exitCode: 1
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "build_test/_deps/googlebenchmark-src/cmake/CXXFeatureCheck.cmake:57 (try_run)"
+      - "build_test/_deps/googlebenchmark-src/CMakeLists.txt:312 (cxx_feature_check)"
+    directories:
+      source: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp"
+      binary: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc /W4"
+      CMAKE_CXX_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake/Modules;R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-src/cmake"
+    buildResult:
+      variable: "COMPILE_HAVE_PTHREAD_AFFINITY"
+      cached: true
+      stdout: |
+        Change Dir: 'R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_73a37.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.14.23+b0019275e for .NET Framework
+        Build started 3/17/2026 11:56:23 PM.
+        
+        Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_73a37.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\Debug\\".
+          Creating directory "cmTC_73a37.dir\\Debug\\cmTC_73a37.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_73a37.dir\\Debug\\cmTC_73a37.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_73a37.dir\\Debug\\cmTC_73a37.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_73a37.dir\\Debug\\\\" /Fd"cmTC_73a37.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\pthread_affinity.cpp"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W4 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_73a37.dir\\Debug\\\\" /Fd"cmTC_73a37.dir\\Debug\\vc143.pdb" /external:W4 /TP /errorReport:queue "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\pthread_affinity.cpp"
+          pthread_affinity.cpp
+        R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\pthread_affinity.cpp(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_73a37.vcxproj]
+        Done Building Project "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_73a37.vcxproj" (default targets) -- FAILED.
+        
+        Build FAILED.
+        
+        "R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_73a37.vcxproj" (default target) (1) ->
+        (ClCompile target) -> 
+          R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\_deps\\googlebenchmark-src\\cmake\\pthread_affinity.cpp(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [R:\\workspaces\\Special-Relativity-in-Financial-Modeling\\build_test\\CMakeFiles\\CMakeTmp\\cmTC_73a37.vcxproj]
+        
+            0 Warning(s)
+            1 Error(s)
+        
+        Time Elapsed 00:00:00.29
+        
+      exitCode: 1
+    runResult:
+      variable: "RUN_HAVE_PTHREAD_AFFINITY"
+      cached: true
+...
