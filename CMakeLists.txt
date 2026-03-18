@@ -78,6 +78,15 @@ target_link_libraries(srfm_engine PUBLIC
     srfm_momentum
 )
 
+add_library(srfm_stream STATIC
+    src/engine/stream_engine.cpp
+    src/stream/signal_consumer.cpp
+    src/stream/signal_processor.cpp
+    src/stream/tick_ingester.cpp
+)
+target_include_directories(srfm_stream PUBLIC src include)
+target_link_libraries(srfm_stream PUBLIC srfm_engine)
+
 # ── Existing momentum unit tests ──────────────────────────────────────────────
 add_executable(test_momentum
     tests/momentum/test_momentum.cpp
@@ -258,24 +267,24 @@ target_link_libraries(test_n_asset PRIVATE
 )
 add_test(NAME NAssetTests COMMAND test_n_asset)
 
-# ── Stream processing tests ───────────────────────────────────────────────────
-add_executable(test_stream
-    tests/stream/test_beta_calculator.cpp
-    tests/stream/test_coordinate_normalizer.cpp
-    tests/stream/test_lorentz_manifold.cpp
-    tests/stream/test_pipeline_invariants.cpp
-    tests/stream/test_signal_chain.cpp
-    tests/stream/test_spsc_ring.cpp
-    tests/stream/test_spsc_stress.cpp
-    tests/stream/test_stream_engine.cpp
-    tests/stream/test_tick_validation.cpp
+# ── Stream processing tests (each file has its own main()) ───────────────────
+set(_STREAM_TESTS
+    test_beta_calculator
+    test_coordinate_normalizer
+    test_lorentz_manifold
+    test_pipeline_invariants
+    test_signal_chain
+    test_spsc_ring
+    test_spsc_stress
+    test_stream_engine
+    test_tick_validation
 )
-target_include_directories(test_stream PRIVATE src include tests/stream)
-target_link_libraries(test_stream PRIVATE
-    srfm_engine
-    GTest::gtest_main
-)
-add_test(NAME StreamTests COMMAND test_stream)
+foreach(_st IN LISTS _STREAM_TESTS)
+    add_executable(stream_${_st} tests/stream/${_st}.cpp)
+    target_include_directories(stream_${_st} PRIVATE src include tests/stream)
+    target_link_libraries(stream_${_st} PRIVATE srfm_stream)
+    add_test(NAME stream_${_st} COMMAND stream_${_st})
+endforeach()
 
 # ── Interval gap tests (symmetry, numerical stability, Lorentz invariance) ───
 if(GTest_FOUND)
