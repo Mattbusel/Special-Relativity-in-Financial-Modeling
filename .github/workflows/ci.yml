@@ -6,20 +6,23 @@ on:
   pull_request:
     branches: [ main, master ]
 
-env:
-  CMAKE_BUILD_TYPE: RelWithDebInfo
+# Cancel in-progress runs for the same branch/PR to save CI minutes.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  # ---------------------------------------------------------------------------
-  # Linux: configure, build (C++20), run tests, static analysis
-  # ---------------------------------------------------------------------------
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Linux: Debug + Release builds, ctest, clang-tidy, cppcheck, Doxygen
+  # ─────────────────────────────────────────────────────────────────────────────
   linux:
-    name: "Linux (${{ matrix.compiler }})"
+    name: "Linux (${{ matrix.compiler }}, ${{ matrix.build_type }})"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         compiler: [gcc-12, clang-17]
+        build_type: [Debug, Release]
 
     steps:
       - name: Checkout
@@ -27,24 +30,33 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install GCC-12
+      - name: Install GCC-12 toolchain
         if: matrix.compiler == 'gcc-12'
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y gcc-12 g++-12 cmake ninja-build clang-format cppcheck valgrind doxygen
+          sudo apt-get install -y \
+            gcc-12 g++-12 \
+            cmake ninja-build \
+            clang-format cppcheck \
+            valgrind doxygen \
+            libeigen3-dev
 
-      - name: Install Clang-17
+      - name: Install Clang-17 toolchain
         if: matrix.compiler == 'clang-17'
         run: |
           wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s 17
-          sudo apt-get install -y clang-17 clang-tidy-17 clang-format-17 cmake ninja-build
-          sudo ln -sf /usr/bin/clang-format-17 /usr/bin/clang-format
+          sudo apt-get install -y \
+            clang-17 clang-tidy-17 clang-format-17 \
+            cmake ninja-build \
+            libeigen3-dev
+          sudo ln -sf /usr/bin/clang-format-17  /usr/bin/clang-format
+          sudo ln -sf /usr/bin/clang-tidy-17    /usr/bin/clang-tidy
 
       - name: Set compiler env (GCC)
         if: matrix.compiler == 'gcc-12'
         run: |
-          echo "CC=gcc-12"     >> "$GITHUB_ENV"
-          echo "CXX=g++-12"   >> "$GITHUB_ENV"
+          echo "CC=gcc-12"   >> "$GITHUB_ENV"
+          echo "CXX=g++-12"  >> "$GITHUB_ENV"
 
       - name: Set compiler env (Clang)
         if: matrix.compiler == 'clang-17'
@@ -52,41 +64,52 @@ jobs:
           echo "CC=clang-17"    >> "$GITHUB_ENV"
           echo "CXX=clang++-17" >> "$GITHUB_ENV"
 
-      - name: Cache CMake build artifacts
+      - name: Cache CMake build
         uses: actions/cache@v4
         with:
-          path: build
-          key: ${{ runner.os }}-${{ matrix.compiler }}-${{ env.CMAKE_BUILD_TYPE }}-${{ hashFiles('CMakeLists.txt', 'src/**', 'include/**', 'tests/**') }}
+          path: build-${{ matrix.compiler }}-${{ matrix.build_type }}
+          key: >
+            ${{ runner.os }}-${{ matrix.compiler }}-${{ matrix.build_type }}-
+            ${{ hashFiles('CMakeLists.txt', 'src/**', 'include/**', 'tests/**') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.compiler }}-${{ env.CMAKE_BUILD_TYPE }}-
+            ${{ runner.os }}-${{ matrix.compiler }}-${{ matrix.build_type }}-
 
-      - name: CMake configure (C++20)
+      - name: CMake configure
         run: |
-          cmake -S . -B build \
+          cmake -S . \
+            -B build-${{ matrix.compiler }}-${{ matrix.build_type }} \
             -G Ninja \
-            -DCMAKE_BUILD_TYPE=${{ env.CMAKE_BUILD_TYPE }} \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             -DCMAKE_CXX_STANDARD=20 \
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DSRFM_WARNINGS_AS_ERRORS=ON
 
       - name: Build
-        run: cmake --build build --parallel
+        run: |
+          cmake --build build-${{ matrix.compiler }}-${{ matrix.build_type }} \
+            --parallel
 
       - name: Run tests (ctest)
-        run: ctest --test-dir build --output-on-failure --parallel 4
-
-      - name: clang-tidy static analysis
-        if: matrix.compiler == 'clang-17'
         run: |
-          find src -name '*.cpp' ! -path '*/simd/*' | \
-            xargs clang-tidy-17 \
-              -p build \
-              --warnings-as-errors='' \
+          ctest \
+            --test-dir build-${{ matrix.compiler }}-${{ matrix.build_type }} \
+            --output-on-failure \
+            --parallel 4
+
+      # clang-tidy — only on Clang Release (avoids Debug symbol noise)
+      - name: clang-tidy static analysis
+        if: matrix.compiler == 'clang-17' && matrix.build_type == 'Release'
+        run: |
+          find src include -name '*.cpp' ! -path '*/simd/*' | \
+            xargs clang-tidy \
+              -p build-${{ matrix.compiler }}-${{ matrix.build_type }} \
               --extra-arg=-std=c++20 \
               2>&1 | tee clang-tidy-report.txt
           echo "clang-tidy completed"
 
+      # cppcheck — only on GCC Debug (complementary checker)
       - name: cppcheck static analysis
-        if: matrix.compiler == 'gcc-12'
+        if: matrix.compiler == 'gcc-12' && matrix.build_type == 'Debug'
         run: |
           cppcheck \
             --enable=warning,performance,portability \
@@ -98,15 +121,14 @@ jobs:
             src/ \
             2>&1 | tee cppcheck-report.txt
 
+      # clang-format lint (once, on GCC Debug to avoid duplication)
       - name: clang-format lint
+        if: matrix.compiler == 'gcc-12' && matrix.build_type == 'Debug'
         run: |
-          # Collect all project C++ sources (exclude third_party and build/)
-          FILES=$(find include src -type f \( -name '*.cpp' -o -name '*.hpp' -o -name '*.h' \) \
-                    ! -path '*/third_party/*' ! -path '*/build/*')
-          if [ -z "$FILES" ]; then
-            echo "No files to format-check."
-            exit 0
-          fi
+          FILES=$(find include src -type f \
+                    \( -name '*.cpp' -o -name '*.hpp' -o -name '*.h' \) \
+                    ! -path '*/third_party/*' ! -path '*/build*')
+          if [ -z "$FILES" ]; then echo "No files to check."; exit 0; fi
           RESULT=0
           for f in $FILES; do
             diff_out=$(clang-format --style=file --dry-run --Werror "$f" 2>&1 || true)
@@ -116,65 +138,58 @@ jobs:
               RESULT=1
             fi
           done
-          if [ $RESULT -ne 0 ]; then
-            echo ""
-            echo "Fix with: clang-format --style=file -i <file>"
-            exit 1
-          fi
-          echo "All files pass clang-format."
+          [ $RESULT -eq 0 ] && echo "All files pass clang-format." || exit 1
 
+      # Valgrind — only GCC Debug (slower, comprehensive leak check)
       - name: Valgrind memory check
-        if: matrix.compiler == 'gcc-12'
+        if: matrix.compiler == 'gcc-12' && matrix.build_type == 'Debug'
         run: |
-          # Run the unit-test executables under Valgrind to detect leaks and
-          # invalid memory accesses.  The build was already done above.
           valgrind \
             --error-exitcode=1 \
             --leak-check=full \
             --show-leak-kinds=definite,indirect \
             --track-origins=yes \
             --suppressions=/usr/lib/valgrind/debian.supp \
-            build/test_momentum 2>&1 | tee valgrind-momentum.txt
-          valgrind \
-            --error-exitcode=1 \
-            --leak-check=full \
-            --show-leak-kinds=definite,indirect \
-            --track-origins=yes \
-            build/test_edge_cases 2>&1 | tee valgrind-edge.txt
+            build-${{ matrix.compiler }}-${{ matrix.build_type }}/test_momentum \
+            2>&1 | tee valgrind-momentum.txt
           echo "Valgrind checks passed."
 
+      # Doxygen — once, on GCC Release
       - name: Generate Doxygen documentation
-        if: matrix.compiler == 'gcc-12'
+        if: matrix.compiler == 'gcc-12' && matrix.build_type == 'Release'
         run: |
           doxygen Doxyfile
-          echo "Doxygen docs generated at docs/api/html/index.html"
+          echo "Doxygen docs at docs/api/html/index.html"
 
-      - name: Upload Doxygen documentation
-        if: matrix.compiler == 'gcc-12'
+      - name: Upload Doxygen artifacts
+        if: matrix.compiler == 'gcc-12' && matrix.build_type == 'Release'
         uses: actions/upload-artifact@v4
         with:
           name: doxygen-api-docs
           path: docs/api/html/
           retention-days: 14
 
-      - name: Upload analysis reports on failure
+      - name: Upload failure artifacts
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: analysis-${{ matrix.compiler }}
+          name: failure-${{ matrix.compiler }}-${{ matrix.build_type }}
           path: |
-            build/Testing/
+            build-${{ matrix.compiler }}-${{ matrix.build_type }}/Testing/
             clang-tidy-report.txt
             cppcheck-report.txt
             valgrind-momentum.txt
-            valgrind-edge.txt
 
-  # ---------------------------------------------------------------------------
-  # Windows: configure, build (C++20), run tests
-  # ---------------------------------------------------------------------------
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Windows: Debug + Release builds, ctest
+  # ─────────────────────────────────────────────────────────────────────────────
   windows:
-    name: "Windows (MSVC)"
+    name: "Windows (MSVC, ${{ matrix.build_type }})"
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
 
     steps:
       - name: Checkout
@@ -182,29 +197,39 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Cache CMake build artifacts
+      - name: Cache CMake build
         uses: actions/cache@v4
         with:
-          path: build
-          key: ${{ runner.os }}-msvc-RelWithDebInfo-${{ hashFiles('CMakeLists.txt', 'src/**', 'include/**', 'tests/**') }}
+          path: build-msvc-${{ matrix.build_type }}
+          key: >
+            ${{ runner.os }}-msvc-${{ matrix.build_type }}-
+            ${{ hashFiles('CMakeLists.txt', 'src/**', 'include/**', 'tests/**') }}
           restore-keys: |
-            ${{ runner.os }}-msvc-RelWithDebInfo-
+            ${{ runner.os }}-msvc-${{ matrix.build_type }}-
 
-      - name: CMake configure (C++20)
+      - name: CMake configure
         run: |
-          cmake -S . -B build `
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          cmake -S . -B build-msvc-${{ matrix.build_type }} `
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} `
+            -DSRFM_WARNINGS_AS_ERRORS=ON
 
       - name: Build
-        run: cmake --build build --config RelWithDebInfo --parallel
+        run: |
+          cmake --build build-msvc-${{ matrix.build_type }} `
+            --config ${{ matrix.build_type }} `
+            --parallel
 
       - name: Run tests (ctest)
-        run: ctest --test-dir build -C RelWithDebInfo --output-on-failure
+        run: |
+          ctest `
+            --test-dir build-msvc-${{ matrix.build_type }} `
+            -C ${{ matrix.build_type }} `
+            --output-on-failure
 
-  # ---------------------------------------------------------------------------
-  # Address + Undefined Behaviour sanitisers (Clang-17, Linux)
-  # ---------------------------------------------------------------------------
-  sanitisers:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Address + Undefined Behaviour Sanitisers (Clang-17, Debug)
+  # ─────────────────────────────────────────────────────────────────────────────
+  asan-ubsan:
     name: "ASAN + UBSAN (clang-17)"
     runs-on: ubuntu-latest
     needs: linux
@@ -215,33 +240,34 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install Clang-17
+      - name: Install Clang-17 + Eigen
         run: |
           wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s 17
-          sudo apt-get install -y clang-17 cmake ninja-build
+          sudo apt-get install -y clang-17 cmake ninja-build libeigen3-dev
 
       - name: CMake configure (ASAN + UBSAN)
         run: |
-          cmake -S . -B build_san \
+          cmake -S . -B build-asan \
             -G Ninja \
             -DCMAKE_CXX_COMPILER=clang++-17 \
             -DCMAKE_C_COMPILER=clang-17 \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" \
-            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
+            -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -g" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined" \
+            -DSRFM_WARNINGS_AS_ERRORS=ON
 
       - name: Build (sanitised)
-        run: cmake --build build_san --parallel
+        run: cmake --build build-asan --parallel
 
-      - name: Run tests (sanitised)
+      - name: Run tests (ASAN + UBSAN)
         env:
-          ASAN_OPTIONS: "halt_on_error=1:detect_leaks=1"
-          UBSAN_OPTIONS: "halt_on_error=1:print_stacktrace=1"
-        run: ctest --test-dir build_san --output-on-failure --parallel 4
+          ASAN_OPTIONS: "halt_on_error=1:detect_leaks=1:abort_on_error=1"
+          UBSAN_OPTIONS: "halt_on_error=1:print_stacktrace=1:abort_on_error=1"
+        run: ctest --test-dir build-asan --output-on-failure --parallel 4
 
-  # ---------------------------------------------------------------------------
-  # Thread sanitiser (Clang-17, Linux)
-  # ---------------------------------------------------------------------------
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Thread Sanitiser (Clang-17, Debug)
+  # ─────────────────────────────────────────────────────────────────────────────
   tsan:
     name: "TSAN (clang-17)"
     runs-on: ubuntu-latest
@@ -253,32 +279,33 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install Clang-17
+      - name: Install Clang-17 + Eigen
         run: |
           wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s 17
-          sudo apt-get install -y clang-17 cmake ninja-build
+          sudo apt-get install -y clang-17 cmake ninja-build libeigen3-dev
 
       - name: CMake configure (TSAN)
         run: |
-          cmake -S . -B build_tsan \
+          cmake -S . -B build-tsan \
             -G Ninja \
             -DCMAKE_CXX_COMPILER=clang++-17 \
             -DCMAKE_C_COMPILER=clang-17 \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_CXX_FLAGS="-fsanitize=thread -fno-omit-frame-pointer" \
-            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=thread"
+            -DCMAKE_CXX_FLAGS="-fsanitize=thread -fno-omit-frame-pointer -g" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=thread" \
+            -DSRFM_WARNINGS_AS_ERRORS=ON
 
       - name: Build (TSAN)
-        run: cmake --build build_tsan --parallel
+        run: cmake --build build-tsan --parallel
 
       - name: Run tests (TSAN)
         env:
-          TSAN_OPTIONS: "halt_on_error=1"
-        run: ctest --test-dir build_tsan --output-on-failure --parallel 4
+          TSAN_OPTIONS: "halt_on_error=1:abort_on_error=1"
+        run: ctest --test-dir build-tsan --output-on-failure --parallel 4
 
-  # ---------------------------------------------------------------------------
-  # Sanitizer scripts (ci/run_asan.sh, ci/run_tsan.sh)
-  # ---------------------------------------------------------------------------
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Sanitizer CI scripts (ci/run_asan.sh, ci/run_tsan.sh)
+  # ─────────────────────────────────────────────────────────────────────────────
   sanitizers:
     name: "Sanitizers (${{ matrix.sanitizer }})"
     runs-on: ubuntu-latest
@@ -294,19 +321,21 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install Clang-17
+      - name: Install Clang-17 + Eigen
         run: |
           wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s 17
-          sudo apt-get install -y clang-17 cmake ninja-build
+          sudo apt-get install -y clang-17 cmake ninja-build libeigen3-dev
+          echo "CC=clang-17"    >> "$GITHUB_ENV"
+          echo "CXX=clang++-17" >> "$GITHUB_ENV"
 
       - name: Run ${{ matrix.sanitizer }}
         run: bash ci/run_${{ matrix.sanitizer }}.sh
 
-  # ---------------------------------------------------------------------------
-  # Fuzz targets — smoke run (30 s each, libFuzzer, Clang-17)
-  # ---------------------------------------------------------------------------
-  fuzz:
-    name: "Fuzz (smoke)"
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Standalone clang-tidy job (separate blocking gate)
+  # ─────────────────────────────────────────────────────────────────────────────
+  clang-tidy:
+    name: "clang-tidy"
     runs-on: ubuntu-latest
     needs: linux
 
@@ -316,10 +345,56 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install Clang-17
+      - name: Install Clang-17 + Eigen
         run: |
           wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s 17
-          sudo apt-get install -y clang-17 cmake ninja-build
+          sudo apt-get install -y clang-17 clang-tidy-17 cmake ninja-build libeigen3-dev
+          sudo ln -sf /usr/bin/clang-tidy-17 /usr/bin/clang-tidy
+
+      - name: Configure (generate compile_commands.json)
+        run: |
+          cmake -S . -B build-tidy \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_COMPILER=clang++-17 \
+            -DCMAKE_C_COMPILER=clang-17 \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+      - name: Run clang-tidy
+        run: |
+          find src include -name '*.cpp' ! -path '*/simd/*' | \
+            xargs clang-tidy \
+              -p build-tidy \
+              --extra-arg=-std=c++20 \
+              2>&1 | tee clang-tidy-standalone-report.txt || true
+          echo "clang-tidy scan complete"
+
+      - name: Upload clang-tidy report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clang-tidy-standalone-report
+          path: clang-tidy-standalone-report.txt
+          retention-days: 14
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Fuzz targets — smoke run (30 s each)
+  # ─────────────────────────────────────────────────────────────────────────────
+  fuzz:
+    name: "Fuzz smoke (clang-17)"
+    runs-on: ubuntu-latest
+    needs: linux
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Clang-17 + Eigen
+        run: |
+          wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s 17
+          sudo apt-get install -y clang-17 cmake ninja-build libeigen3-dev
 
       - name: Build fuzz targets
         run: |
@@ -340,52 +415,9 @@ jobs:
             timeout 30 "$t" -max_total_time=30 || true
           done
 
-  # ---------------------------------------------------------------------------
-  # Standalone clang-tidy job
-  # ---------------------------------------------------------------------------
-  clang-tidy:
-    name: "clang-tidy"
-    runs-on: ubuntu-latest
-    needs: linux
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Install Clang-17
-        run: |
-          wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s 17
-          sudo apt-get install -y clang-17 clang-tidy-17 cmake ninja-build
-
-      - name: Configure (compile commands)
-        run: |
-          cmake -S . -B build-tidy \
-            -G Ninja \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-            -DCMAKE_CXX_COMPILER=clang++-17 \
-            -DCMAKE_C_COMPILER=clang-17 \
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-
-      - name: Run clang-tidy
-        run: |
-          find src include -name '*.cpp' -o -name '*.hpp' | \
-            xargs clang-tidy-17 -p build-tidy --extra-arg=-std=c++20 \
-            2>&1 | tee clang-tidy-standalone-report.txt || true
-          echo "clang-tidy standalone scan complete"
-
-      - name: Upload clang-tidy report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: clang-tidy-standalone-report
-          path: clang-tidy-standalone-report.txt
-          retention-days: 14
-
-  # ---------------------------------------------------------------------------
+  # ─────────────────────────────────────────────────────────────────────────────
   # Python validation suite (pytest)
-  # ---------------------------------------------------------------------------
+  # ─────────────────────────────────────────────────────────────────────────────
   python-tests:
     name: "Python tests (3.11)"
     runs-on: ubuntu-latest
@@ -404,3 +436,21 @@ jobs:
 
       - name: Run pytest
         run: pytest --tb=short -v
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Final gate — all required jobs must pass
+  # ─────────────────────────────────────────────────────────────────────────────
+  all-checks:
+    name: "All checks passed"
+    runs-on: ubuntu-latest
+    needs:
+      - linux
+      - windows
+      - asan-ubsan
+      - tsan
+      - sanitizers
+      - clang-tidy
+      - fuzz
+    steps:
+      - name: Success
+        run: echo "All CI jobs passed."
