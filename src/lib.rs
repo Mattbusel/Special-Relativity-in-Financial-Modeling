@@ -65,6 +65,14 @@ pub enum OrchestratorError {
     #[error("io error: {0}")]
     Io(#[from] std::io::Error),
 
+    /// A configuration error, such as a missing required environment variable.
+    #[error("configuration error: {0}")]
+    ConfigError(String),
+
+    /// An inference error returned by a model worker backend.
+    #[error("inference error: {0}")]
+    Inference(String),
+
     /// A subsystem-specific error with a human-readable message.
     #[error("{0}")]
     Other(String),

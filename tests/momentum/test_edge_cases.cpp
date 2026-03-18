@@ -657,7 +657,7 @@ static void test_rapidity_additivity() {
 
 static void test_kinetic_energy_invariants() {
     // At beta = 0: kinetic energy = 0 (rest state)
-    auto b0 = BetaVelocity::make(0.0).value();
+    auto b0 = to_lorentz_beta(BetaVelocity::make(0.0).value());
     auto ek0 = BetaCalculator::kineticEnergy(b0, 1.0);
     SRFM_HAS_VALUE(ek0);
     SRFM_CHECK_NEAR(*ek0, 0.0, EPS);
@@ -666,7 +666,7 @@ static void test_kinetic_energy_invariants() {
     for (double bv : {0.0, 0.1, 0.5, 0.8, 0.99}) {
         auto b = BetaVelocity::make(bv);
         if (!b) continue;
-        auto ek = BetaCalculator::kineticEnergy(*b, 1.0);
+        auto ek = BetaCalculator::kineticEnergy(to_lorentz_beta(*b), 1.0);
         SRFM_HAS_VALUE(ek);
         SRFM_CHECK(*ek >= 0.0);
         SRFM_CHECK(std::isfinite(*ek));

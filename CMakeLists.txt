@@ -21,6 +21,20 @@ endif()
 find_package(RapidCheck CONFIG QUIET)
 find_package(Eigen3 QUIET)
 
+# If Eigen3 was not found via find_package, fall back to the vendored copy.
+if(NOT (Eigen3_FOUND OR TARGET Eigen3::Eigen))
+    set(_EIGEN_VENDOR_DIR "${CMAKE_SOURCE_DIR}/third_party/eigen")
+    if(EXISTS "${_EIGEN_VENDOR_DIR}/Eigen/Dense")
+        message(STATUS "Using vendored Eigen3 from third_party/eigen")
+        add_library(Eigen3::Eigen INTERFACE IMPORTED GLOBAL)
+        set_target_properties(Eigen3::Eigen PROPERTIES
+            INTERFACE_INCLUDE_DIRECTORIES
+                "${_EIGEN_VENDOR_DIR};${CMAKE_SOURCE_DIR}"
+        )
+        set(Eigen3_FOUND TRUE)
+    endif()
+endif()
+
 # GTest: used by test_interval_gaps and any other GTest-based suites.
 # Try system package first; fall back to FetchContent so the build works
 # without vcpkg or a pre-installed libgtest-dev.
@@ -52,25 +66,31 @@ target_include_directories(srfm_momentum PUBLIC src)
 add_library(srfm_beta_calculator STATIC
     src/beta_calculator/beta_calculator.cpp
 )
-target_include_directories(srfm_beta_calculator PUBLIC src)
+target_include_directories(srfm_beta_calculator PUBLIC src include)
 target_link_libraries(srfm_beta_calculator PUBLIC srfm_momentum)
+if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
+    target_link_libraries(srfm_beta_calculator PUBLIC Eigen3::Eigen)
+endif()
 
 add_library(srfm_manifold STATIC
     src/manifold/spacetime_manifold.cpp
 )
-target_include_directories(srfm_manifold PUBLIC src)
+target_include_directories(srfm_manifold PUBLIC src include)
 target_link_libraries(srfm_manifold PUBLIC srfm_momentum)
+if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
+    target_link_libraries(srfm_manifold PUBLIC Eigen3::Eigen)
+endif()
 
 add_library(srfm_geodesic STATIC
     src/geodesic/geodesic_solver.cpp
 )
-target_include_directories(srfm_geodesic PUBLIC src)
+target_include_directories(srfm_geodesic PUBLIC src include)
 target_link_libraries(srfm_geodesic PUBLIC srfm_manifold)
 
 add_library(srfm_engine STATIC
     src/engine/engine.cpp
 )
-target_include_directories(srfm_engine PUBLIC src)
+target_include_directories(srfm_engine PUBLIC src include)
 target_link_libraries(srfm_engine PUBLIC
     srfm_beta_calculator
     srfm_manifold

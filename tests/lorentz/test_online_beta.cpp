@@ -11,7 +11,7 @@
 ///   - Stationary prices give β = 0
 
 #include <gtest/gtest.h>
-#include "beta_calculator.hpp"
+#include "lorentz/beta_calculator.hpp"
 #include "srfm/constants.hpp"
 
 #include <cmath>
