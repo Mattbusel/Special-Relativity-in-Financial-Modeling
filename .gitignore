@@ -49,3 +49,6 @@ paper/*.out
 *.log
 --help
 build_test/
+tests/*/build/
+*.obj
+*.exe

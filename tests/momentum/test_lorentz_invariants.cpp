@@ -22,8 +22,8 @@
 
 #include "srfm_test.hpp"
 #include "momentum/momentum.hpp"
-#include "../manifold/spacetime_manifold.hpp"
-#include "../geodesic/geodesic_solver.hpp"
+#include "manifold/spacetime_manifold.hpp"
+#include "geodesic/geodesic_solver.hpp"
 
 #include <array>
 #include <cmath>

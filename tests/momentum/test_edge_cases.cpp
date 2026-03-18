@@ -19,11 +19,11 @@
 
 #include "srfm_test.hpp"
 #include "momentum/momentum.hpp"
-#include "../manifold/spacetime_manifold.hpp"
-#include "../geodesic/geodesic_solver.hpp"
-#include "../lorentz/lorentz_transform.hpp"
-#include "../lorentz/beta_calculator.hpp"
-#include "../beta_calculator/beta_calculator.hpp"
+#include "manifold/spacetime_manifold.hpp"
+#include "geodesic/geodesic_solver.hpp"
+#include "lorentz/lorentz_transform.hpp"
+#include "lorentz/beta_calculator.hpp"
+#include "beta_calculator/beta_calculator.hpp"
 
 #include <array>
 #include <cmath>
@@ -34,6 +34,11 @@ using namespace srfm::momentum;
 using namespace srfm::manifold;
 using namespace srfm::geodesic;
 using namespace srfm::lorentz;
+
+// Convert srfm::momentum::BetaVelocity to srfm::BetaVelocity (for LorentzTransform APIs).
+static srfm::BetaVelocity to_lorentz_beta(srfm::momentum::BetaVelocity b) noexcept {
+    return srfm::BetaVelocity{b.value()};
+}
 
 static constexpr double NAN_VAL = std::numeric_limits<double>::quiet_NaN();
 static constexpr double INF_VAL = std::numeric_limits<double>::infinity();
@@ -158,7 +163,8 @@ static void test_zero_velocity() {
 
 static void test_zero_proper_time() {
     // dilateTime(0, any_valid_beta) = 0  (zero proper time stays zero)
-    auto b06 = BetaVelocity::make(0.6).value();
+    auto b06_mom = BetaVelocity::make(0.6).value();
+    auto b06 = to_lorentz_beta(b06_mom);
     auto dt  = LorentzTransform::dilateTime(0.0, b06);
     SRFM_HAS_VALUE(dt);
     SRFM_CHECK_NEAR(*dt, 0.0, EPS);
@@ -419,7 +425,7 @@ static void test_lorentz_transform_invalid_beta() {
 // =============================================================================
 
 static void test_contract_length_invalid() {
-    auto b06 = BetaVelocity::make(0.6).value();
+    auto b06 = to_lorentz_beta(BetaVelocity::make(0.6).value());
 
     // Proper length must be strictly positive
     SRFM_NO_VALUE(LorentzTransform::contractLength(0.0, b06));
@@ -439,7 +445,7 @@ static void test_contract_length_invalid() {
 // =============================================================================
 
 static void test_total_energy_invalid() {
-    auto b06 = BetaVelocity::make(0.6).value();
+    auto b06 = to_lorentz_beta(BetaVelocity::make(0.6).value());
 
     SRFM_NO_VALUE(LorentzTransform::totalEnergy(b06, 0.0));
     SRFM_NO_VALUE(LorentzTransform::totalEnergy(b06, -1.0));
@@ -632,14 +638,14 @@ static void test_rapidity_additivity() {
     auto b1 = BetaVelocity::make(b1_val).value();
     auto b2 = BetaVelocity::make(b2_val).value();
 
-    auto phi1 = LorentzTransform::rapidity(b1);
-    auto phi2 = LorentzTransform::rapidity(b2);
+    auto phi1 = LorentzTransform::rapidity(to_lorentz_beta(b1));
+    auto phi2 = LorentzTransform::rapidity(to_lorentz_beta(b2));
     SRFM_HAS_VALUE(phi1);
     SRFM_HAS_VALUE(phi2);
 
     auto b_composed = compose_velocities(b1, b2);
     SRFM_HAS_VALUE(b_composed);
-    auto phi_composed = LorentzTransform::rapidity(*b_composed);
+    auto phi_composed = LorentzTransform::rapidity(to_lorentz_beta(*b_composed));
     SRFM_HAS_VALUE(phi_composed);
 
     SRFM_CHECK_NEAR(*phi_composed, *phi1 + *phi2, 1e-9);
