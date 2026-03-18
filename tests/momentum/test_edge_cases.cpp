@@ -559,14 +559,14 @@ static void test_online_beta_causal_property() {
 
     // Both result vectors must be finite with values in [0, BETA_MAX_SAFE)
     for (const auto& bv : *result_short) {
-        SRFM_CHECK(std::isfinite(bv.value()));
-        SRFM_CHECK(bv.value() >= 0.0);
-        SRFM_CHECK(bv.value() < BETA_MAX_SAFE);
+        SRFM_CHECK(std::isfinite(bv.value));
+        SRFM_CHECK(bv.value >= 0.0);
+        SRFM_CHECK(bv.value < BETA_MAX_SAFE);
     }
     for (const auto& bv : *result_long) {
-        SRFM_CHECK(std::isfinite(bv.value()));
-        SRFM_CHECK(bv.value() >= 0.0);
-        SRFM_CHECK(bv.value() < BETA_MAX_SAFE);
+        SRFM_CHECK(std::isfinite(bv.value));
+        SRFM_CHECK(bv.value >= 0.0);
+        SRFM_CHECK(bv.value < BETA_MAX_SAFE);
     }
 
     // Output length matches input length
@@ -613,8 +613,8 @@ static void test_doppler_reciprocity() {
         auto b_neg = BetaVelocity::make(-b_val);
         if (!b_neg) continue;
 
-        auto d_pos = BetaCalculator::dopplerFactor(*b_pos);
-        auto d_neg = BetaCalculator::dopplerFactor(*b_neg);
+        auto d_pos = BetaCalculator::dopplerFactor(to_lorentz_beta(*b_pos));
+        auto d_neg = BetaCalculator::dopplerFactor(to_lorentz_beta(*b_neg));
 
         if (!d_pos || !d_neg) continue;
 

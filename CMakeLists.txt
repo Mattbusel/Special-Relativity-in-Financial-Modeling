@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 project(srfm_cpp
-    VERSION 1.0.0
+    VERSION 1.1.0
     DESCRIPTION "Special Relativity in Financial Modelling — C++ library"
     LANGUAGES CXX
 )

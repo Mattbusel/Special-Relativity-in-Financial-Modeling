@@ -8,6 +8,46 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.1.0] - 2026-03-18
+
+### Added
+- `tests/integration/test_error_handling.cpp`: 22 integration tests covering
+  IEEE 754 special values (NaN, ±Inf, denormals) across every public API
+  surface; verifies no crash/UB and correct `std::nullopt` propagation for
+  `Engine`, `PerformanceCalculator`, `Backtester`, `LorentzSignalAdjuster`,
+  `SpacetimeInterval`, `MetricTensor`, `MomentumProcessor`, and `DataLoader`.
+- `CMakeLists.txt`: All previously unregistered test executables now wired into
+  `add_test()`: `test_lorentz_transform`, `test_beta_calculator`,
+  `test_online_beta`, `test_backtester`, `test_performance_metrics`,
+  `test_gamma_sizing`, `test_metrics_precision`, `test_full_pipeline`,
+  `test_error_handling`, `test_metric_tensor`, `test_christoffel`,
+  `test_geodesic`, `test_n_asset`, `test_stream`.
+- `CMakeLists.txt`: `SRFM_WARNINGS_AS_ERRORS` option (ON in CI, OFF by
+  default); `CMAKE_EXPORT_COMPILE_COMMANDS=ON`; generator-expression include
+  dirs on all installed targets; `srfm_backtest` library target.
+- `.github/workflows/ci.yml`: `matrix.build_type: [Debug, Release]` on Linux
+  jobs; ASAN+UBSAN and TSAN jobs; standalone `clang-tidy` job; Doxygen HTML
+  generation with artifact upload on `gcc-12 && Release`; `all-checks` gate
+  job; `concurrency` block to cancel in-progress runs; `libeigen3-dev`
+  installed in all Linux jobs.
+- `Doxyfile`: `ARCHITECTURE.md` and `CHANGELOG.md` added to INPUT;
+  `EXCLUDE_PATTERNS` for build dirs; `WARN_NO_PARAMDOC=YES`;
+  `BUILTIN_STL_SUPPORT=YES`; `HTML_DYNAMIC_SECTIONS=YES`.
+- `README.md`: Fully rewritten with mathematical background (spacetime
+  embedding, Lorentz factor, geodesic equation, metric tensor), architecture
+  diagram, build instructions (Linux/macOS/Windows/vcpkg), C++ API examples,
+  streaming and SIMD usage, test coverage table, performance benchmark table,
+  empirical validation summary, paper build commands, API reference, and
+  contributing checklist.
+- `cmake/srfmConfig.cmake.in`: Package config template for downstream
+  `find_package(srfm CONFIG REQUIRED)`.
+
+### Changed
+- `CMakeLists.txt` version bumped from 1.0.0 to 1.1.0.
+- README.md version badge updated to 1.1.0.
+
+---
+
 ## [Unreleased]
 
 ### Added

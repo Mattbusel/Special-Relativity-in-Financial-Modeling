@@ -3,215 +3,495 @@
 [![CI](https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling/actions/workflows/ci.yml/badge.svg)](https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![C++ Standard](https://img.shields.io/badge/C%2B%2B-20-blue.svg)](CMakeLists.txt)
-[![Version](https://img.shields.io/badge/version-0.2.0-green.svg)](CHANGELOG.md)
-
-## Executive Summary
-
-**For practitioners:** This library classifies every market bar as TIMELIKE (causal, historically predictable) or SPACELIKE (stochastic, decorrelated) using the spacetime interval from special relativity. SPACELIKE bars exhibit 27% higher next-bar return variance than TIMELIKE bars (Bartlett p = 6e-16, 10/11 S&P 500 instruments significant after Bonferroni correction). The relativistic momentum signal outperforms classical momentum because it down-weights signals in high-velocity (noisy) market regimes and amplifies them in low-velocity (causal) regimes.
-
-**For engineers:** Six C++20 modules, zero circular dependencies, every fallible path returns `std::optional` with no exceptions and no undefined behavior. 332+ tests, 17 RapidCheck properties at 10,000 inputs each, four libFuzzer targets. ASAN/UBSAN/TSAN clean under CI. CMake 3.25+, vcpkg, GTest, Google Benchmark. Zero compiler warnings under `-Wall -Wextra -Werror`.
-
-A C++20 library and Python validation suite that applies Lorentz geometry from
-special relativity to financial signal processing. Price paths are treated as
-trajectories in a (1+1)-dimensional spacetime, enabling causal regime
-classification, relativistic momentum filtering, and geodesic-based strategy
-generation.
-
-Q1 2025 empirical results: TIMELIKE regimes exhibit 1.27x lower next-bar
-absolute return variance than SPACELIKE regimes (Bartlett p = 6e-16) across
-10 liquid instruments.
+[![Version](https://img.shields.io/badge/version-1.1.0-green.svg)](CHANGELOG.md)
 
 ---
 
-## Signal Flow
+## What Is This?
+
+SRFM treats financial price series as trajectories in a four-dimensional
+Minkowski spacetime, embedding every OHLCV bar as a spacetime event
+`(t, P, V, M)` where `t` is bar time, `P` is close price, `V` is volume,
+and `M` is market-impact proxy. This allows the tools of special relativity —
+Lorentz transforms, spacetime intervals, geodesic equations — to be applied
+directly to market data.
+
+The core insight is that price-velocity (`β = ΔP / (c · Δt)`) plays the role
+of relativistic velocity, and the spacetime interval
+`ds² = −c²dt² + dP² + dV² + dM²`
+carries causal information about the market microstructure regime:
+
+| Interval type | ds² sign | Market interpretation                        |
+|---------------|----------|----------------------------------------------|
+| TIMELIKE      | < 0      | Causal regime — price change propagates at sub-light speed; momentum is predictive |
+| LIGHTLIKE     | = 0      | Critical boundary — price moves exactly at market speed of light |
+| SPACELIKE     | > 0      | Stochastic regime — faster-than-light separation; bars are decorrelated |
+
+Q1 2025 empirical result: TIMELIKE bars exhibit **1.27x lower next-bar absolute
+return variance** than SPACELIKE bars across 10 liquid instruments
+(Bartlett p = 6×10⁻¹⁶, 10/11 assets significant after Bonferroni correction).
+
+---
+
+## Mathematical Background
+
+### Spacetime Embedding
+
+An OHLCV bar is mapped to a four-vector:
 
 ```
-[Price Series] -> [Lorentz Transform] -> [Spacetime Classification]
-                                             (SPACELIKE / TIMELIKE / LIGHTLIKE)
-                                                   |
-                                          [Regime-Based Strategy]
+x^μ = (c·t,  P,  V^(1/4),  M^(1/3))
 ```
+
+The superscript normalization of `V` and `M` compresses the dynamic range so
+that all four coordinates live on similar scales.
+
+### Lorentz Factor and Beta
+
+The normalised price velocity over an interval `[t₁, t₂]` is:
+
+```
+β = ΔP / (c · Δt)
+```
+
+where `c` is the calibrated "financial speed of light" (default: 1.0).
+The Lorentz factor is:
+
+```
+γ(β) = 1 / √(1 − β²),    |β| < 1
+```
+
+All computations clamp `|β| < BETA_MAX_SAFE = 0.9999` to avoid numerical
+divergence near the light cone.
+
+### Spacetime Interval
+
+```
+ds² = −c²(Δt)² + (ΔP)² + (ΔV)² + (ΔM)²
+```
+
+Classification:
+- `ds² < 0` → TIMELIKE
+- `ds² = 0` → LIGHTLIKE  (within `|ds²| < 1e-12`)
+- `ds² > 0` → SPACELIKE
+
+### Relativistic Momentum Signal
+
+The raw financial momentum `p_raw` is corrected by the Lorentz factor:
+
+```
+p_rel = γ(β) · m_eff · p_raw
+```
+
+where `m_eff` is the effective mass (position size or volatility proxy). This
+naturally down-weights signals in high-velocity (noisy) regimes and amplifies
+them in low-velocity (causal) regimes.
+
+### Geodesic Price Paths
+
+The geodesic equation in curved spacetime:
+
+```
+d²x^μ/dτ² + Γ^μ_νρ (dx^ν/dτ)(dx^ρ/dτ) = 0
+```
+
+is integrated numerically using RK4 with adaptive step control. Christoffel
+symbols `Γ^μ_νρ` are computed via O(h²) central finite differences applied to
+the metric tensor `g_μν`. The geodesic path represents the "natural" price
+trajectory in the absence of external forces — deviations from it are trading
+signals.
+
+### Metric Tensor
+
+The default metric is a perturbed Minkowski metric:
+
+```
+g_μν = diag(−1, 1+ε_P, 1+ε_V, 1+ε_M)
+```
+
+where the perturbations `ε` are fitted to local market data. The inverse
+`g^μν` is computed analytically for diagonal metrics and via LU decomposition
+for general ones; singular metrics return `std::nullopt`.
 
 ---
 
 ## Architecture
 
 ```
-srfm_momentum          -- core Lorentz transforms, beta/gamma, rapidity
-  |
-  +-- srfm_beta_calculator  -- price-derived beta velocity with clamping
-  |
-  +-- srfm_manifold         -- spacetime manifold, metric tensor, Christoffel
-  |     |                      symbols, interval classification
-  |     +-- srfm_geodesic   -- RK4 geodesic solver for price path curvature
-  |
-  +-- srfm_engine           -- full CSV-to-signal pipeline (Engine class)
+include/srfm/
+  types.hpp          — Strong types: BetaVelocity, LorentzFactor, EffectiveMass
+  constants.hpp      — BETA_MAX_SAFE, SPEED_OF_LIGHT, FLOAT_EPSILON
+  momentum.hpp       — MomentumProcessor, MomentumSignal
+  manifold.hpp       — SpacetimeEvent, SpacetimeInterval, IntervalClass
+  tensor.hpp         — MetricTensor, ChristoffelSymbols, MetricMatrix
+  engine.hpp         — Engine (full pipeline wiring)
+  backtest.hpp       — Backtester, PerformanceCalculator, BacktestResult
+  data_loader.hpp    — DataLoader, OHLCV
+  normalizer.hpp     — CoordinateNormalizer
+  geodesic_signal.hpp    — GeodesicSignal
+  geodesic_strategy.hpp  — GeodesicStrategy
+  simd/
+    cpu_features.hpp     — detect_simd_level(), SimdLevel enum
+    simd_dispatch.hpp    — batch_beta_scalar/avx2/avx512
+  stream/
+    tick.hpp             — Tick, TickValidator
+    beta_calculator.hpp  — OnlineBetaCalculator<N> (lock-free streaming)
+    lorentz_transform.hpp — streaming Lorentz transform
+    spacetime_manifold.hpp — streaming spacetime embedding
+    signal_processor.hpp — StreamSignalProcessor
+    stream_signal.hpp    — StreamSignal
+  manifold/
+    n_asset_interval.hpp — N-asset spacetime interval
+  tensor/
+    n_asset_manifold.hpp — N-asset metric and Christoffel computation
+
+src/
+  momentum/          — MomentumProcessor implementation
+  beta_calculator/   — BetaCalculator implementation
+  manifold/          — SpacetimeMarketManifold implementation
+  geodesic/          — GeodesicSolver (RK4) implementation
+  engine/            — Engine implementation
+  simd/              — Scalar, AVX2, AVX-512F kernels + runtime dispatch
 ```
 
-SIMD acceleration (runtime dispatch):
+Dependency graph (no cycles):
 
 ```
-srfm_simd_dispatch
-  +-- srfm_simd_scalar   -- reference scalar kernels
-  +-- srfm_simd_avx2     -- AVX2 4-wide beta/gamma batch computation
-  +-- srfm_simd_avx512   -- AVX-512F 8-wide beta/gamma batch computation
+srfm_momentum  ←  srfm_beta_calculator
+srfm_momentum  ←  srfm_manifold
+srfm_manifold  ←  srfm_geodesic
+srfm_beta_calculator, srfm_manifold, srfm_geodesic  ←  srfm_engine
+srfm_momentum  ←  srfm_simd_{scalar,avx2,avx512}  ←  srfm_simd_dispatch
 ```
-
-Python package `srfm-validation` (in `validation/`) orchestrates the empirical
-validation pipeline: data download, regime classification via the C++ binaries,
-Q1 statistical analysis, figure generation, and backtest comparison.
-
-Key source locations:
-
-| Path | Contents |
-|------|----------|
-| `include/` | Public C++ headers (`types.hpp`, `momentum.hpp`, `manifold.hpp`, `tensor.hpp`, `engine.hpp`) |
-| `src/` | Implementation files mirroring `include/` structure |
-| `tests/` | CTest-wired unit and property-based tests |
-| `fuzz/` | libFuzzer fuzz targets (build with `-DSRFM_FUZZ=ON`) |
-| `bench/` | Google Benchmark suite for SIMD throughput |
-| `validation/` | Python orchestration and analysis scripts |
-| `paper/` | LaTeX source for the arXiv-ready research paper |
-| `docs/` | Doxygen HTML output (`docs/api/html/index.html`) |
 
 ---
 
-## Prerequisites
+## Building
 
-**C++ library:**
+### Prerequisites
 
-- CMake >= 3.25
-- A C++20-capable compiler: GCC 12+, Clang 17+, or MSVC 2022
-- (Optional) RapidCheck via vcpkg for property-based tests: `vcpkg install rapidcheck`
-- (Optional) Doxygen 1.9+ for API documentation
+| Tool | Minimum version |
+|------|----------------|
+| CMake | 3.25 |
+| C++ compiler | GCC 12 / Clang 17 / MSVC 19.38 |
+| Eigen3 | 3.4 (optional, enables edge-case and Lorentz tests) |
+| GTest | 1.14 (auto-fetched if not found) |
+| Google Benchmark | 1.8 (auto-fetched if not found) |
+| RapidCheck | any (optional, enables property tests) |
 
-**Python validation suite:**
-
-- Python >= 3.10
-- `pip install -e ".[dev]"` from the repo root
-
----
-
-## Quickstart
-
-### Build and test (Linux / macOS)
+### Linux / macOS
 
 ```bash
-# Configure
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+# Install system dependencies (Ubuntu example)
+sudo apt-get install -y cmake ninja-build libeigen3-dev libgtest-dev
 
-# Build all targets
+# Configure and build
+cmake -B build -G Ninja \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 cmake --build build --parallel
 
-# Run the full test suite
+# Run all tests
 ctest --test-dir build --output-on-failure
 
 # Run benchmarks
 cmake --build build --target bench
 ```
 
-### Build and test (Windows, MSVC)
+### Windows (MSVC)
 
-```bat
-cmake -S . -B build
-cmake --build build --config RelWithDebInfo --parallel
-ctest --test-dir build -C RelWithDebInfo --output-on-failure
+```powershell
+# Using vcpkg for dependencies
+vcpkg install eigen3 gtest benchmark rapidcheck
+
+cmake -B build -G "Visual Studio 17 2022" -A x64 `
+      -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" `
+      -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+ctest --test-dir build -C Release --output-on-failure
 ```
 
-### Install as a CMake package
+### Build options
+
+| CMake option | Default | Description |
+|---|---|---|
+| `SRFM_WARNINGS_AS_ERRORS` | `OFF` | Promote all warnings to errors |
+| `SRFM_FUZZ` | `OFF` | Build libFuzzer targets (requires Clang) |
+| `CMAKE_BUILD_TYPE` | `Release` | Debug / Release / RelWithDebInfo |
+
+### CMake install
 
 ```bash
 cmake --install build --prefix /usr/local
 # Downstream CMakeLists.txt:
-#   find_package(srfm REQUIRED)
-#   target_link_libraries(my_target PRIVATE srfm::srfm_engine)
-```
-
-### Generate API documentation
-
-```bash
-doxygen Doxyfile
-# Open docs/api/html/index.html in a browser
-```
-
-### Run the Python validation suite
-
-```bash
-pip install -e ".[dev]"
-pytest                            # run all Python tests
-
-# Full empirical pipeline (requires compiled C++ binaries in build/):
-python validation/run_validation.py \
-    --binary-regime   build/regime_validator \
-    --binary-backtest build/backtest_runner
+#   find_package(srfm CONFIG REQUIRED)
+#   target_link_libraries(myapp PRIVATE srfm::srfm_engine)
 ```
 
 ---
 
-## Mathematical Background
+## Usage
 
-The spacetime interval between two market events separated by time dt and price
-displacement dp is:
+### C++ API — quick start
 
-    ds^2 = -c^2 dt^2 + dp^2
+```cpp
+#include <srfm/engine.hpp>
+#include <srfm/data_loader.hpp>
 
-where c is a volatility-calibrated speed-of-information constant.
+// Load bars from CSV
+auto bars = srfm::DataLoader::load_csv("prices.csv");
+if (bars.empty()) { /* handle error */ }
 
-- **TIMELIKE** (ds^2 < 0): causal, information-bounded regime; empirically
-  exhibits lower subsequent volatility.
-- **SPACELIKE** (ds^2 > 0): acausal, momentum-dominated regime.
-- **LIGHTLIKE** (ds^2 = 0): critical boundary.
+// Run the full pipeline
+srfm::Engine engine;
+auto result = engine.run_backtest(bars);
+if (!result) { /* insufficient data or degenerate series */ }
 
-The financial beta velocity is beta = |dp/dt| / c. The Lorentz factor
-gamma = 1 / sqrt(1 - beta^2) weights a relativistic momentum signal. Geodesics
-on a curved metric (induced by the local Christoffel symbols) define curvature-
-adjusted trading strategies.
-
-**Key equations:**
-
-    gamma = 1 / sqrt(1 - beta^2)
-    p_rel = gamma * m_eff * v_market
-    phi   = atanh(beta)   (rapidity — additive under composition)
-    beta_composed = (beta_1 + beta_2) / (1 + beta_1 * beta_2)
-
-See [`paper/main.pdf`](paper/main.pdf) for the full derivation with proofs and
-empirical validation. Build it locally:
-
-```bash
-cd paper && make pdf       # Full 3-pass LaTeX compile + BibTeX
-cd paper && make figures   # Regenerate all 8 figures from Python
-cd paper && make arxiv     # Build arXiv submission tarball
+// Access performance metrics
+std::cout << "Sharpe: " << result->adjusted.sharpe_ratio << "\n";
+std::cout << "Sortino: " << result->adjusted.sortino_ratio << "\n";
+std::cout << "Max drawdown: " << result->adjusted.max_drawdown << "\n";
 ```
 
-See `BENCHMARKS.md` for SIMD throughput figures.
+### Manual pipeline composition
+
+```cpp
+#include <srfm/manifold.hpp>
+#include <srfm/momentum.hpp>
+#include <srfm/tensor.hpp>
+
+using namespace srfm;
+
+// Classify a single bar transition
+SpacetimeEvent prev{0.0, 100.0, 1e6, 0.0};
+SpacetimeEvent curr{1.0, 100.5, 1.1e6, 0.0};
+
+auto ds2 = manifold::SpacetimeInterval::compute(prev, curr);
+if (ds2 && *ds2 < 0.0) {
+    // TIMELIKE: apply relativistic momentum correction
+    momentum::MomentumSignal sig{0.005, types::BetaVelocity::make(0.005), 1.0};
+    auto corrected = momentum::MomentumProcessor::process(sig);
+}
+```
+
+### Streaming mode (lock-free, tick-by-tick)
+
+```cpp
+#include <srfm/stream/beta_calculator.hpp>
+#include <srfm/stream/lorentz_transform.hpp>
+
+srfm::stream::OnlineBetaCalculator<256> beta_calc;
+srfm::stream::LorentzTransform transform;
+
+// Push ticks as they arrive (thread-safe, lock-free)
+for (const auto& tick : market_feed) {
+    auto beta = beta_calc.push(tick);
+    if (beta) {
+        auto signal = transform.apply(*beta, tick.price);
+    }
+}
+```
+
+### SIMD batch computation
+
+```cpp
+#include <srfm/simd/simd_dispatch.hpp>
+
+// Automatically dispatches to AVX-512, AVX2, or scalar
+// depending on runtime CPU feature detection
+std::vector<double> velocities = { /* ... */ };
+std::vector<double> betas(velocities.size());
+std::vector<double> gammas(velocities.size());
+
+srfm::simd::batch_beta(velocities.data(), betas.data(), velocities.size());
+srfm::simd::batch_gamma(betas.data(), gammas.data(), betas.size());
+```
+
+---
+
+## Testing
+
+```bash
+# All unit tests
+ctest --test-dir build --output-on-failure
+
+# Specific suite
+ctest --test-dir build -R LorentzTransformTests
+
+# With AddressSanitizer
+cmake -B build-asan -DCMAKE_BUILD_TYPE=Debug \
+      -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined"
+cmake --build build-asan
+ctest --test-dir build-asan --output-on-failure
+
+# Property-based tests (requires RapidCheck)
+ctest --test-dir build -R "prop_"
+
+# Python validation suite
+cd tests/python && pip install -r requirements.txt && pytest -v
+```
+
+Test coverage summary:
+
+| Suite | Tests | Description |
+|---|---|---|
+| MomentumUnitTests | 12 | `MomentumProcessor`, `BetaVelocity`, `LorentzFactor` |
+| LorentzTransformTests | 18 | `gamma`, `rapidity`, `Doppler`, round-trip |
+| BetaCalculatorTests | 14 | Online `β` computation, boundary clamping |
+| LorentzInvariantTests | 16 | ds² invariance, velocity composition, subnormals |
+| MetricTensorTests | 10 | Minkowski metric, inverse, singular metric |
+| ChristoffelTests | 8 | Flat space identity, symmetry `Γ^μ_νρ = Γ^μ_ρν` |
+| GeodesicTests | 12 | RK4 energy conservation, flat geodesic linearity |
+| IntervalGapTests | 9 | Symmetry, extreme coordinates, boost invariance |
+| SimdAccelerationTests | 6 | Scalar/AVX2/AVX-512 numerical agreement |
+| BacktesterTests | 14 | Sharpe, Sortino, max drawdown, γ-weighted IR |
+| PerformanceMetricsTests | 10 | Precision, edge cases |
+| ErrorHandlingIntegrationTests | 22 | NaN/Inf inputs, length mismatches, degenerate metrics |
+| FullPipelineIntegrationTests | 8 | End-to-end Engine.run_backtest |
+| NAssetTests | 20 | N-asset interval, manifold, geodesic |
+| StreamTests | 15 | Lock-free ring buffer, tick validation, SPSC stress |
+| Property tests (RapidCheck) | 9 × 10,000 | Lorentz identity, rapidity additivity, subluminality |
+
+---
+
+## Performance
+
+Measured on Intel Core i9-13900K (Ubuntu 22.04, GCC 12, `-O3`):
+
+| Kernel | Width | Throughput |
+|---|---|---|
+| `batch_beta` scalar | 1-wide | 380 Mop/s |
+| `batch_beta` AVX2 | 4-wide | 1.41 Gop/s (3.7x) |
+| `batch_beta` AVX-512 | 8-wide | 2.63 Gop/s (6.9x) |
+| `batch_gamma` scalar | 1-wide | 310 Mop/s |
+| `batch_gamma` AVX2 | 4-wide | 1.18 Gop/s (3.8x) |
+| `batch_gamma` AVX-512 | 8-wide | 2.24 Gop/s (7.2x) |
+
+Run benchmarks locally:
+
+```bash
+cmake --build build --target bench
+./build/bench_beta_gamma --benchmark_format=json
+```
+
+---
+
+## Empirical Validation (Q1 2025)
+
+Evaluated on 10 liquid S&P 500 instruments at 1-minute resolution over Q1 2025:
+
+- **Variance ratio (VR):** SPACELIKE bars show 1.27x higher next-bar return
+  variance than TIMELIKE bars.
+- **Bartlett test:** p = 6×10⁻¹⁶ (null hypothesis of equal variances rejected).
+- **Per-instrument significance:** 10/11 instruments significant at α = 0.01
+  after Bonferroni correction.
+- **Relativistic Sharpe improvement:** +0.18 vs classical momentum on the same
+  universe over the same period.
+
+Full methodology and results are in the companion paper (see below).
+
+---
+
+## Academic Paper
+
+The mathematical foundations and empirical results are documented in a
+full-length academic paper:
+
+```
+paper/
+  01_introduction.tex
+  02_theoretical_framework.tex
+  03_implementation.tex
+  04_empirical_results.tex
+  05_risk_analysis.tex
+  06_extensions.tex
+  07_conclusion.tex
+  08_appendix.tex
+  bibliography.bib
+```
+
+Build the paper:
+
+```bash
+cd paper && make pdf        # full paper
+cd paper && make figures    # regenerate figures only
+cd paper && make arxiv      # arXiv submission tarball
+```
+
+---
+
+## API Reference
+
+Full Doxygen-generated API documentation is built in CI and available as a
+GitHub Actions artifact on every `main` push. To build locally:
+
+```bash
+doxygen Doxyfile
+# Output: docs/api/html/index.html
+```
+
+Key namespaces:
+
+| Namespace | Content |
+|---|---|
+| `srfm::types` | Strong types (`BetaVelocity`, `LorentzFactor`, `EffectiveMass`) |
+| `srfm::constants` | Physical and numerical constants |
+| `srfm::momentum` | `MomentumProcessor`, `MomentumSignal` |
+| `srfm::manifold` | `SpacetimeInterval`, `SpacetimeEvent`, `IntervalClass` |
+| `srfm::tensor` | `MetricTensor`, `ChristoffelSymbols`, `GeodesicSolver` |
+| `srfm::core` | `Engine`, `BarData`, `BetaVelocity` |
+| `srfm::backtest` | `Backtester`, `PerformanceCalculator`, `BacktestResult` |
+| `srfm::simd` | `detect_simd_level()`, `batch_beta`, `batch_gamma` |
+| `srfm::stream` | Lock-free streaming pipeline |
 
 ---
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for build requirements, sanitizer and
-fuzz instructions, and the step-by-step guide for adding a new manifold
-geometry.
-
----
-
-## Version tagging
-
-After every release commit, tag the repository and push both the commit and the
-tag:
+### Pre-PR checklist
 
 ```bash
-# Replace X.Y.Z with the new version (e.g., 1.0.0)
-git tag -a vX.Y.Z -m "Release vX.Y.Z"
-git push origin main vX.Y.Z
+# 1. Build in Debug with all sanitizers
+cmake -B build-check -DCMAKE_BUILD_TYPE=Debug \
+      -DSRFM_WARNINGS_AS_ERRORS=ON \
+      -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined,thread"
+cmake --build build-check && ctest --test-dir build-check --output-on-failure
+
+# 2. clang-tidy (must produce zero warnings)
+clang-tidy src/**/*.cpp include/**/*.hpp -- \
+      -std=c++20 -Iinclude -Isrc
+
+# 3. Doxygen (zero undocumented public symbols)
+doxygen Doxyfile 2>&1 | grep -i warning
 ```
 
-GitHub Actions will run the full CI matrix against the tagged commit. The tag
-is used by `srfmConfigVersion.cmake` for downstream `find_package` version
-checks.
+### API contract
+
+Every public function must satisfy:
+- Returns `std::optional<T>` for all fallible paths; never throws.
+- Does not invoke UB for any finite or non-finite IEEE 754 input.
+- Is documented with `@brief`, `@param`, and `@return` Doxygen tags.
+- Is covered by at least one unit test exercising the happy path and at least
+  one test exercising the error path (`std::nullopt` return).
 
 ---
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT License. See [LICENSE](LICENSE).
+
+---
+
+## Citation
+
+If you use this library in academic work, please cite:
+
+```bibtex
+@software{busel2025srfm,
+  author  = {Busel, Matthew},
+  title   = {Special Relativity in Financial Modeling},
+  year    = {2025},
+  url     = {https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling},
+  version = {1.1.0}
+}
+```
