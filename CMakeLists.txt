@@ -77,6 +77,29 @@ target_link_libraries(test_edge_cases PRIVATE
 )
 add_test(NAME EdgeCaseBoundaryTests COMMAND test_edge_cases)
 
+# ── Lorentz invariants and numerical edge-case tests ─────────────────────────
+add_executable(test_lorentz_invariants
+    tests/momentum/test_lorentz_invariants.cpp
+)
+target_include_directories(test_lorentz_invariants PRIVATE src tests/momentum)
+target_link_libraries(test_lorentz_invariants PRIVATE
+    srfm_momentum
+    srfm_manifold
+    srfm_geodesic
+)
+add_test(NAME LorentzInvariantTests COMMAND test_lorentz_invariants)
+
+# ── Interval gap tests (symmetry, numerical stability, Lorentz invariance) ───
+add_executable(test_interval_gaps
+    tests/manifold/test_interval_gaps.cpp
+)
+target_include_directories(test_interval_gaps PRIVATE src include)
+target_link_libraries(test_interval_gaps PRIVATE
+    srfm_manifold
+    GTest::gtest_main
+)
+add_test(NAME IntervalGapTests COMMAND test_interval_gaps)
+
 # ── Property-based tests (RapidCheck) ────────────────────────────────────────
 if(RapidCheck_FOUND)
     set(PROPERTY_TESTS
@@ -277,22 +300,28 @@ add_custom_target(bench
 )
 
 # ── Install targets and package config ────────────────────────────────────────
+# Only the core API libraries (momentum, beta_calculator, manifold, geodesic,
+# engine) are exported. The SIMD implementation targets use source-relative
+# include paths that are not suitable for export and are considered internal.
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-set(SRFM_INSTALL_TARGETS
-    srfm_momentum
-    srfm_beta_calculator
-    srfm_manifold
-    srfm_geodesic
-    srfm_engine
-    srfm_simd_scalar
-    srfm_simd_avx2
-    srfm_simd_avx512
-    srfm_simd_dispatch
-)
+# Patch include dirs on core targets to use generator expressions so that
+# the same target works both in the build tree and after installation.
+foreach(_tgt srfm_momentum srfm_beta_calculator srfm_manifold srfm_geodesic srfm_engine)
+    get_target_property(_cur_incs ${_tgt} INTERFACE_INCLUDE_DIRECTORIES)
+    set_target_properties(${_tgt} PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES
+            "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>;$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+    )
+endforeach()
 
-install(TARGETS ${SRFM_INSTALL_TARGETS}
+install(TARGETS
+        srfm_momentum
+        srfm_beta_calculator
+        srfm_manifold
+        srfm_geodesic
+        srfm_engine
     EXPORT srfmTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
@@ -303,7 +332,7 @@ install(DIRECTORY include/
 )
 
 install(DIRECTORY src/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/srfm/src
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/srfm
     FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h"
 )
 
