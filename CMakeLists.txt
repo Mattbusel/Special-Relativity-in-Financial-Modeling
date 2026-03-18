@@ -108,6 +108,25 @@ if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
     target_link_libraries(srfm_lorentz PUBLIC Eigen3::Eigen)
 endif()
 
+add_library(srfm_tensor STATIC
+    src/tensor/metric_tensor.cpp
+    src/tensor/christoffel.cpp
+    src/tensor/christoffel_n.cpp
+    src/tensor/geodesic.cpp
+    src/tensor/geodesic_n.cpp
+    src/tensor/geodesic_signal.cpp
+    src/tensor/n_asset_manifold.cpp
+)
+# Note: ${CMAKE_SOURCE_DIR} is NOT added here to avoid a bare 'version' file
+# in the project root shadowing <version> from C++20 standard library on MSVC.
+# Targets that include <third_party/eigen/Eigen/Dense> must add ${CMAKE_SOURCE_DIR}
+# to their own include directories (see test_n_asset below).
+target_include_directories(srfm_tensor PUBLIC src include)
+target_link_libraries(srfm_tensor PUBLIC srfm_manifold srfm_geodesic)
+if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
+    target_link_libraries(srfm_tensor PUBLIC Eigen3::Eigen)
+endif()
+
 add_library(srfm_backtest STATIC
     src/backtest/backtester.cpp
     src/backtest/geodesic_strategy.cpp
@@ -263,7 +282,7 @@ add_executable(test_metric_tensor
 )
 target_include_directories(test_metric_tensor PRIVATE src include)
 target_link_libraries(test_metric_tensor PRIVATE
-    srfm_manifold
+    srfm_tensor
     GTest::gtest_main
 )
 add_test(NAME MetricTensorTests COMMAND test_metric_tensor)
@@ -273,8 +292,7 @@ add_executable(test_christoffel
 )
 target_include_directories(test_christoffel PRIVATE src include)
 target_link_libraries(test_christoffel PRIVATE
-    srfm_manifold
-    srfm_geodesic
+    srfm_tensor
     GTest::gtest_main
 )
 add_test(NAME ChristoffelTests COMMAND test_christoffel)
@@ -284,8 +302,7 @@ add_executable(test_geodesic
 )
 target_include_directories(test_geodesic PRIVATE src include)
 target_link_libraries(test_geodesic PRIVATE
-    srfm_manifold
-    srfm_geodesic
+    srfm_tensor
     GTest::gtest_main
 )
 add_test(NAME GeodesicTests COMMAND test_geodesic)
@@ -298,10 +315,9 @@ add_executable(test_n_asset
     tests/n_asset/test_geodesic_n.cpp
     tests/n_asset/test_n_asset_engine.cpp
 )
-target_include_directories(test_n_asset PRIVATE src include tests/n_asset
-    ${CMAKE_SOURCE_DIR}  # needed for <third_party/eigen/Eigen/Dense>
-)
+target_include_directories(test_n_asset PRIVATE src include tests/n_asset)
 target_link_libraries(test_n_asset PRIVATE
+    srfm_tensor
     srfm_engine
     GTest::gtest_main
 )
