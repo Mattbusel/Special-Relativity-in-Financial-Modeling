@@ -35,6 +35,8 @@
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace srfm::stream {
@@ -67,7 +69,10 @@ public:
         : window_{window}
         , buf_(window, 0.0)
     {
-        assert(window >= 2u);
+        if (window < 2u)
+            throw std::invalid_argument(
+                "CoordinateNormalizer: window must be >= 2, got " +
+                std::to_string(window));
     }
 
     // ── State mutation ─────────────────────────────────────────────────────────

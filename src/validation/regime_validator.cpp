@@ -40,7 +40,6 @@
 #include <iostream>
 #include <optional>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -102,10 +101,12 @@ static int find_col(const std::vector<std::string>& header,
 
 // ─── Data Loading ─────────────────────────────────────────────────────────────
 
-static std::vector<OhlcvBar> load_csv(const std::string& path) {
+static std::optional<std::vector<OhlcvBar>> load_csv(const std::string& path,
+                                                      std::string& err) {
     std::ifstream file(path);
     if (!file.is_open()) {
-        throw std::runtime_error("Cannot open input file: " + path);
+        err = "Cannot open input file: " + path;
+        return std::nullopt;
     }
 
     std::vector<OhlcvBar> bars;
@@ -113,7 +114,8 @@ static std::vector<OhlcvBar> load_csv(const std::string& path) {
 
     // Read header
     if (!std::getline(file, line)) {
-        throw std::runtime_error("Empty CSV file: " + path);
+        err = "Empty CSV file: " + path;
+        return std::nullopt;
     }
     auto header = split_csv(line);
 
@@ -125,7 +127,8 @@ static std::vector<OhlcvBar> load_csv(const std::string& path) {
     int col_volume = find_col(header, "volume");
 
     if (col_close < 0 || col_volume < 0) {
-        throw std::runtime_error("CSV missing required columns 'close' or 'volume'");
+        err = "CSV missing required columns 'close' or 'volume'";
+        return std::nullopt;
     }
 
     std::size_t row_idx = 0;
@@ -292,14 +295,16 @@ static std::vector<ClassifiedBar> classify_bars(
 
 // ─── Output ───────────────────────────────────────────────────────────────────
 
-static void write_output(
+static bool write_output(
     const std::string& ticker,
     const std::vector<ClassifiedBar>& bars,
-    const std::string& output_path)
+    const std::string& output_path,
+    std::string& err)
 {
     std::ofstream out(output_path);
     if (!out.is_open()) {
-        throw std::runtime_error("Cannot open output file: " + output_path);
+        err = "Cannot open output file: " + output_path;
+        return false;
     }
 
     out << "ticker,bar_index,interval_type,next_bar_abs_return,next_bar_return,beta,geodesic_deviation\n";
@@ -315,6 +320,7 @@ static void write_output(
             << b.beta << ","
             << b.geodesic_deviation << "\n";
     }
+    return true;
 }
 
 // ─── CLI Argument Parsing ─────────────────────────────────────────────────────
@@ -363,13 +369,13 @@ int main(int argc, char* argv[]) {
     const Args& args = *maybe_args;
 
     // ── Load data ─────────────────────────────────────────────────────────────
-    std::vector<OhlcvBar> bars;
-    try {
-        bars = load_csv(args.input_path);
-    } catch (const std::exception& ex) {
-        std::cerr << "[FATAL] " << ex.what() << "\n";
+    std::string load_err;
+    auto maybe_bars = load_csv(args.input_path, load_err);
+    if (!maybe_bars.has_value()) {
+        std::cerr << "[FATAL] " << load_err << "\n";
         return 1;
     }
+    std::vector<OhlcvBar> bars = std::move(*maybe_bars);
 
     if (bars.empty()) {
         std::cerr << "[FATAL] No valid bars loaded from " << args.input_path << "\n";
@@ -400,10 +406,9 @@ int main(int argc, char* argv[]) {
     std::cout << "  LIGHTLIKE: " << n_ll << "  (" << (100.0 * n_ll / classified.size()) << "%)\n";
 
     // ── Write output ──────────────────────────────────────────────────────────
-    try {
-        write_output(args.ticker, classified, args.output_path);
-    } catch (const std::exception& ex) {
-        std::cerr << "[FATAL] " << ex.what() << "\n";
+    std::string write_err;
+    if (!write_output(args.ticker, classified, args.output_path, write_err)) {
+        std::cerr << "[FATAL] " << write_err << "\n";
         return 1;
     }
 

@@ -74,8 +74,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ matrix.compiler }}-${{ matrix.build_type }}-
 
+      - name: Install lcov (GCC Debug only)
+        if: matrix.compiler == 'gcc-12' && matrix.build_type == 'Debug'
+        run: sudo apt-get install -y lcov
+
       - name: CMake configure
         run: |
+          EXTRA_FLAGS=""
+          if [ "${{ matrix.compiler }}" = "gcc-12" ] && [ "${{ matrix.build_type }}" = "Debug" ]; then
+            EXTRA_FLAGS="-DCMAKE_CXX_FLAGS=--coverage -DCMAKE_EXE_LINKER_FLAGS=--coverage"
+          fi
           cmake -S . \
             -B build-${{ matrix.compiler }}-${{ matrix.build_type }} \
             -G Ninja \
@@ -83,7 +91,8 @@ jobs:
             -DCMAKE_CXX_STANDARD=20 \
             -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
             -DSRFM_WARNINGS_AS_ERRORS=ON \
-            -DSRFM_BUILD_INTEGRATION_TESTS=ON
+            -DSRFM_BUILD_INTEGRATION_TESTS=ON \
+            $EXTRA_FLAGS
 
       - name: Build
         run: |
@@ -96,6 +105,33 @@ jobs:
             --test-dir build-${{ matrix.compiler }}-${{ matrix.build_type }} \
             --output-on-failure \
             --parallel 4
+
+      - name: Collect coverage and check >= 80% (GCC Debug only)
+        if: matrix.compiler == 'gcc-12' && matrix.build_type == 'Debug'
+        run: |
+          BUILD_DIR=build-${{ matrix.compiler }}-${{ matrix.build_type }}
+          lcov \
+            --capture \
+            --directory "$BUILD_DIR" \
+            --output-file coverage.info \
+            --no-external \
+            --ignore-errors source
+          lcov \
+            --remove coverage.info \
+            '*/tests/*' \
+            '*/third_party/*' \
+            '*/googletest*' \
+            --output-file coverage_filtered.info
+          lcov --summary coverage_filtered.info 2>&1 | tee coverage_summary.txt
+          BRANCH_COV=$(grep -oP 'branches\.\.\.: \K[\d.]+' coverage_summary.txt || echo "0")
+          echo "Branch coverage: ${BRANCH_COV}%"
+          python3 -c "
+          cov = float('${BRANCH_COV}' or '0')
+          if cov < 80.0:
+              print(f'FAIL: branch coverage {cov:.1f}% < 80%')
+              exit(1)
+          print(f'PASS: branch coverage {cov:.1f}% >= 80%')
+          "
 
       # clang-tidy — only on Clang Release (avoids Debug symbol noise)
       - name: clang-tidy static analysis

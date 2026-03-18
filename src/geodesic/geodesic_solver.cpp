@@ -10,6 +10,17 @@
 #include <algorithm>
 #include <cmath>
 
+#if defined(SRFM_HAS_SPDLOG) && SRFM_HAS_SPDLOG
+#  include <spdlog/spdlog.h>
+#  define SRFM_LOG_TRACE(...)  spdlog::trace(__VA_ARGS__)
+#  define SRFM_LOG_DEBUG(...)  spdlog::debug(__VA_ARGS__)
+#  define SRFM_LOG_WARN(...)   spdlog::warn(__VA_ARGS__)
+#else
+#  define SRFM_LOG_TRACE(...)  (void)0
+#  define SRFM_LOG_DEBUG(...)  (void)0
+#  define SRFM_LOG_WARN(...)   (void)0
+#endif
+
 namespace srfm::geodesic {
 
 // ── GeodesicState ─────────────────────────────────────────────────────────────
@@ -99,15 +110,31 @@ GeodesicSolver::solve(const GeodesicState& initial,
                       const MetricTensor&  metric,
                       int                  steps,
                       double               dt) const noexcept {
+    SRFM_LOG_TRACE("GeodesicSolver::solve entry: steps={}, dt={}, x0=[{},{},{},{}]",
+                   steps, dt, initial.x[0], initial.x[1], initial.x[2], initial.x[3]);
+
     // Validate initial state
-    if (!initial.is_finite()) return std::nullopt;
+    if (!initial.is_finite()) {
+        SRFM_LOG_WARN("GeodesicSolver::solve: initial state is not finite — returning nullopt");
+        return std::nullopt;
+    }
 
     // Clamp integration parameters to safe ranges
     const int    clamped_steps = std::clamp(steps, 1, 100'000);
     const double clamped_dt    = std::clamp(dt, 1e-8, 1.0);
 
+    if (clamped_steps != steps) {
+        SRFM_LOG_WARN("GeodesicSolver::solve: steps={} clamped to {}", steps, clamped_steps);
+    }
+    if (clamped_dt != dt) {
+        SRFM_LOG_WARN("GeodesicSolver::solve: dt={} clamped to {}", dt, clamped_dt);
+    }
+
     // Validate metric
-    if (!metric.is_valid()) return std::nullopt;
+    if (!metric.is_valid()) {
+        SRFM_LOG_WARN("GeodesicSolver::solve: metric is not valid — returning nullopt");
+        return std::nullopt;
+    }
 
     // Compute Christoffel symbols (constant for flat metric)
     manifold::SpacetimeManifold mfld;
@@ -116,9 +143,15 @@ GeodesicSolver::solve(const GeodesicState& initial,
     GeodesicState state = initial;
     for (int step = 0; step < clamped_steps; ++step) {
         auto next = rk4_step(state, christoffel, clamped_dt);
-        if (!next) return std::nullopt;
+        if (!next) {
+            SRFM_LOG_WARN("GeodesicSolver::solve: NaN detected during step {} — returning nullopt", step);
+            return std::nullopt;
+        }
         state = *next;
     }
+
+    SRFM_LOG_DEBUG("GeodesicSolver::solve: completed {} steps, final x=[{},{},{},{}]",
+                   clamped_steps, state.x[0], state.x[1], state.x[2], state.x[3]);
 
     return state;
 }

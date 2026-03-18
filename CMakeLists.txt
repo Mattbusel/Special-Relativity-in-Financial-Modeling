@@ -21,6 +21,7 @@ endif()
 find_package(RapidCheck CONFIG QUIET)
 find_package(Eigen3 QUIET)
 find_package(fmt QUIET)
+find_package(spdlog QUIET)
 
 # If Eigen3 was not found via find_package, fall back to the vendored copy.
 if(NOT (Eigen3_FOUND OR TARGET Eigen3::Eigen))
@@ -96,6 +97,10 @@ add_library(srfm_geodesic STATIC
 )
 target_include_directories(srfm_geodesic PUBLIC src include)
 target_link_libraries(srfm_geodesic PUBLIC srfm_manifold)
+if(spdlog_FOUND OR TARGET spdlog::spdlog)
+    target_link_libraries(srfm_geodesic PUBLIC spdlog::spdlog)
+    target_compile_definitions(srfm_geodesic PUBLIC SRFM_HAS_SPDLOG=1)
+endif()
 
 add_library(srfm_engine STATIC
     src/engine/engine.cpp
@@ -334,6 +339,18 @@ target_link_libraries(test_geodesic PRIVATE
     GTest::gtest_main
 )
 add_test(NAME GeodesicTests COMMAND test_geodesic)
+
+# ── Geodesic solver branch-coverage tests ─────────────────────────────────────
+add_executable(test_geodesic_solver_branches
+    tests/geodesic/test_geodesic_solver_branches.cpp
+)
+target_include_directories(test_geodesic_solver_branches PRIVATE src include)
+target_link_libraries(test_geodesic_solver_branches PRIVATE
+    srfm_geodesic
+    srfm_backtest
+    GTest::gtest_main
+)
+add_test(NAME GeodesicSolverBranchTests COMMAND test_geodesic_solver_branches)
 
 # ── N-asset tests (each file has its own main()) ─────────────────────────────
 set(_NASSET_TESTS

@@ -34,7 +34,6 @@
 #include <iostream>
 #include <optional>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -91,15 +90,18 @@ struct RegimeRow {
     double      geodesic_deviation = 0.0;
 };
 
-static std::vector<RegimeRow> load_regime_csv(const std::string& path) {
+static std::optional<std::vector<RegimeRow>> load_regime_csv(const std::string& path,
+                                                              std::string& err) {
     std::ifstream file(path);
     if (!file.is_open()) {
-        throw std::runtime_error("Cannot open: " + path);
+        err = "Cannot open: " + path;
+        return std::nullopt;
     }
 
     std::string line;
     if (!std::getline(file, line)) {
-        throw std::runtime_error("Empty file: " + path);
+        err = "Empty file: " + path;
+        return std::nullopt;
     }
     auto hdr = split_csv(line);
 
@@ -111,7 +113,8 @@ static std::vector<RegimeRow> load_regime_csv(const std::string& path) {
     int col_geo      = find_col(hdr, "geodesic_deviation");
 
     if (col_type < 0 || col_ret < 0) {
-        throw std::runtime_error("CSV missing required columns interval_type / next_bar_abs_return");
+        err = "CSV missing required columns interval_type / next_bar_abs_return";
+        return std::nullopt;
     }
 
     std::vector<RegimeRow> rows;
@@ -193,10 +196,11 @@ build_bars(const std::vector<RegimeRow>& rows) {
 
 // ─── Output ───────────────────────────────────────────────────────────────────
 
-static void write_backtest_csv(
+static bool write_backtest_csv(
     const std::string& ticker,
     const srfm::backtest::ExtendedBacktester::TripleComparison& result,
-    const std::string& output_dir)
+    const std::string& output_dir,
+    std::string& err)
 {
     fs::create_directories(output_dir);
     std::string safe_ticker = ticker;
@@ -205,7 +209,8 @@ static void write_backtest_csv(
     std::string out_path = output_dir + "/" + safe_ticker + "_backtest.csv";
     std::ofstream out(out_path);
     if (!out.is_open()) {
-        throw std::runtime_error("Cannot open output: " + out_path);
+        err = "Cannot open output: " + out_path;
+        return false;
     }
 
     out << "ticker,strategy,sharpe,sortino,max_drawdown\n";
@@ -224,6 +229,7 @@ static void write_backtest_csv(
     write_row("GEODESIC_DEVIATION", result.geodesic);
 
     std::cout << "[" << ticker << "] Backtest CSV written to " << out_path << "\n";
+    return true;
 }
 
 // ─── CLI Args ─────────────────────────────────────────────────────────────────
@@ -264,13 +270,13 @@ int main(int argc, char* argv[]) {
     const Args& args = *maybe_args;
 
     // ── Load regime data ───────────────────────────────────────────────────────
-    std::vector<RegimeRow> rows;
-    try {
-        rows = load_regime_csv(args.input_path);
-    } catch (const std::exception& ex) {
-        std::cerr << "[FATAL] " << ex.what() << "\n";
+    std::string load_err;
+    auto maybe_rows = load_regime_csv(args.input_path, load_err);
+    if (!maybe_rows.has_value()) {
+        std::cerr << "[FATAL] " << load_err << "\n";
         return 1;
     }
+    std::vector<RegimeRow> rows = std::move(*maybe_rows);
 
     std::cout << "[" << args.ticker << "] Loaded " << rows.size() << " regime rows\n";
 
@@ -300,10 +306,9 @@ int main(int argc, char* argv[]) {
     std::cout << maybe_result->to_string();
 
     // ── Write CSV ──────────────────────────────────────────────────────────────
-    try {
-        write_backtest_csv(args.ticker, *maybe_result, args.output_dir);
-    } catch (const std::exception& ex) {
-        std::cerr << "[FATAL] " << ex.what() << "\n";
+    std::string write_err;
+    if (!write_backtest_csv(args.ticker, *maybe_result, args.output_dir, write_err)) {
+        std::cerr << "[FATAL] " << write_err << "\n";
         return 1;
     }
 
