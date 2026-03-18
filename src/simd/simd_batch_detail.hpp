@@ -47,7 +47,7 @@
 #if defined(_MSC_VER)
 #  define SRFM_RESTRICT __restrict
 #else
-#  define SRFM_RESTRICT SRFM_RESTRICT
+#  define SRFM_RESTRICT __restrict__
 #endif
 
 namespace srfm::simd::detail {

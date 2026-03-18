@@ -78,5 +78,42 @@ pub enum OrchestratorError {
     Other(String),
 }
 
+pub mod metrics;
+
 // Re-export the most commonly used types at the crate root.
 pub use worker::{EchoWorker, ModelWorker};
+
+/// A stable identifier for an agent/session.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub struct SessionId(String);
+
+impl SessionId {
+    /// Create a new `SessionId` from any string.
+    pub fn new(s: impl Into<String>) -> Self {
+        Self(s.into())
+    }
+
+    /// Return the inner string value.
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl std::fmt::Display for SessionId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+/// A prompt request submitted to the pipeline.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct PromptRequest {
+    /// Session this request belongs to.
+    pub session: SessionId,
+    /// Unique request identifier.
+    pub request_id: String,
+    /// The prompt text to run inference on.
+    pub input: String,
+    /// Optional key-value metadata attached to the request.
+    pub meta: Option<std::collections::HashMap<String, String>>,
+}

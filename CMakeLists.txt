@@ -24,15 +24,29 @@ find_package(fmt QUIET)
 find_package(spdlog QUIET)
 
 # If Eigen3 was not found via find_package, fall back to the vendored copy.
+# If the vendored copy is incomplete (missing Eigen/Core), use FetchContent.
 if(NOT (Eigen3_FOUND OR TARGET Eigen3::Eigen))
     set(_EIGEN_VENDOR_DIR "${CMAKE_SOURCE_DIR}/third_party/eigen")
-    if(EXISTS "${_EIGEN_VENDOR_DIR}/Eigen/Dense")
+    if(EXISTS "${_EIGEN_VENDOR_DIR}/Eigen/Dense" AND EXISTS "${_EIGEN_VENDOR_DIR}/Eigen/Core")
         message(STATUS "Using vendored Eigen3 from third_party/eigen")
         add_library(Eigen3::Eigen INTERFACE IMPORTED GLOBAL)
         set_target_properties(Eigen3::Eigen PROPERTIES
             INTERFACE_INCLUDE_DIRECTORIES
                 "${_EIGEN_VENDOR_DIR};${CMAKE_SOURCE_DIR}"
         )
+        set(Eigen3_FOUND TRUE)
+    else()
+        message(STATUS "Vendored Eigen3 incomplete or missing — fetching via FetchContent")
+        include(FetchContent)
+        FetchContent_Declare(
+            Eigen3
+            GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+            GIT_TAG        3.4.0
+            GIT_SHALLOW    TRUE
+        )
+        set(EIGEN_BUILD_DOC OFF CACHE BOOL "" FORCE)
+        set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+        FetchContent_MakeAvailable(Eigen3)
         set(Eigen3_FOUND TRUE)
     endif()
 endif()
