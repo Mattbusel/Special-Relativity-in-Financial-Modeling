@@ -1,0 +1,17 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/CheckCXXCompilerFlag.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/CheckCXXSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/CheckIncludeFileCXX.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/CheckLibraryExists.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/FindGit.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/FindPackageMessage.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/FindThreads.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/Internal/CheckCompilerFlag.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/Internal/CheckFlagCommonConfig.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/Internal/CheckSourceCompiles.cmake
+R:/workspaces/Special-Relativity-in-Financial-Modeling/build_fresh2/_deps/googlebenchmark-src/CMakeLists.txt
+R:/workspaces/Special-Relativity-in-Financial-Modeling/build_fresh2/_deps/googlebenchmark-src/cmake/AddCXXCompilerFlag.cmake
+R:/workspaces/Special-Relativity-in-Financial-Modeling/build_fresh2/_deps/googlebenchmark-src/cmake/CXXFeatureCheck.cmake
+R:/workspaces/Special-Relativity-in-Financial-Modeling/build_fresh2/_deps/googlebenchmark-src/cmake/GetGitVersion.cmake

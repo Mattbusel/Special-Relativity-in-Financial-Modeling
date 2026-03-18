@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="R:\workspaces\Special-Relativity-in-Financial-Modeling\build_fresh2\_deps\googletest-subbuild\CMakeFiles\37291017edfa1d2ba9215dd11d906029\googletest-populate-mkdir.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="R:\workspaces\Special-Relativity-in-Financial-Modeling\build_fresh2\_deps\googletest-subbuild\CMakeFiles\37291017edfa1d2ba9215dd11d906029\googletest-populate-download.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="R:\workspaces\Special-Relativity-in-Financial-Modeling\build_fresh2\_deps\googletest-subbuild\CMakeFiles\37291017edfa1d2ba9215dd11d906029\googletest-populate-update.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="R:\workspaces\Special-Relativity-in-Financial-Modeling\build_fresh2\_deps\googletest-subbuild\CMakeFiles\37291017edfa1d2ba9215dd11d906029\googletest-populate-patch.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="R:\workspaces\Special-Relativity-in-Financial-Modeling\build_fresh2\_deps\googletest-subbuild\CMakeFiles\37291017edfa1d2ba9215dd11d906029\googletest-populate-configure.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="R:\workspaces\Special-Relativity-in-Financial-Modeling\build_fresh2\_deps\googletest-subbuild\CMakeFiles\37291017edfa1d2ba9215dd11d906029\googletest-populate-build.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="R:\workspaces\Special-Relativity-in-Financial-Modeling\build_fresh2\_deps\googletest-subbuild\CMakeFiles\37291017edfa1d2ba9215dd11d906029\googletest-populate-install.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="R:\workspaces\Special-Relativity-in-Financial-Modeling\build_fresh2\_deps\googletest-subbuild\CMakeFiles\37291017edfa1d2ba9215dd11d906029\googletest-populate-test.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="R:\workspaces\Special-Relativity-in-Financial-Modeling\build_fresh2\_deps\googletest-subbuild\CMakeFiles\ce1e27a94d55703b73a3be2166caa76e\googletest-populate-complete.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="R:\workspaces\Special-Relativity-in-Financial-Modeling\build_fresh2\_deps\googletest-subbuild\CMakeFiles\bf80bc425b8b4ceb8696e2df9bfcadc1\googletest-populate.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="R:\workspaces\Special-Relativity-in-Financial-Modeling\build_fresh2\_deps\googletest-subbuild\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="R:\workspaces\Special-Relativity-in-Financial-Modeling\build_fresh2\_deps\googletest-subbuild\CMakeFiles\googletest-populate" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{3DB93E7A-27DF-3CC0-8DD6-DBC17D71C5FC}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

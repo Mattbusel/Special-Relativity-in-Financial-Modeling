@@ -1,0 +1,8 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-4.2/Modules/BasicConfigVersion-SameMajorVersion.cmake.in
+C:/Program Files/CMake/share/cmake-4.2/Modules/CMakePackageConfigHelpers.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/GNUInstallDirs.cmake
+C:/Program Files/CMake/share/cmake-4.2/Modules/WriteBasicConfigVersionFile.cmake
+R:/workspaces/Special-Relativity-in-Financial-Modeling/build_fresh2/_deps/googlebenchmark-src/cmake/Config.cmake.in
+R:/workspaces/Special-Relativity-in-Financial-Modeling/build_fresh2/_deps/googlebenchmark-src/cmake/benchmark.pc.in
+R:/workspaces/Special-Relativity-in-Financial-Modeling/build_fresh2/_deps/googlebenchmark-src/src/CMakeLists.txt

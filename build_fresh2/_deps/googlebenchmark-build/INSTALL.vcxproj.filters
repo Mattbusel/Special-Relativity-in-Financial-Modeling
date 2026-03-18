@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="R:\workspaces\Special-Relativity-in-Financial-Modeling\build_fresh2\CMakeFiles\16f9e809fe872c3e94d3eb32cdc827e2\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{2A91EAAF-BBBB-3649-8E08-28658071AED4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,10 @@
+^R:\WORKSPACES\SPECIAL-RELATIVITY-IN-FINANCIAL-MODELING\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SR:/workspaces/Special-Relativity-in-Financial-Modeling -BR:/workspaces/Special-Relativity-in-Financial-Modeling/build_fresh2 --check-stamp-file R:/workspaces/Special-Relativity-in-Financial-Modeling/build_fresh2/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
