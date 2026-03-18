@@ -98,6 +98,24 @@ target_link_libraries(srfm_engine PUBLIC
     srfm_momentum
 )
 
+add_library(srfm_lorentz STATIC
+    src/lorentz/beta_calculator.cpp
+    src/lorentz/lorentz_transform.cpp
+)
+target_include_directories(srfm_lorentz PUBLIC src include)
+target_link_libraries(srfm_lorentz PUBLIC srfm_momentum)
+if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
+    target_link_libraries(srfm_lorentz PUBLIC Eigen3::Eigen)
+endif()
+
+add_library(srfm_backtest STATIC
+    src/backtest/backtester.cpp
+    src/backtest/geodesic_strategy.cpp
+    src/backtest/performance_metrics.cpp
+)
+target_include_directories(srfm_backtest PUBLIC src include)
+target_link_libraries(srfm_backtest PUBLIC srfm_engine srfm_lorentz)
+
 add_library(srfm_stream STATIC
     src/engine/stream_engine.cpp
     src/stream/signal_consumer.cpp
@@ -126,6 +144,7 @@ target_link_libraries(test_edge_cases PRIVATE
     srfm_beta_calculator
     srfm_manifold
     srfm_geodesic
+    srfm_lorentz
     Eigen3::Eigen
 )
 add_test(NAME EdgeCaseBoundaryTests COMMAND test_edge_cases)
@@ -149,8 +168,7 @@ add_executable(test_lorentz_transform
 )
 target_include_directories(test_lorentz_transform PRIVATE src include)
 target_link_libraries(test_lorentz_transform PRIVATE
-    srfm_momentum
-    srfm_beta_calculator
+    srfm_lorentz
     GTest::gtest_main
 )
 add_test(NAME LorentzTransformTests COMMAND test_lorentz_transform)
@@ -160,8 +178,7 @@ add_executable(test_beta_calculator
 )
 target_include_directories(test_beta_calculator PRIVATE src include)
 target_link_libraries(test_beta_calculator PRIVATE
-    srfm_momentum
-    srfm_beta_calculator
+    srfm_lorentz
     GTest::gtest_main
 )
 add_test(NAME BetaCalculatorTests COMMAND test_beta_calculator)
@@ -171,8 +188,7 @@ add_executable(test_online_beta
 )
 target_include_directories(test_online_beta PRIVATE src include)
 target_link_libraries(test_online_beta PRIVATE
-    srfm_momentum
-    srfm_beta_calculator
+    srfm_lorentz
     GTest::gtest_main
 )
 add_test(NAME OnlineBetaTests COMMAND test_online_beta)
@@ -183,7 +199,7 @@ add_executable(test_backtester
 )
 target_include_directories(test_backtester PRIVATE src include)
 target_link_libraries(test_backtester PRIVATE
-    srfm_engine
+    srfm_backtest
     GTest::gtest_main
 )
 add_test(NAME BacktesterTests COMMAND test_backtester)
@@ -193,7 +209,7 @@ add_executable(test_performance_metrics
 )
 target_include_directories(test_performance_metrics PRIVATE src include)
 target_link_libraries(test_performance_metrics PRIVATE
-    srfm_engine
+    srfm_backtest
     GTest::gtest_main
 )
 add_test(NAME PerformanceMetricsTests COMMAND test_performance_metrics)
@@ -203,7 +219,7 @@ add_executable(test_gamma_sizing
 )
 target_include_directories(test_gamma_sizing PRIVATE src include)
 target_link_libraries(test_gamma_sizing PRIVATE
-    srfm_engine
+    srfm_backtest
     GTest::gtest_main
 )
 add_test(NAME GammaSizingTests COMMAND test_gamma_sizing)
@@ -213,7 +229,7 @@ add_executable(test_metrics_precision
 )
 target_include_directories(test_metrics_precision PRIVATE src include)
 target_link_libraries(test_metrics_precision PRIVATE
-    srfm_engine
+    srfm_backtest
     GTest::gtest_main
 )
 add_test(NAME MetricsPrecisionTests COMMAND test_metrics_precision)
@@ -224,7 +240,8 @@ add_executable(test_full_pipeline
 )
 target_include_directories(test_full_pipeline PRIVATE src include)
 target_link_libraries(test_full_pipeline PRIVATE
-    srfm_engine
+    srfm_backtest
+    srfm_lorentz
     GTest::gtest_main
 )
 add_test(NAME FullPipelineIntegrationTests COMMAND test_full_pipeline)
@@ -234,7 +251,8 @@ add_executable(test_error_handling
 )
 target_include_directories(test_error_handling PRIVATE src include)
 target_link_libraries(test_error_handling PRIVATE
-    srfm_engine
+    srfm_backtest
+    srfm_lorentz
     GTest::gtest_main
 )
 add_test(NAME ErrorHandlingIntegrationTests COMMAND test_error_handling)
@@ -280,7 +298,9 @@ add_executable(test_n_asset
     tests/n_asset/test_geodesic_n.cpp
     tests/n_asset/test_n_asset_engine.cpp
 )
-target_include_directories(test_n_asset PRIVATE src include tests/n_asset)
+target_include_directories(test_n_asset PRIVATE src include tests/n_asset
+    ${CMAKE_SOURCE_DIR}  # needed for <third_party/eigen/Eigen/Dense>
+)
 target_link_libraries(test_n_asset PRIVATE
     srfm_engine
     GTest::gtest_main
