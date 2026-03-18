@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"R:/workspaces/Special-Relativity-in-Financial-Modeling/build_test/_deps/googlebenchmark-subbuild/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

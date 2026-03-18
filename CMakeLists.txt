@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 project(srfm_cpp
-    VERSION 0.2.0
+    VERSION 1.0.0
     DESCRIPTION "Special Relativity in Financial Modelling — C++ library"
     LANGUAGES CXX
 )
@@ -17,8 +17,30 @@ else()
     add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wno-unused-parameter)
 endif()
 
-# ── vcpkg / RapidCheck ────────────────────────────────────────────────────────
+# ── Optional dependencies ─────────────────────────────────────────────────────
 find_package(RapidCheck CONFIG QUIET)
+find_package(Eigen3 QUIET)
+
+# GTest: used by test_interval_gaps and any other GTest-based suites.
+# Try system package first; fall back to FetchContent so the build works
+# without vcpkg or a pre-installed libgtest-dev.
+find_package(GTest QUIET)
+if(NOT GTest_FOUND)
+    include(FetchContent)
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG        v1.14.0
+    )
+    set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+    set(BUILD_GMOCK   OFF CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+    # Alias so the downstream targets can use the same GTest::gtest_main name.
+    if(NOT TARGET GTest::gtest_main)
+        add_library(GTest::gtest_main ALIAS gtest_main)
+    endif()
+endif()
+find_package(GTest CONFIG QUIET)
 
 # ── Source library targets ────────────────────────────────────────────────────
 
@@ -64,24 +86,27 @@ target_include_directories(test_momentum PRIVATE src tests)
 target_link_libraries(test_momentum PRIVATE srfm_momentum)
 add_test(NAME MomentumUnitTests COMMAND test_momentum)
 
-# ── Edge-case and boundary tests ──────────────────────────────────────────────
+# ── Edge-case and boundary tests (require Eigen3 via lorentz headers) ─────────
+if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
 add_executable(test_edge_cases
     tests/momentum/test_edge_cases.cpp
 )
-target_include_directories(test_edge_cases PRIVATE src tests/momentum)
+target_include_directories(test_edge_cases PRIVATE src include tests/momentum)
 target_link_libraries(test_edge_cases PRIVATE
     srfm_momentum
     srfm_beta_calculator
     srfm_manifold
     srfm_geodesic
+    Eigen3::Eigen
 )
 add_test(NAME EdgeCaseBoundaryTests COMMAND test_edge_cases)
+endif()
 
 # ── Lorentz invariants and numerical edge-case tests ─────────────────────────
 add_executable(test_lorentz_invariants
     tests/momentum/test_lorentz_invariants.cpp
 )
-target_include_directories(test_lorentz_invariants PRIVATE src tests/momentum)
+target_include_directories(test_lorentz_invariants PRIVATE src include tests/momentum)
 target_link_libraries(test_lorentz_invariants PRIVATE
     srfm_momentum
     srfm_manifold
@@ -90,15 +115,22 @@ target_link_libraries(test_lorentz_invariants PRIVATE
 add_test(NAME LorentzInvariantTests COMMAND test_lorentz_invariants)
 
 # ── Interval gap tests (symmetry, numerical stability, Lorentz invariance) ───
-add_executable(test_interval_gaps
-    tests/manifold/test_interval_gaps.cpp
-)
-target_include_directories(test_interval_gaps PRIVATE src include)
-target_link_libraries(test_interval_gaps PRIVATE
-    srfm_manifold
-    GTest::gtest_main
-)
-add_test(NAME IntervalGapTests COMMAND test_interval_gaps)
+if(GTest_FOUND)
+    add_executable(test_interval_gaps
+        tests/manifold/test_interval_gaps.cpp
+    )
+    target_include_directories(test_interval_gaps PRIVATE src include)
+    target_link_libraries(test_interval_gaps PRIVATE
+        srfm_manifold
+        GTest::gtest_main
+    )
+    add_test(NAME IntervalGapTests COMMAND test_interval_gaps)
+else()
+    message(STATUS
+        "GTest not found -- test_interval_gaps will not be built. "
+        "Install via vcpkg: vcpkg install gtest"
+    )
+endif()
 
 # ── Property-based tests (RapidCheck) ────────────────────────────────────────
 if(RapidCheck_FOUND)

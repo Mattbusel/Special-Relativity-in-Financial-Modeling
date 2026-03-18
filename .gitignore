@@ -48,3 +48,4 @@ paper/*.out
 # Logs and misc
 *.log
 --help
+build_test/
