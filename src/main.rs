@@ -26,8 +26,11 @@ fn main() {
     // captured even when no specific subcommand is active.
     tracing_subscriber::fmt()
         .with_env_filter(
-            tracing_subscriber::EnvFilter::from_default_env()
-                .add_directive("tokio_prompt_orchestrator=info".parse().expect("valid directive")),
+            tracing_subscriber::EnvFilter::from_default_env().add_directive(
+                "tokio_prompt_orchestrator=info"
+                    .parse()
+                    .expect("valid directive"),
+            ),
         )
         .init();
 
@@ -82,8 +85,7 @@ fn main() {
                 port,
                 ..Default::default()
             };
-            if let Err(e) = rt.block_on(tokio_prompt_orchestrator::web_api::start_server(cfg, tx))
-            {
+            if let Err(e) = rt.block_on(tokio_prompt_orchestrator::web_api::start_server(cfg, tx)) {
                 eprintln!("Web API error: {e}");
                 process::exit(1);
             }

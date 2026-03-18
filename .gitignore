@@ -58,3 +58,4 @@ build_fresh*/
 *.vcxproj.filters
 CMakeCache.txt
 CMakeFiles/
+build_fresh2/

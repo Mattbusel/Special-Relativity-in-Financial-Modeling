@@ -30,7 +30,7 @@
 
 #include <optional>
 #include <vector>
-#include <third_party/eigen/Eigen/Dense>
+#include <Eigen/Dense>
 
 namespace srfm::tensor {
 

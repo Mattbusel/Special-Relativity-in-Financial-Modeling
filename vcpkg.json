@@ -9,6 +9,6 @@
       "description": "Property-based testing framework (RapidCheck). Used for 10,000-input invariant testing of all relativistic physics kernels."
     }
   ],
-  "builtin-baseline": "2024-11-12",
+  "builtin-baseline": "29f10019c26142cc4689b53b8c91da519db09e5c",
   "overrides": []
 }

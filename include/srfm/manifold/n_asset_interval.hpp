@@ -35,7 +35,7 @@
 #include <span>
 #include <vector>
 #include <cmath>
-#include <third_party/eigen/Eigen/Dense>
+#include <Eigen/Dense>
 
 namespace srfm::manifold {
 
