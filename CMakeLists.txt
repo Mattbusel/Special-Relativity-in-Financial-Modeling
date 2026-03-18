@@ -64,6 +64,19 @@ target_include_directories(test_momentum PRIVATE src tests)
 target_link_libraries(test_momentum PRIVATE srfm_momentum)
 add_test(NAME MomentumUnitTests COMMAND test_momentum)
 
+# ── Edge-case and boundary tests ──────────────────────────────────────────────
+add_executable(test_edge_cases
+    tests/momentum/test_edge_cases.cpp
+)
+target_include_directories(test_edge_cases PRIVATE src tests/momentum)
+target_link_libraries(test_edge_cases PRIVATE
+    srfm_momentum
+    srfm_beta_calculator
+    srfm_manifold
+    srfm_geodesic
+)
+add_test(NAME EdgeCaseBoundaryTests COMMAND test_edge_cases)
+
 # ── Property-based tests (RapidCheck) ────────────────────────────────────────
 if(RapidCheck_FOUND)
     set(PROPERTY_TESTS
@@ -73,6 +86,9 @@ if(RapidCheck_FOUND)
         prop_velocity_subluminal
         prop_christoffel_flat
         prop_geodesic_flat
+        prop_interval_invariant
+        prop_metric_positive_definite
+        prop_christoffel_symmetry
     )
 
     foreach(test_name IN LISTS PROPERTY_TESTS)
@@ -256,6 +272,61 @@ target_compile_options(bench_beta_gamma PRIVATE
 add_custom_target(bench
     COMMAND bench_beta_gamma
     DEPENDS bench_beta_gamma
-    COMMENT "Running SRFM AGT-08 β/γ SIMD benchmarks"
+    COMMENT "Running SRFM AGT-08 beta/gamma SIMD benchmarks"
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+
+# ── Install targets and package config ────────────────────────────────────────
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+set(SRFM_INSTALL_TARGETS
+    srfm_momentum
+    srfm_beta_calculator
+    srfm_manifold
+    srfm_geodesic
+    srfm_engine
+    srfm_simd_scalar
+    srfm_simd_avx2
+    srfm_simd_avx512
+    srfm_simd_dispatch
+)
+
+install(TARGETS ${SRFM_INSTALL_TARGETS}
+    EXPORT srfmTargets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(DIRECTORY include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(DIRECTORY src/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/srfm/src
+    FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h"
+)
+
+install(EXPORT srfmTargets
+    FILE srfmTargets.cmake
+    NAMESPACE srfm::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/srfm
+)
+
+configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/srfmConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/srfmConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/srfm
+)
+
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/srfmConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/srfmConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/srfmConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/srfm
 )
