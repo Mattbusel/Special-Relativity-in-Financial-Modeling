@@ -52,3 +52,9 @@ build_test/
 tests/*/build/
 *.obj
 *.exe
+build/
+build_fresh*/
+*.vcxproj
+*.vcxproj.filters
+CMakeCache.txt
+CMakeFiles/
