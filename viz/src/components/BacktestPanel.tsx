@@ -94,8 +94,9 @@ function generateEquityCurve(
     curve.push(current);
   }
 
-  // Scale to match total return
-  const finalScale = (1 + annualReturn) / curve[curve.length - 1];
+  // Scale to match total return (guard against degenerate endpoint)
+  const endpoint = curve[curve.length - 1];
+  const finalScale = endpoint > 0 ? (1 + annualReturn) / endpoint : 1;
   return curve.map(v => v * finalScale);
 }
 

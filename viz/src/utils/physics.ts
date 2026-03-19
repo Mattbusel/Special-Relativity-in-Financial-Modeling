@@ -119,8 +119,10 @@ export function computeSpacetimeEvents(bars: OHLCVBar[], beta: number): Spacetim
   if (bars.length < 2) return events;
 
   // Compute normalization constants from full dataset
-  const priceRange = Math.max(...bars.map(b => b.high)) - Math.min(...bars.map(b => b.low));
-  const volumeRange = Math.max(...bars.map(b => b.volume)) - Math.min(...bars.map(b => b.volume));
+  const priceRange = bars.reduce((max, b) => Math.max(max, b.high), -Infinity)
+                   - bars.reduce((min, b) => Math.min(min, b.low), Infinity);
+  const volumeRange = bars.reduce((max, b) => Math.max(max, b.volume), -Infinity)
+                    - bars.reduce((min, b) => Math.min(min, b.volume), Infinity);
 
   for (let i = 1; i < bars.length; i++) {
     const prev = bars[i - 1];
@@ -155,7 +157,7 @@ export function computeSpacetimeEvents(bars: OHLCVBar[], beta: number): Spacetim
  * β-dependent curvature bends the path via local momentum and volume.
  */
 export function computeGeodesicPath(bars: OHLCVBar[], beta: number): number[] {
-  if (bars.length === 0) return [];
+  if (bars.length < 2) return bars.map(b => b.close);
 
   const prices = bars.map(b => b.close);
   const volumes = bars.map(b => b.volume);
@@ -168,7 +170,7 @@ export function computeGeodesicPath(bars: OHLCVBar[], beta: number): number[] {
   const flatGeodesic = prices.map((_, i) => startPrice + (endPrice - startPrice) * (i / (n - 1)));
 
   // Compute local momentum for curvature perturbation
-  const maxVol = Math.max(...volumes);
+  const maxVol = volumes.reduce((max, v) => Math.max(max, v), -Infinity);
   const g = gamma(beta);
 
   const geodesic = flatGeodesic.map((flatPrice, i) => {
