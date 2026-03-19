@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Text, Grid } from '@react-three/drei';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
 import { generateOHLCV, computeSpacetimeEvents, gamma } from '../utils/physics';
 import type { SpacetimeEvent } from '../types/market';
@@ -15,6 +16,9 @@ interface ConeProps {
   beta: number;
 }
 
+// Threshold below which beta change does not trigger geometry rebuild
+const BETA_REBUILD_THRESHOLD = 0.005;
+
 function LightCones({ beta }: ConeProps) {
   const futureMeshRef = useRef<THREE.Mesh>(null);
   const pastMeshRef = useRef<THREE.Mesh>(null);
@@ -23,38 +27,48 @@ function LightCones({ beta }: ConeProps) {
   const futureRedRef = useRef<THREE.Mesh>(null);
   const pastRedRef = useRef<THREE.Mesh>(null);
 
-  const targetAngle = useRef(beta);
-  const currentAngle = useRef(beta);
+  // Track the last beta value for which geometries were built
+  const lastBuiltBeta = useRef<number>(beta);
 
-  useEffect(() => {
-    targetAngle.current = beta;
-  }, [beta]);
-
-  useFrame((_, delta) => {
-    // Smoothly animate cone radius toward target
-    const speed = 1 / 0.5; // 0.5s transition
-    const diff = targetAngle.current - currentAngle.current;
-    currentAngle.current += diff * Math.min(delta * speed, 1);
-
-    const coneRadius = 1.0 + currentAngle.current * 1.5; // opens wider as beta→1
-    const coneHeight = 3;
-    const segments = 32;
-
-    const updateConeGeo = (mesh: THREE.Mesh | null, open: boolean) => {
-      if (!mesh) return;
-      mesh.geometry.dispose();
-      const newGeo = new THREE.ConeGeometry(coneRadius, coneHeight, segments, 1, open);
-      mesh.geometry = newGeo;
-    };
-
-    // Update all cones
-    [futureMeshRef, futureWireRef, futureRedRef].forEach(ref => updateConeGeo(ref.current, false));
-    [pastMeshRef, pastWireRef, pastRedRef].forEach(ref => updateConeGeo(ref.current, false));
-  });
-
-  const initialRadius = 1.0 + beta * 1.5;
+  // Pre-built geometry refs — only recreated when beta changes significantly
   const coneHeight = 3;
   const segments = 32;
+
+  const buildGeometries = useCallback((b: number) => {
+    const r = 1.0 + b * 1.5;
+    const gMain = new THREE.ConeGeometry(r, coneHeight, segments, 1, false);
+    const gRed = new THREE.ConeGeometry(r * 1.6, coneHeight, segments, 1, false);
+    return { gMain, gRed };
+  }, []);
+
+  // Geometry store — updated only when beta changes significantly
+  const geoRef = useRef(buildGeometries(beta));
+
+  useEffect(() => {
+    if (Math.abs(beta - lastBuiltBeta.current) < BETA_REBUILD_THRESHOLD) return;
+    lastBuiltBeta.current = beta;
+
+    const { gMain, gRed } = buildGeometries(beta);
+    const oldGeo = geoRef.current;
+    geoRef.current = { gMain, gRed };
+
+    // Apply to meshes
+    const applyGeo = (mesh: THREE.Mesh | null, geo: THREE.BufferGeometry) => {
+      if (!mesh) return;
+      mesh.geometry.dispose();
+      mesh.geometry = geo;
+    };
+
+    [futureMeshRef, futureWireRef].forEach(r => applyGeo(r.current, gMain.clone()));
+    [pastMeshRef, pastWireRef].forEach(r => applyGeo(r.current, gMain.clone()));
+    [futureRedRef, pastRedRef].forEach(r => applyGeo(r.current, gRed.clone()));
+
+    // Dispose old geometries
+    oldGeo.gMain.dispose();
+    oldGeo.gRed.dispose();
+  }, [beta, buildGeometries]);
+
+  const initialRadius = 1.0 + beta * 1.5;
 
   return (
     <group>
@@ -259,9 +273,10 @@ interface SceneProps {
   beta: number;
   events: SpacetimeEvent[];
   visibleCount: number;
+  controlsRef: React.MutableRefObject<OrbitControlsImpl | null>;
 }
 
-function Scene({ beta, events, visibleCount }: SceneProps) {
+function Scene({ beta, events, visibleCount, controlsRef }: SceneProps) {
   return (
     <>
       <color attach="background" args={['#0a0a0a']} />
@@ -290,11 +305,14 @@ function Scene({ beta, events, visibleCount }: SceneProps) {
       />
 
       <OrbitControls
+        ref={controlsRef}
         enablePan
         enableZoom
         enableRotate
         minDistance={3}
         maxDistance={20}
+        minPolarAngle={0}
+        maxPolarAngle={Math.PI}
         target={[0, 0, 0]}
       />
       <AutoRotate />
@@ -358,6 +376,11 @@ export default function LightCone3D({ beta }: LightCone3DProps) {
   const [events, setEvents] = useState<SpacetimeEvent[]>([]);
   const [visibleCount, setVisibleCount] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
+
+  const handleResetCamera = useCallback(() => {
+    controlsRef.current?.reset();
+  }, []);
 
   const allEvents = useMemo(() => {
     const bars = generateOHLCV(100, 42);
@@ -403,8 +426,32 @@ export default function LightCone3D({ beta }: LightCone3DProps) {
         gl={{ antialias: true, alpha: false }}
         dpr={[1, 2]}
       >
-        <Scene beta={beta} events={events} visibleCount={visibleCount} />
+        <Scene beta={beta} events={events} visibleCount={visibleCount} controlsRef={controlsRef} />
       </Canvas>
+
+      {/* Reset camera button (HTML overlay) */}
+      <button
+        onClick={handleResetCamera}
+        aria-label="Reset camera to default position"
+        style={{
+          position: 'absolute',
+          top: 16,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'rgba(5,5,8,0.85)',
+          border: '1px solid #00ffff44',
+          color: '#00ffff',
+          fontSize: '10px',
+          fontFamily: 'inherit',
+          padding: '4px 12px',
+          cursor: 'pointer',
+          borderRadius: 2,
+          backdropFilter: 'blur(4px)',
+          letterSpacing: '0.08em',
+        }}
+      >
+        ⟳ RESET CAMERA
+      </button>
 
       <Legend beta={beta} />
 

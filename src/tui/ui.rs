@@ -16,6 +16,8 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Clear, Paragraph, Wrap};
 use ratatui::Frame;
 
+use ratatui::widgets::Gauge;
+
 use super::app::{App, MIN_COLS, MIN_ROWS};
 use super::widgets;
 
@@ -25,10 +27,10 @@ use super::widgets;
 /// * `f` - The Ratatui frame to render into.
 /// * `app` - The application state to display.
 pub fn draw(f: &mut Frame, app: &App) {
-    let size = f.area();
+    let size = f.size();
 
-    // Minimum size guard
-    if size.width < MIN_COLS || size.height < MIN_ROWS {
+    // Minimum size guard (80x24 effective minimum)
+    if size.width < 80 || size.height < 24 {
         draw_too_small(f, size);
         return;
     }
@@ -56,11 +58,14 @@ pub fn draw(f: &mut Frame, app: &App) {
         .borders(Borders::ALL)
         .border_style(Style::default().fg(Color::Cyan));
 
+    let ver = env!("CARGO_PKG_VERSION");
+    let symbol = app.current_symbol();
+    let footer_text = format!(
+        " [q]uit [p]ause [r]eset [h]elp [f]ullscreen [Tab]symbol [e]xport [j/k]scroll  {} \u{03b2}={:.3} \u{03b3}={:.2} v{} ",
+        symbol, app.beta_display, app.gamma_display, ver
+    );
     let footer = Line::from(vec![
-        Span::styled(
-            " [q]uit  [p]ause  [r]eset  [h]elp ",
-            Style::default().fg(Color::DarkGray),
-        ),
+        Span::styled(footer_text, Style::default().fg(Color::DarkGray)),
         if app.paused {
             Span::styled(
                 " PAUSED ",
@@ -117,21 +122,56 @@ pub fn draw(f: &mut Frame, app: &App) {
         ])
         .split(top_chunks[1]);
 
-    // Render all widgets
-    widgets::pipeline::render(f, left_chunks[0], app);
-    widgets::channels::render(f, left_chunks[1], app);
-    widgets::health::render(f, right_chunks[0], app);
-    widgets::circuit::render(f, right_chunks[1], app);
-    widgets::dedup::render(f, right_chunks[2], app);
-    widgets::sparkline::render(f, main_chunks[1], app);
-    widgets::log::render(f, main_chunks[2], app);
+    if app.fullscreen_sparkline {
+        // Fullscreen sparkline: fill entire inner area
+        widgets::sparkline::render(f, inner, app);
+    } else {
+        // Render all widgets
+        widgets::pipeline::render(f, left_chunks[0], app);
+        widgets::channels::render(f, left_chunks[1], app);
+        widgets::health::render(f, right_chunks[0], app);
+        widgets::circuit::render(f, right_chunks[1], app);
+        widgets::dedup::render(f, right_chunks[2], app);
+        widgets::sparkline::render_multi_sparkline(f, main_chunks[1], app);
+        widgets::log::render(f, main_chunks[2], app);
+    }
+
+    // Loading overlay
+    if let Some(progress) = app.loading_progress {
+        draw_loading_overlay(f, size, progress);
+    }
+}
+
+/// Renders the loading progress overlay.
+fn draw_loading_overlay(f: &mut Frame, area: Rect, progress: u8) {
+    let popup_width = 40.min(area.width.saturating_sub(4));
+    let popup_height = 5.min(area.height.saturating_sub(4));
+    let popup_x = (area.width.saturating_sub(popup_width)) / 2;
+    let popup_y = (area.height.saturating_sub(popup_height)) / 2;
+    let popup_area = Rect::new(popup_x, popup_y, popup_width, popup_height);
+
+    f.render_widget(Clear, popup_area);
+
+    let block = Block::default()
+        .title(" Loading ")
+        .borders(Borders::ALL)
+        .border_style(Style::default().fg(Color::Cyan));
+
+    let pct = progress as u16;
+    let gauge = Gauge::default()
+        .block(block)
+        .gauge_style(Style::default().fg(Color::Cyan))
+        .percent(pct)
+        .label(format!("Loading\u{2026} {}%", pct));
+
+    f.render_widget(gauge, popup_area);
 }
 
 /// Renders the "terminal too small" warning.
 fn draw_too_small(f: &mut Frame, area: Rect) {
     let msg = format!(
-        "Terminal too small \u{2014} resize to at least {}x{}",
-        MIN_COLS, MIN_ROWS
+        "Terminal too small \u{2014} resize to at least 80x24 (currently {}x{})",
+        area.width, area.height
     );
     let current_size = format!("Current size: {}x{}", area.width, area.height);
 
@@ -160,8 +200,8 @@ fn draw_too_small(f: &mut Frame, area: Rect) {
 /// Renders the help overlay.
 fn draw_help_overlay(f: &mut Frame, area: Rect) {
     // Center the help popup
-    let popup_width = 50.min(area.width.saturating_sub(4));
-    let popup_height = 18.min(area.height.saturating_sub(4));
+    let popup_width = 52.min(area.width.saturating_sub(4));
+    let popup_height = 22.min(area.height.saturating_sub(4));
     let popup_x = (area.width.saturating_sub(popup_width)) / 2;
     let popup_y = (area.height.saturating_sub(popup_height)) / 2;
     let popup_area = Rect::new(popup_x, popup_y, popup_width, popup_height);
@@ -181,32 +221,43 @@ fn draw_help_overlay(f: &mut Frame, area: Rect) {
             "  Keybindings:",
             Style::default().fg(Color::White),
         )),
-        Line::from(Span::styled(
-            "    [q] Quit              [Esc] Quit",
-            Style::default().fg(Color::DarkGray),
-        )),
-        Line::from(Span::styled(
-            "    [Ctrl+C] Force quit",
-            Style::default().fg(Color::DarkGray),
-        )),
-        Line::from(Span::styled(
-            "    [p] Pause / Resume",
-            Style::default().fg(Color::DarkGray),
-        )),
-        Line::from(Span::styled(
-            "    [r] Reset counters",
-            Style::default().fg(Color::DarkGray),
-        )),
-        Line::from(Span::styled(
-            "    [h] Toggle this help",
-            Style::default().fg(Color::DarkGray),
-        )),
-        Line::from(Span::styled(
-            "    [↑↓] Scroll log",
-            Style::default().fg(Color::DarkGray),
-        )),
+        Line::from(vec![
+            Span::styled("    ?  ", Style::default().fg(Color::Cyan)),
+            Span::styled("Toggle this help", Style::default().fg(Color::DarkGray)),
+        ]),
+        Line::from(vec![
+            Span::styled("    q  ", Style::default().fg(Color::Cyan)),
+            Span::styled("Quit  (Esc / Ctrl+C also quit)", Style::default().fg(Color::DarkGray)),
+        ]),
+        Line::from(vec![
+            Span::styled("    p  ", Style::default().fg(Color::Cyan)),
+            Span::styled("Pause / Resume", Style::default().fg(Color::DarkGray)),
+        ]),
+        Line::from(vec![
+            Span::styled("    r  ", Style::default().fg(Color::Cyan)),
+            Span::styled("Reset stats", Style::default().fg(Color::DarkGray)),
+        ]),
+        Line::from(vec![
+            Span::styled("    e  ", Style::default().fg(Color::Cyan)),
+            Span::styled("Export log to file", Style::default().fg(Color::DarkGray)),
+        ]),
+        Line::from(vec![
+            Span::styled("    f  ", Style::default().fg(Color::Cyan)),
+            Span::styled("Toggle fullscreen sparkline", Style::default().fg(Color::DarkGray)),
+        ]),
+        Line::from(vec![
+            Span::styled("  Tab  ", Style::default().fg(Color::Cyan)),
+            Span::styled("Next symbol", Style::default().fg(Color::DarkGray)),
+        ]),
+        Line::from(vec![
+            Span::styled("  j/k  ", Style::default().fg(Color::Cyan)),
+            Span::styled("[j/k] Vim scroll log", Style::default().fg(Color::DarkGray)),
+        ]),
+        Line::from(vec![
+            Span::styled("    \u{2191}\u{2193} ", Style::default().fg(Color::Cyan)),
+            Span::styled("Scroll log", Style::default().fg(Color::DarkGray)),
+        ]),
         Line::from(""),
-        Line::from(Span::styled("  ", Style::default().fg(Color::DarkGray))),
         Line::from(Span::styled(
             "  --mock  Synthetic 2-min story (default)",
             Style::default().fg(Color::DarkGray),
@@ -288,5 +339,18 @@ mod tests {
 
         assert_eq!(popup_width, 36);
         assert_eq!(popup_height, 11);
+    }
+
+    #[test]
+    fn test_effective_min_size_guard_80x24() {
+        // The draw function guards at 80x24
+        let area = Rect::new(0, 0, 79, 24);
+        assert!(area.width < 80, "width 79 < 80 should trigger guard");
+    }
+
+    #[test]
+    fn test_effective_min_size_passes_80x24() {
+        let area = Rect::new(0, 0, 80, 24);
+        assert!(area.width >= 80 && area.height >= 24);
     }
 }

@@ -10,5 +10,10 @@
     }
   ],
   "builtin-baseline": "29f10019c26142cc4689b53b8c91da519db09e5c",
-  "overrides": []
+  "overrides": [
+    { "name": "gtest",   "version": "1.14.0" },
+    { "name": "spdlog",  "version": "1.13.0" },
+    { "name": "fmt",     "version": "10.2.1" },
+    { "name": "eigen3",  "version": "3.4.0"  }
+  ]
 }

@@ -435,13 +435,15 @@ export default function LorentzDashboard({ beta }: LorentzDashboardProps) {
       gap: 12,
     }}>
       {/* 2x2 chart grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: 12,
-        flex: 1,
-        minHeight: 0,
-      }}>
+      <div
+        className="chart-grid-2"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 12,
+          flex: 1,
+          minHeight: 0,
+        }}>
         <GammaCurve data={data} currentBeta={beta} />
         <RapidityCurve data={data} currentBeta={beta} />
         <TimeDilationChart currentBeta={beta} />

@@ -13,11 +13,16 @@
 use std::collections::VecDeque;
 use std::time::Duration;
 
+use chrono::Local;
+
 /// Maximum number of throughput history data points (one per second, 60s window).
 pub const THROUGHPUT_HISTORY_CAP: usize = 60;
 
 /// Maximum number of log entries retained for display.
 pub const LOG_ENTRIES_CAP: usize = 50;
+
+/// Maximum number of regime history samples (one per second, 60s window).
+pub const REGIME_HISTORY_CAP: usize = 60;
 
 /// Minimum terminal width for the dashboard to render.
 pub const MIN_COLS: u16 = 60;
@@ -30,6 +35,37 @@ pub const STAGE_NAMES: [&str; 5] = ["RAG", "ASSEMBLE", "INFER", "POST", "STREAM"
 
 /// Pipeline stage latency budgets in milliseconds (P99).
 pub const STAGE_BUDGETS_MS: [f64; 5] = [20.0, 10.0, 400.0, 15.0, 10.0];
+
+/// Tracked instrument symbols available for selection.
+pub const SYMBOLS: [&str; 4] = ["SPY", "QQQ", "BTC", "ETH"];
+
+/// Causal character of a market spacetime interval.
+///
+/// Derived from the sign of ds² = −c²Δt² + ΔP² + ΔV² + ΔM².
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum RegimeType {
+    /// ds² < 0: causal, subluminal market movement.
+    Timelike,
+    /// ds² ≈ 0: at the speed of information.
+    Lightlike,
+    /// ds² > 0: acausal, stochastic movement.
+    Spacelike,
+    /// Insufficient data to classify.
+    #[default]
+    Unknown,
+}
+
+impl RegimeType {
+    /// Short display label.
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::Timelike => "TIMELIKE",
+            Self::Lightlike => "LIGHTLIKE",
+            Self::Spacelike => "SPACELIKE",
+            Self::Unknown => "---",
+        }
+    }
+}
 
 /// Primary application state for the TUI dashboard.
 #[derive(Debug)]
@@ -65,6 +101,11 @@ pub struct App {
     /// Throughput history: requests per second for the last 60 seconds.
     pub throughput_history: VecDeque<u64>,
 
+    /// CPU usage history for the last 60 seconds (percentage 0.0-100.0).
+    pub cpu_history: VecDeque<f64>,
+    /// Memory usage history for the last 60 seconds (percentage 0.0-100.0).
+    pub mem_history: VecDeque<f64>,
+
     /// Current CPU usage percentage (0.0 - 100.0).
     pub cpu_percent: f64,
     /// Current memory usage percentage (0.0 - 100.0).
@@ -82,6 +123,28 @@ pub struct App {
 
     /// Data update interval.
     pub tick_rate: Duration,
+
+    // ── Relativistic physics display ─────────────────────────────────────────
+
+    /// Current market velocity β (from BetaCalculator).
+    pub beta_display: f64,
+    /// Current Lorentz factor γ = 1/√(1−β²).
+    pub gamma_display: f64,
+    /// Current spacetime interval ds² between last two events.
+    pub ds2_display: f64,
+    /// Most recent regime classification.
+    pub regime: RegimeType,
+    /// Regime history for the last 60 ticks (used to colour-code the sparkline).
+    pub regime_history: VecDeque<RegimeType>,
+
+    // ── UI state ─────────────────────────────────────────────────────────────
+
+    /// Whether the throughput sparkline is displayed full-screen.
+    pub fullscreen_sparkline: bool,
+    /// Index of the currently selected tracked symbol.
+    pub selected_symbol: usize,
+    /// Startup loading progress (0–100). `None` = fully loaded.
+    pub loading_progress: Option<u8>,
 }
 
 /// Depth of a bounded channel between two pipeline stages.
@@ -205,6 +268,9 @@ impl App {
 
             throughput_history: VecDeque::with_capacity(THROUGHPUT_HISTORY_CAP),
 
+            cpu_history: VecDeque::with_capacity(THROUGHPUT_HISTORY_CAP),
+            mem_history: VecDeque::with_capacity(THROUGHPUT_HISTORY_CAP),
+
             cpu_percent: 0.0,
             mem_percent: 0.0,
             active_tasks: 0,
@@ -214,6 +280,16 @@ impl App {
             log_scroll_offset: 0,
 
             tick_rate,
+
+            beta_display: 0.0,
+            gamma_display: 1.0,
+            ds2_display: 0.0,
+            regime: RegimeType::Unknown,
+            regime_history: VecDeque::with_capacity(REGIME_HISTORY_CAP),
+
+            fullscreen_sparkline: false,
+            selected_symbol: 0,
+            loading_progress: None,
         }
     }
 
@@ -226,6 +302,30 @@ impl App {
         self.log_entries.clear();
         self.tick_count = 0;
         self.log_scroll_offset = 0;
+        self.beta_display = 0.0;
+        self.gamma_display = 1.0;
+        self.ds2_display = 0.0;
+        self.regime = RegimeType::Unknown;
+        self.regime_history.clear();
+    }
+
+    /// Advances to the next tracked symbol, wrapping around.
+    pub fn next_symbol(&mut self) {
+        self.selected_symbol = (self.selected_symbol + 1) % SYMBOLS.len();
+    }
+
+    /// Returns the name of the currently selected symbol.
+    pub fn current_symbol(&self) -> &'static str {
+        SYMBOLS[self.selected_symbol % SYMBOLS.len()]
+    }
+
+    /// Pushes a regime sample, evicting the oldest if at capacity.
+    pub fn push_regime(&mut self, regime: RegimeType) {
+        if self.regime_history.len() >= REGIME_HISTORY_CAP {
+            self.regime_history.pop_front();
+        }
+        self.regime_history.push_back(regime);
+        self.regime = regime;
     }
 
     /// Scrolls log view up by one line.
@@ -255,6 +355,47 @@ impl App {
             self.throughput_history.pop_front();
         }
         self.throughput_history.push_back(value);
+    }
+
+    /// Records the current cpu_percent into cpu_history, evicting oldest if at capacity.
+    pub fn push_cpu_sample(&mut self) {
+        if self.cpu_history.len() >= THROUGHPUT_HISTORY_CAP {
+            self.cpu_history.pop_front();
+        }
+        self.cpu_history.push_back(self.cpu_percent);
+    }
+
+    /// Records the current mem_percent into mem_history, evicting oldest if at capacity.
+    pub fn push_mem_sample(&mut self) {
+        if self.mem_history.len() >= THROUGHPUT_HISTORY_CAP {
+            self.mem_history.pop_front();
+        }
+        self.mem_history.push_back(self.mem_percent);
+    }
+
+    /// Exports the current log entries to a timestamped file.
+    ///
+    /// Writes all log entries to `srfm-log-YYYYMMDD-HHMMSS.txt` in the current
+    /// working directory. Silently ignores write errors so callers never panic.
+    pub fn export_log(&self) {
+        let filename = Local::now()
+            .format("srfm-log-%Y%m%d-%H%M%S.txt")
+            .to_string();
+        let mut contents = String::new();
+        for entry in &self.log_entries {
+            contents.push_str(&format!(
+                "[{}] {} {}{}\n",
+                entry.timestamp,
+                entry.level.label(),
+                entry.message,
+                if entry.fields.is_empty() {
+                    String::new()
+                } else {
+                    format!("  {}", entry.fields)
+                }
+            ));
+        }
+        let _ = std::fs::write(&filename, contents);
     }
 
     /// Computes the deduplication savings percentage.
@@ -732,5 +873,44 @@ mod tests {
         assert_eq!(app.log_scroll_offset, 0);
         app.scroll_log_down();
         assert_eq!(app.log_scroll_offset, 0);
+    }
+
+    #[test]
+    fn test_next_symbol_wraps() {
+        let mut app = App::new(Duration::from_secs(1));
+        let n = SYMBOLS.len();
+        for _ in 0..n {
+            app.next_symbol();
+        }
+        assert_eq!(app.selected_symbol, 0);
+    }
+
+    #[test]
+    fn test_push_regime_bounded() {
+        let mut app = App::new(Duration::from_secs(1));
+        for _ in 0..(REGIME_HISTORY_CAP + 10) {
+            app.push_regime(RegimeType::Timelike);
+        }
+        assert_eq!(app.regime_history.len(), REGIME_HISTORY_CAP);
+    }
+
+    #[test]
+    fn test_current_symbol_returns_name() {
+        let app = App::new(Duration::from_secs(1));
+        let sym = app.current_symbol();
+        assert_eq!(sym, SYMBOLS[0]);
+    }
+
+    #[test]
+    fn test_export_log_no_panic() {
+        let mut app = App::new(Duration::from_secs(1));
+        app.push_log(LogEntry {
+            timestamp: "00:00:01".into(),
+            level: LogLevel::Info,
+            message: "test export".into(),
+            fields: "key=val".into(),
+        });
+        // export_log silently ignores I/O errors, must never panic
+        app.export_log();
     }
 }

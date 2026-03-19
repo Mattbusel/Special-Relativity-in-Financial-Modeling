@@ -11,7 +11,7 @@
 //! - No panics on network errors in live mode (graceful degradation)
 //! - Story loop is deterministic and visually compelling
 
-use super::app::{App, CircuitState, LogEntry, LogLevel};
+use super::app::{App, CircuitState, LogEntry, LogLevel, RegimeType};
 
 /// Cost per inference call in USD (used for savings estimate).
 const COST_PER_INFERENCE: f64 = 0.012;
@@ -67,6 +67,7 @@ impl MockMetrics {
         self.update_dedup(app, phase_tick);
         self.update_throughput(app, t, phase_tick);
         self.update_health(app, t, phase_tick);
+        self.update_relativistics(app, t, phase_tick);
         self.update_logs(app, phase_tick);
         self.update_active_stage(app, t);
     }
@@ -277,6 +278,8 @@ impl MockMetrics {
             (mem_base + 3.0 * (t * 0.03).sin() + 1.0 * (t * 0.11).cos()).clamp(0.0, 100.0);
         app.active_tasks =
             ((180.0 + 40.0 * (t * 0.06).sin() + 15.0 * (t * 0.15).cos()) as usize).max(1);
+        app.push_cpu_sample();
+        app.push_mem_sample();
     }
 
     /// Generates log entries appropriate to the current story phase.

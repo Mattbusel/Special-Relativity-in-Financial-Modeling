@@ -5,5 +5,32 @@
 }
 
 body {
-  background: #030a12;
+  background: var(--bg, #030a12);
+}
+
+/* ── Responsive grid helpers ──────────────────────────────── */
+
+/* At 1024px: collapse 4-column stat grids to 2 columns */
+@media (max-width: 1024px) {
+  .stats-grid-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .chart-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* At 768px: single-column layout, hide secondary slider labels */
+@media (max-width: 768px) {
+  .stats-grid-4 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .chart-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+  /* Collapse slider bar items that overflow */
+  .slider-bar-sep,
+  .slider-bar-extra {
+    display: none !important;
+  }
 }

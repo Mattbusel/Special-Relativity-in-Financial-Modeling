@@ -8,6 +8,35 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## Release Process
+
+### Tagging a release
+
+Create a signed annotated tag for the new version and push it to the remote:
+
+```bash
+git tag -s v1.1.0 -m "Release v1.1.0"
+git push origin v1.1.0
+```
+
+### CI behaviour on tags
+
+The CI pipeline triggers on all refs that match `v*`. When a tag matching
+this pattern is pushed, the pipeline runs the full build-and-test matrix
+(Linux gcc/clang × Debug/Release, ASAN+UBSAN, TSAN, clang-tidy, performance
+regression) and, on success, automatically creates a GitHub Release with the
+tag name as the release title.
+
+### Checklist before tagging
+
+1. Bump the version in `CMakeLists.txt`, `pyproject.toml`, and `Doxyfile`.
+2. Move all items from the `[Unreleased]` section of this file into a new
+   dated `[x.y.z]` section.
+3. Update the comparison links at the bottom of this file.
+4. Confirm CI is green on `main` before tagging.
+
+---
+
 ## [1.1.0] - 2026-03-18
 
 ### Added

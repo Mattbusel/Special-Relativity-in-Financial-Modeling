@@ -71,18 +71,28 @@ pub fn render(f: &mut Frame, area: Rect, app: &App) {
 
     let visible_count = inner.height as usize;
     let max_line_width = inner.width as usize;
+    let scroll_offset = app.log_scroll_offset;
 
+    // Reserve one line for the scroll indicator when scrolled up
+    let display_lines = if scroll_offset > 0 {
+        visible_count.saturating_sub(1)
+    } else {
+        visible_count
+    };
+
+    // Skip `scroll_offset` entries from the back (newest), then take display_lines
     let entries: Vec<&crate::tui::app::LogEntry> = app
         .log_entries
         .iter()
         .rev()
-        .take(visible_count)
+        .skip(scroll_offset)
+        .take(display_lines)
         .collect::<Vec<_>>()
         .into_iter()
         .rev()
         .collect();
 
-    let lines: Vec<Line> = entries
+    let mut lines: Vec<Line> = entries
         .iter()
         .map(|entry| {
             let color = level_color(entry.level);
@@ -109,6 +119,14 @@ pub fn render(f: &mut Frame, area: Rect, app: &App) {
             ])
         })
         .collect();
+
+    // Append scroll indicator when scrolled up
+    if scroll_offset > 0 {
+        lines.push(Line::from(Span::styled(
+            format!("  \u{2191} {} more  ", scroll_offset),
+            Style::default().fg(Color::DarkGray),
+        )));
+    }
 
     let para = Paragraph::new(lines);
     f.render_widget(para, inner);

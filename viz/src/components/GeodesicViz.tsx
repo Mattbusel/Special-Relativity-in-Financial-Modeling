@@ -168,6 +168,80 @@ export default function GeodesicViz({ beta }: GeodesicVizProps) {
           {isAnimating ? '⟳ COMPUTING...' : '▶ ANIMATE GEODESIC'}
         </button>
 
+        {/* Step controls */}
+        <button
+          onClick={() => {
+            if (animRef.current) { clearInterval(animRef.current); animRef.current = null; }
+            setIsAnimating(false);
+            setAnimatedBars(prev => Math.max(prev - 1, 1));
+          }}
+          disabled={isAnimating || animatedBars <= 1}
+          aria-label="Step back one bar"
+          style={{
+            background: 'transparent',
+            border: '1px solid #1a1a2e',
+            color: animatedBars <= 1 ? '#333' : '#888',
+            fontSize: 11,
+            fontFamily: "'JetBrains Mono', monospace",
+            padding: '5px 10px',
+            cursor: animatedBars <= 1 ? 'default' : 'pointer',
+            borderRadius: 2,
+          }}
+        >
+          ◀ BACK
+        </button>
+
+        <button
+          onClick={() => {
+            if (animRef.current) { clearInterval(animRef.current); animRef.current = null; }
+            setIsAnimating(false);
+            setAnimatedBars(prev => Math.min(prev + 1, allBars.length));
+          }}
+          disabled={isAnimating || animatedBars >= allBars.length}
+          aria-label="Step forward one bar"
+          style={{
+            background: 'transparent',
+            border: '1px solid #1a1a2e',
+            color: animatedBars >= allBars.length ? '#333' : '#888',
+            fontSize: 11,
+            fontFamily: "'JetBrains Mono', monospace",
+            padding: '5px 10px',
+            cursor: animatedBars >= allBars.length ? 'default' : 'pointer',
+            borderRadius: 2,
+          }}
+        >
+          FWD ▶
+        </button>
+
+        {/* Jump to bar N */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11 }}>
+          <span style={{ color: '#555' }}>JUMP:</span>
+          <input
+            type="number"
+            min={1}
+            max={allBars.length}
+            value={animatedBars}
+            aria-label="Jump to bar number"
+            onChange={e => {
+              const val = Math.max(1, Math.min(parseInt(e.target.value) || 1, allBars.length));
+              if (animRef.current) { clearInterval(animRef.current); animRef.current = null; }
+              setIsAnimating(false);
+              setAnimatedBars(val);
+            }}
+            style={{
+              width: 64,
+              background: '#0d0d1a',
+              border: '1px solid #1a1a2e',
+              color: CYAN,
+              fontSize: 11,
+              fontFamily: "'JetBrains Mono', monospace",
+              padding: '3px 6px',
+              borderRadius: 2,
+              outline: 'none',
+            }}
+          />
+        </div>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11 }}>
           <span style={{ color: '#555' }}>SPEED:</span>
           <input

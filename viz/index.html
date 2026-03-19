@@ -6,6 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tokio Prompt — Relativistic Market Intelligence</title>
     <style>
+      /* ── Theme tokens ─────────────────────────────────── */
+      :root,
+      [data-theme="dark"] {
+        --bg: #0a0a0a;
+        --bg-panel: #0d0d1a;
+        --border: #1a1a2e;
+        --text: #e0e0e0;
+        --text-muted: #888888;
+      }
+      [data-theme="light"] {
+        --bg: #f0f4f8;
+        --bg-panel: #ffffff;
+        --border: #d0d8e4;
+        --text: #1a1a2e;
+        --text-muted: #555577;
+      }
+
       * {
         margin: 0;
         padding: 0;
@@ -14,8 +31,8 @@
       html, body, #root {
         width: 100%;
         height: 100%;
-        background: #0a0a0a;
-        color: #e0e0e0;
+        background: var(--bg);
+        color: var(--text);
         font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
         overflow: hidden;
       }

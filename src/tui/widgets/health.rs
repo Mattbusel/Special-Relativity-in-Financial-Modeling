@@ -28,8 +28,12 @@ const HEALTH_BAR_WIDTH: usize = 14;
 /// * `area` - Rectangular area allocated for this widget.
 /// * `app` - Application state containing system health metrics.
 pub fn render(f: &mut Frame, area: Rect, app: &App) {
+    let health_title = format!(
+        " SYSTEM HEALTH  {} ",
+        chrono::Local::now().format("%H:%M:%S")
+    );
     let block = Block::default()
-        .title(" SYSTEM HEALTH ")
+        .title(health_title)
         .borders(Borders::ALL)
         .border_style(Style::default().fg(Color::DarkGray));
     let inner = block.inner(area);

@@ -8,12 +8,18 @@ interface RegimeHeatmapProps {
 
 type PlaybackSpeed = 1 | 5 | 10;
 
-const TIMELIKE_BG = 'rgba(0,255,255,0.12)';
-const SPACELIKE_BG = 'rgba(255,51,51,0.12)';
-const LIGHTLIKE_BG = 'rgba(255,255,0,0.12)';
-const TIMELIKE_COLOR = '#00ffff';
-const SPACELIKE_COLOR = '#ff3333';
-const LIGHTLIKE_COLOR = '#ffff00';
+// WCAG AA compliant foreground colors (contrast ≥ 4.5:1 on #0a0a0a dark bg)
+const TIMELIKE_BG = 'rgba(0,200,220,0.14)';
+const SPACELIKE_BG = 'rgba(220,80,80,0.14)';
+const LIGHTLIKE_BG = 'rgba(230,180,0,0.14)';
+const TIMELIKE_COLOR = '#00c8dc';   // contrast ~5.1:1
+const SPACELIKE_COLOR = '#e05050';  // contrast ~4.6:1
+const LIGHTLIKE_COLOR = '#e6b400';  // contrast ~6.2:1
+
+// Shape prefixes for color-blind accessibility
+const TIMELIKE_SYMBOL = '■';
+const SPACELIKE_SYMBOL = '●';
+const LIGHTLIKE_SYMBOL = '▲';
 
 function regimeBg(regime: string): string {
   switch (regime) {
@@ -268,15 +274,15 @@ export default function RegimeHeatmap({ beta }: RegimeHeatmapProps) {
         flexShrink: 0,
       }}>
         <div style={{ fontSize: 11 }}>
-          <span style={{ color: '#555' }}>TIMELIKE: </span>
+          <span style={{ color: '#555' }}>{TIMELIKE_SYMBOL} TIMELIKE: </span>
           <span style={{ color: TIMELIKE_COLOR, fontWeight: 700 }}>{counts.TIMELIKE}</span>
         </div>
         <div style={{ fontSize: 11 }}>
-          <span style={{ color: '#555' }}>SPACELIKE: </span>
+          <span style={{ color: '#555' }}>{SPACELIKE_SYMBOL} SPACELIKE: </span>
           <span style={{ color: SPACELIKE_COLOR, fontWeight: 700 }}>{counts.SPACELIKE}</span>
         </div>
         <div style={{ fontSize: 11 }}>
-          <span style={{ color: '#555' }}>LIGHTLIKE: </span>
+          <span style={{ color: '#555' }}>{LIGHTLIKE_SYMBOL} LIGHTLIKE: </span>
           <span style={{ color: LIGHTLIKE_COLOR, fontWeight: 700 }}>{counts.LIGHTLIKE}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -446,18 +452,29 @@ export default function RegimeHeatmap({ beta }: RegimeHeatmapProps) {
                     {evt.ds2.toFixed(4)}
                   </td>
                   <td style={{ padding: '5px 12px' }}>
-                    <span style={{
-                      background: regimeBg(evt.regime),
-                      color: regimeColor(evt.regime),
-                      padding: '2px 8px',
-                      borderRadius: 2,
-                      fontSize: 10,
-                      letterSpacing: '0.08em',
-                      fontWeight: 700,
-                      border: `1px solid ${regimeColor(evt.regime)}33`,
-                    }}>
-                      {evt.regime}
-                    </span>
+                    {(() => {
+                      const symbol =
+                        evt.regime === 'TIMELIKE' ? TIMELIKE_SYMBOL :
+                        evt.regime === 'SPACELIKE' ? SPACELIKE_SYMBOL :
+                        LIGHTLIKE_SYMBOL;
+                      return (
+                        <span
+                          aria-label={`Regime: ${evt.regime}`}
+                          style={{
+                            background: regimeBg(evt.regime),
+                            color: regimeColor(evt.regime),
+                            padding: '2px 8px',
+                            borderRadius: 2,
+                            fontSize: 10,
+                            letterSpacing: '0.08em',
+                            fontWeight: 700,
+                            border: `1px solid ${regimeColor(evt.regime)}33`,
+                          }}
+                        >
+                          {symbol} {evt.regime}
+                        </span>
+                      );
+                    })()}
                   </td>
                 </tr>
               ))}

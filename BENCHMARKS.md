@@ -88,3 +88,79 @@ cargo bench --bench workers
 # Save a baseline for comparison
 ./scripts/bench_all.sh --baseline
 ```
+
+---
+
+## C++ Performance Regression Suite
+
+The C++ library has a separate regression harness driven by
+`bench/regression/run_regression.sh` and the baseline file
+`bench/regression/baselines.json`.
+
+### Regression gate thresholds
+
+Each benchmark has an individual `threshold_ns_per_op` entry in
+`baselines.json` equal to `baseline_ns_per_op × 1.15` (15% above baseline).
+If the measured value exceeds this threshold the script exits with code 1,
+which fails CI.
+
+| Benchmark | Baseline (ns/op) | Threshold (ns/op) | Description |
+|---|---|---|---|
+| `beta_compute_1M` | 120.0 | 138.0 | `BetaCalculator::fromPriceVelocityOnline` × 1 M bars |
+| `gamma_compute_1M` | 8.5 | 9.8 | `lorentz_gamma()` × 1 M calls |
+| `full_pipeline_1M` | 850.0 | 977.5 | `Engine::process()` × 1 M bars (full stack) |
+| `christoffel_compute` | 45.0 | 51.8 | `SpacetimeManifold::christoffelSymbols()` 4×4 flat metric |
+| `rk4_geodesic_100steps` | 1200.0 | 1380.0 | `GeodesicSolver::solve()` 100 RK4 steps |
+| `doppler_factor_1M` | 12.0 | 13.8 | `doppler_factor()` × 1 M calls |
+| `rapidity_1M` | 10.0 | 11.5 | `rapidity()` (atanh) × 1 M calls |
+| `compose_velocities_1M` | 5.0 | 5.75 | `compose_velocities()` × 1 M calls |
+
+A measured value more than 15% above the baseline for any benchmark causes
+the CI job to fail with exit code 1.
+
+### Running benchmarks locally
+
+Prerequisites: a Release build in `build/` and `jq` on the PATH.
+
+```bash
+# Build the project in Release mode first (from the repo root):
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
+
+# Run the regression suite against the default build directory:
+bash bench/regression/run_regression.sh
+
+# Point at a non-default build directory:
+bash bench/regression/run_regression.sh /path/to/custom/build
+
+# Point at a non-default baselines file:
+bash bench/regression/run_regression.sh build bench/regression/baselines.json
+```
+
+The script prints a human-readable table to stdout and writes a
+machine-readable `bench/regression/report.json`.
+
+### Updating baselines.json after an intentional improvement
+
+When a deliberate optimisation improves one or more benchmarks, update the
+baselines so the new faster numbers become the new reference:
+
+1. Run the suite locally on the optimised build and note the measured values
+   from stdout (or from `bench/regression/report.json`).
+2. Open `bench/regression/baselines.json` and update
+   `baseline_ns_per_op` for each improved benchmark to the new measured value.
+3. Recalculate `threshold_ns_per_op = baseline_ns_per_op × 1.15` and update
+   that field too.
+4. Commit `baselines.json` together with the optimisation code change so CI
+   picks up the new baseline on the same push.
+
+Example edit for `gamma_compute_1M` after improving from 8.5 ns to 6.0 ns:
+
+```json
+"gamma_compute_1M": {
+  "description": "lorentz_gamma() called 1M times",
+  "baseline_ns_per_op": 6.0,
+  "threshold_ns_per_op": 6.9,
+  "notes": "Single sqrt() call. Should be < 15 ns/op."
+}
+```

@@ -1,0 +1,95 @@
+name: Benchmark Regression
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y build-essential cmake ninja-build
+
+      - name: Bootstrap vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
+          "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh" -disableMetrics
+
+      - name: Cache vcpkg packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/vcpkg/installed
+            ${{ github.workspace }}/vcpkg/packages
+            ${{ github.workspace }}/vcpkg/buildtrees
+          key: vcpkg-bench-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            vcpkg-bench-${{ runner.os }}-
+
+      - name: Configure (Release)
+        run: |
+          cmake -B build \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+
+      - name: Build benchmarks
+        run: cmake --build build --target bench_runner --parallel
+
+      - name: Run regression benchmarks
+        run: |
+          BASELINES="bench/regression/baselines.json"
+          BENCH_BIN="build/bench_runner"
+          THRESHOLD=10   # percent
+
+          python3 - <<'PYEOF'
+          import json, subprocess, sys, os
+
+          threshold_pct = float(os.environ.get("THRESHOLD", "10"))
+          baselines_path = os.environ.get("BASELINES", "bench/regression/baselines.json")
+          bench_bin = os.environ.get("BENCH_BIN", "build/bench_runner")
+
+          with open(baselines_path) as f:
+              data = json.load(f)
+
+          benchmarks = data.get("benchmarks", {})
+          failures = []
+
+          for name, info in benchmarks.items():
+              result = subprocess.run(
+                  [bench_bin, name],
+                  capture_output=True, text=True
+              )
+              if result.returncode != 0:
+                  print(f"SKIP {name}: bench_runner returned {result.returncode}: {result.stderr.strip()}")
+                  continue
+
+              measured = float(result.stdout.strip())
+              baseline = float(info["baseline_ns_per_op"])
+              threshold_ns = baseline * (1.0 + threshold_pct / 100.0)
+
+              status = "PASS" if measured <= threshold_ns else "FAIL"
+              print(f"{status}  {name}: {measured:.2f} ns/op  (baseline={baseline:.2f}, limit={threshold_ns:.2f})")
+
+              if status == "FAIL":
+                  failures.append(name)
+
+          if failures:
+              print(f"\nBenchmark regression detected in: {', '.join(failures)}")
+              sys.exit(1)
+          else:
+              print("\nAll benchmarks within threshold.")
+          PYEOF
+        env:
+          BASELINES: bench/regression/baselines.json
+          BENCH_BIN: build/bench_runner
+          THRESHOLD: 10

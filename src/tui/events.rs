@@ -2,7 +2,7 @@
 //!
 //! ## Responsibility
 //! Polls crossterm events and translates keyboard input into app state mutations.
-//! Handles quit, pause, reset, and help overlay toggling.
+//! Handles quit, pause, reset, help overlay toggling, and log export.
 //!
 //! ## Guarantees
 //! - Non-blocking event polling with configurable timeout
@@ -30,6 +30,12 @@ pub enum InputEvent {
     ScrollUp,
     /// User pressed down arrow to scroll log.
     ScrollDown,
+    /// User requested log export to file.
+    LogExport,
+    /// User toggled fullscreen sparkline mode.
+    FullscreenToggle,
+    /// User advanced to the next tracked symbol.
+    NextSymbol,
     /// A terminal resize occurred.
     Resize(u16, u16),
     /// No actionable event within the poll window.
@@ -75,6 +81,9 @@ pub fn apply_event(app: &mut App, event: InputEvent) {
         InputEvent::Help => app.show_help = !app.show_help,
         InputEvent::ScrollUp => app.scroll_log_up(),
         InputEvent::ScrollDown => app.scroll_log_down(),
+        InputEvent::LogExport => app.export_log(),
+        InputEvent::FullscreenToggle => app.fullscreen_sparkline = !app.fullscreen_sparkline,
+        InputEvent::NextSymbol => app.next_symbol(),
         InputEvent::Resize(_, _) | InputEvent::None => {}
     }
 }
@@ -90,7 +99,12 @@ fn translate_key(key: KeyEvent) -> InputEvent {
         KeyCode::Char('q') | KeyCode::Char('Q') => InputEvent::Quit,
         KeyCode::Char('p') | KeyCode::Char('P') => InputEvent::Pause,
         KeyCode::Char('r') | KeyCode::Char('R') => InputEvent::Reset,
-        KeyCode::Char('h') | KeyCode::Char('H') => InputEvent::Help,
+        KeyCode::Char('h') | KeyCode::Char('H') | KeyCode::Char('?') => InputEvent::Help,
+        KeyCode::Char('e') | KeyCode::Char('E') => InputEvent::LogExport,
+        KeyCode::Char('f') | KeyCode::Char('F') => InputEvent::FullscreenToggle,
+        KeyCode::Tab => InputEvent::NextSymbol,
+        KeyCode::Char('j') => InputEvent::ScrollDown,
+        KeyCode::Char('k') => InputEvent::ScrollUp,
         KeyCode::Esc => InputEvent::Quit,
         KeyCode::Up => InputEvent::ScrollUp,
         KeyCode::Down => InputEvent::ScrollDown,
@@ -242,5 +256,73 @@ mod tests {
         let mut app = App::new(Duration::from_secs(1));
         apply_event(&mut app, InputEvent::ScrollDown);
         assert_eq!(app.log_scroll_offset, 0);
+    }
+
+    #[test]
+    fn test_translate_key_question_mark_toggles_help() {
+        let key = KeyEvent::new(KeyCode::Char('?'), KeyModifiers::NONE);
+        assert_eq!(translate_key(key), InputEvent::Help);
+    }
+
+    #[test]
+    fn test_translate_key_e_exports_log() {
+        let key = KeyEvent::new(KeyCode::Char('e'), KeyModifiers::NONE);
+        assert_eq!(translate_key(key), InputEvent::LogExport);
+    }
+
+    #[test]
+    fn test_translate_key_uppercase_e_exports_log() {
+        let key = KeyEvent::new(KeyCode::Char('E'), KeyModifiers::NONE);
+        assert_eq!(translate_key(key), InputEvent::LogExport);
+    }
+
+    #[test]
+    fn test_apply_event_log_export_calls_export() {
+        let mut app = App::new(Duration::from_secs(1));
+        // export_log writes a file; just verify it doesn't panic on empty log
+        apply_event(&mut app, InputEvent::LogExport);
+        // No panic = pass
+    }
+
+    #[test]
+    fn test_translate_key_j_scrolls_down() {
+        let key = KeyEvent::new(KeyCode::Char('j'), KeyModifiers::NONE);
+        assert_eq!(translate_key(key), InputEvent::ScrollDown);
+    }
+
+    #[test]
+    fn test_translate_key_k_scrolls_up() {
+        let key = KeyEvent::new(KeyCode::Char('k'), KeyModifiers::NONE);
+        assert_eq!(translate_key(key), InputEvent::ScrollUp);
+    }
+
+    #[test]
+    fn test_translate_key_f_toggles_fullscreen() {
+        let key = KeyEvent::new(KeyCode::Char('f'), KeyModifiers::NONE);
+        assert_eq!(translate_key(key), InputEvent::FullscreenToggle);
+    }
+
+    #[test]
+    fn test_translate_key_tab_next_symbol() {
+        let key = KeyEvent::new(KeyCode::Tab, KeyModifiers::NONE);
+        assert_eq!(translate_key(key), InputEvent::NextSymbol);
+    }
+
+    #[test]
+    fn test_apply_event_fullscreen_toggle() {
+        let mut app = App::new(Duration::from_secs(1));
+        assert!(!app.fullscreen_sparkline);
+        apply_event(&mut app, InputEvent::FullscreenToggle);
+        assert!(app.fullscreen_sparkline);
+        apply_event(&mut app, InputEvent::FullscreenToggle);
+        assert!(!app.fullscreen_sparkline);
+    }
+
+    #[test]
+    fn test_apply_event_next_symbol() {
+        let mut app = App::new(Duration::from_secs(1));
+        let initial = app.selected_symbol;
+        apply_event(&mut app, InputEvent::NextSymbol);
+        assert_eq!(app.selected_symbol, (initial + 1) % crate::tui::app::SYMBOLS.len());
     }
 }

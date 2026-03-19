@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { useWebSocket } from '../hooks/useWebSocket';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -222,8 +223,37 @@ function EquityTooltip({ active, payload, label }: {
 // ─── Main component ────────────────────────────────────────────────────────────
 
 export default function BacktestPanel({ beta }: BacktestPanelProps) {
+  const { isConnected } = useWebSocket('ws://localhost:8080/api/v1/ws');
+
   const stats = HARDCODED_STATS;
   const bh = BH_STATS;
+
+  const handleExportCSV = useCallback(() => {
+    const rows: string[][] = [
+      ['metric', 'relativistic', 'buy_and_hold'],
+      ['sharpe', String(stats.sharpe), String(bh.sharpe)],
+      ['sortino', String(stats.sortino), String(bh.sortino)],
+      ['max_drawdown', String(stats.maxDrawdown), String(bh.maxDrawdown)],
+      ['win_rate', String(stats.winRate), String(bh.winRate)],
+      ['total_return', String(stats.totalReturn), String(bh.totalReturn)],
+      ['calmar', String(stats.calmar), String(bh.calmar)],
+      ['annualized_return', String(stats.annualizedReturn), String(bh.annualizedReturn)],
+      ['volatility', String(stats.volatility), String(bh.volatility)],
+      ['beta', String(beta), ''],
+    ];
+    const csv = rows.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `backtest_beta${beta.toFixed(4)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [stats, bh, beta]);
+
+  const handleExportPNG = useCallback(() => {
+    window.print();
+  }, []);
 
   // Generate equity curves
   const relativisticCurve = useMemo(
@@ -317,8 +347,23 @@ export default function BacktestPanel({ beta }: BacktestPanelProps) {
           </div>
         </div>
 
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: 11, color: '#555', letterSpacing: '0.1em', marginBottom: 8 }}>β = {beta.toFixed(4)}</div>
+        <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
+            {/* Connection badge */}
+            <span style={{
+              fontSize: 10,
+              padding: '2px 8px',
+              borderRadius: 2,
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              background: isConnected ? 'rgba(0,255,65,0.12)' : 'rgba(255,153,0,0.12)',
+              border: `1px solid ${isConnected ? '#00ff4144' : '#ff990044'}`,
+              color: isConnected ? GREEN : ORANGE,
+            }}>
+              {isConnected ? '● LIVE' : '○ DEMO MODE'}
+            </span>
+          </div>
+          <div style={{ fontSize: 11, color: '#555', letterSpacing: '0.1em' }}>β = {beta.toFixed(4)}</div>
           <div style={{ fontSize: 11, color: '#444' }}>
             Sortino: <span style={{ color: GREEN }}>{stats.sortino.toFixed(2)}</span>
           </div>
@@ -330,6 +375,43 @@ export default function BacktestPanel({ beta }: BacktestPanelProps) {
           </div>
           <div style={{ fontSize: 11, color: '#444' }}>
             Max DD: <span style={{ color: RED }}>{(stats.maxDrawdown * 100).toFixed(1)}%</span>
+          </div>
+          {/* Export buttons */}
+          <div style={{ display: 'flex', gap: 6, marginTop: 4, justifyContent: 'flex-end' }}>
+            <button
+              onClick={handleExportCSV}
+              aria-label="Export backtest stats as CSV"
+              style={{
+                background: 'rgba(0,255,255,0.08)',
+                border: '1px solid #00ffff33',
+                color: CYAN,
+                fontSize: 10,
+                fontFamily: 'inherit',
+                padding: '3px 10px',
+                cursor: 'pointer',
+                borderRadius: 2,
+                letterSpacing: '0.06em',
+              }}
+            >
+              ↓ CSV
+            </button>
+            <button
+              onClick={handleExportPNG}
+              aria-label="Export backtest panel as PNG via print dialog"
+              style={{
+                background: 'rgba(0,255,65,0.08)',
+                border: '1px solid #00ff4133',
+                color: GREEN,
+                fontSize: 10,
+                fontFamily: 'inherit',
+                padding: '3px 10px',
+                cursor: 'pointer',
+                borderRadius: 2,
+                letterSpacing: '0.06em',
+              }}
+            >
+              ↓ PNG
+            </button>
           </div>
         </div>
       </motion.div>

@@ -1,11 +1,16 @@
-import React, { useState, useCallback } from 'react';
+import React, { Suspense, useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { gamma, rapidity } from './utils/physics';
-import LightCone3D from './components/LightCone3D';
-import LorentzDashboard from './components/LorentzDashboard';
-import RegimeHeatmap from './components/RegimeHeatmap';
-import GeodesicViz from './components/GeodesicViz';
-import BacktestPanel from './components/BacktestPanel';
+import { ThemeProvider } from './context/ThemeContext';
+import ThemeToggle from './components/ThemeToggle';
+import ErrorBoundary from './components/ErrorBoundary';
+import { SkeletonChart, SkeletonPanel } from './components/Skeleton';
+
+const LightCone3D = React.lazy(() => import('./components/LightCone3D'));
+const LorentzDashboard = React.lazy(() => import('./components/LorentzDashboard'));
+const RegimeHeatmap = React.lazy(() => import('./components/RegimeHeatmap'));
+const GeodesicViz = React.lazy(() => import('./components/GeodesicViz'));
+const BacktestPanel = React.lazy(() => import('./components/BacktestPanel'));
 
 type TabId = 'lightcone' | 'lorentz' | 'heatmap' | 'geodesic' | 'backtest';
 
@@ -28,8 +33,8 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     width: '100vw',
     height: '100vh',
-    background: '#0a0a0a',
-    color: '#e0e0e0',
+    background: 'var(--bg)',
+    color: 'var(--text)',
     fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
     overflow: 'hidden',
   },
@@ -38,7 +43,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '10px 20px',
-    borderBottom: '1px solid #1a1a2e',
+    borderBottom: '1px solid var(--border)',
     background: '#050508',
     flexShrink: 0,
   },
@@ -52,7 +57,7 @@ const styles: Record<string, React.CSSProperties> = {
   headerRight: {
     display: 'flex',
     alignItems: 'center',
-    gap: '20px',
+    gap: '12px',
   },
   githubLink: {
     color: '#00ff41',
@@ -68,8 +73,9 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '12px',
     padding: '8px 20px',
     background: '#0d0d1a',
-    borderBottom: '1px solid #1a1a2e',
+    borderBottom: '1px solid var(--border)',
     flexShrink: 0,
+    flexWrap: 'wrap',
   },
   sliderLabel: {
     fontSize: '11px',
@@ -94,9 +100,10 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     padding: '0 20px',
     background: '#050508',
-    borderBottom: '1px solid #1a1a2e',
+    borderBottom: '1px solid var(--border)',
     flexShrink: 0,
     gap: '2px',
+    overflowX: 'auto',
   },
   tabContent: {
     flex: 1,
@@ -115,6 +122,9 @@ const sliderTrackStyle = `
     background: linear-gradient(to right, #1a1a2e, #00ffff);
     outline: none;
     cursor: pointer;
+  }
+  @media (max-width: 768px) {
+    .beta-slider { width: 120px; }
   }
   .beta-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -137,7 +147,7 @@ const sliderTrackStyle = `
   }
 `;
 
-export default function App() {
+function AppInner() {
   const [beta, setBeta] = useState(0.72);
   const [activeTab, setActiveTab] = useState<TabId>('lightcone');
 
@@ -151,15 +161,45 @@ export default function App() {
   const renderTab = () => {
     switch (activeTab) {
       case 'lightcone':
-        return <LightCone3D beta={beta} />;
+        return (
+          <ErrorBoundary>
+            <Suspense fallback={<SkeletonChart />}>
+              <LightCone3D beta={beta} />
+            </Suspense>
+          </ErrorBoundary>
+        );
       case 'lorentz':
-        return <LorentzDashboard beta={beta} />;
+        return (
+          <ErrorBoundary>
+            <Suspense fallback={<SkeletonChart />}>
+              <LorentzDashboard beta={beta} />
+            </Suspense>
+          </ErrorBoundary>
+        );
       case 'heatmap':
-        return <RegimeHeatmap beta={beta} />;
+        return (
+          <ErrorBoundary>
+            <Suspense fallback={<SkeletonChart />}>
+              <RegimeHeatmap beta={beta} />
+            </Suspense>
+          </ErrorBoundary>
+        );
       case 'geodesic':
-        return <GeodesicViz beta={beta} />;
+        return (
+          <ErrorBoundary>
+            <Suspense fallback={<SkeletonChart />}>
+              <GeodesicViz beta={beta} />
+            </Suspense>
+          </ErrorBoundary>
+        );
       case 'backtest':
-        return <BacktestPanel beta={beta} />;
+        return (
+          <ErrorBoundary>
+            <Suspense fallback={<SkeletonPanel />}>
+              <BacktestPanel beta={beta} />
+            </Suspense>
+          </ErrorBoundary>
+        );
     }
   };
 
@@ -173,6 +213,7 @@ export default function App() {
           TOKIO PROMPT // RELATIVISTIC MARKET INTELLIGENCE
         </div>
         <div style={styles.headerRight}>
+          <ThemeToggle />
           <a
             href="https://github.com/tokio-prompt"
             target="_blank"
@@ -196,6 +237,7 @@ export default function App() {
           step={0.0001}
           value={beta}
           onChange={handleBetaChange}
+          aria-label="Beta — market velocity relative to speed of light"
         />
         <span style={styles.sliderValue}>β = {beta.toFixed(4)}</span>
         <span style={{ fontSize: '11px', color: '#555', margin: '0 4px' }}>|</span>
@@ -244,6 +286,14 @@ export default function App() {
   );
 }
 
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppInner />
+    </ThemeProvider>
+  );
+}
+
 interface TabButtonProps {
   tab: Tab;
   active: boolean;
@@ -254,6 +304,8 @@ function TabButton({ tab, active, onClick }: TabButtonProps) {
   return (
     <button
       onClick={onClick}
+      aria-selected={active}
+      role="tab"
       style={{
         background: active ? '#00ffff18' : 'transparent',
         border: 'none',
