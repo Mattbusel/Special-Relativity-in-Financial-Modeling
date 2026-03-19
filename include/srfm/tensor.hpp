@@ -187,6 +187,54 @@ private:
     double              h_;
 };
 
+// ─── CachedChristoffelSymbols ────────────────────────────────────────────────
+
+/// Thread-local cache wrapper around ChristoffelSymbols.
+///
+/// Caches the most recently computed ChristoffelArray so that repeated calls
+/// from the RK4 geodesic solver at the same (or very nearby) spacetime point
+/// do not re-evaluate all 64 finite-difference metric derivatives.
+///
+/// Cache invalidation: the cached result is reused when the requested point
+/// is within `cache_tol` (default 1e-8) of the cached point in L∞ norm.
+///
+/// Thread safety: NOT thread-safe (one instance per thread / per GeodesicSolver).
+class CachedChristoffelSymbols {
+public:
+    /// Construct from a metric tensor with an optional cache tolerance.
+    explicit CachedChristoffelSymbols(const MetricTensor& metric,
+                                      double h          = constants::DEFAULT_FD_STEP,
+                                      double cache_tol  = 1e-8)
+        : inner_{metric, h}, cache_tol_{cache_tol} {}
+
+    /// Compute (or return cached) Christoffel symbols at point x.
+    ChristoffelArray compute(const SpacetimePoint& x) const {
+        if (cache_valid_ && (x - cached_point_).cwiseAbs().maxCoeff() < cache_tol_) {
+            return cached_result_;
+        }
+        cached_result_ = inner_.compute(x);
+        cached_point_  = x;
+        cache_valid_   = true;
+        return cached_result_;
+    }
+
+    /// Contract cached symbols with a four-velocity.
+    FourVelocity contract(const ChristoffelArray& gamma,
+                          const FourVelocity& u) const {
+        return inner_.contract(gamma, u);
+    }
+
+    /// Invalidate the cache (e.g. after a metric parameter change).
+    void invalidate() const noexcept { cache_valid_ = false; }
+
+private:
+    ChristoffelSymbols        inner_;
+    double                    cache_tol_;
+    mutable bool              cache_valid_{false};
+    mutable SpacetimePoint    cached_point_{SpacetimePoint::Zero()};
+    mutable ChristoffelArray  cached_result_{};
+};
+
 // ─── GeodesicSolver ───────────────────────────────────────────────────────────
 
 /// Phase-space state for the geodesic ODE: position x^μ and velocity u^μ.

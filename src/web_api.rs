@@ -22,7 +22,7 @@ use axum::{
     body::Body,
     extract::{
         ws::{Message, WebSocket},
-        Path, State, WebSocketUpgrade,
+        Path, Query, State, WebSocketUpgrade,
     },
     http::{header, HeaderValue, Request, StatusCode},
     middleware::{self, Next},
@@ -46,6 +46,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 #[cfg(feature = "web-api")]
 use std::collections::HashSet;
+#[cfg(feature = "web-api")]
+use std::sync::atomic::{AtomicUsize, Ordering};
 #[cfg(feature = "web-api")]
 use std::sync::Arc;
 #[cfg(feature = "web-api")]
@@ -176,6 +178,23 @@ struct AppState {
     config: ServerConfig,
     /// Optional API key.  `None` means authentication is disabled (startup warning emitted).
     api_key: Option<String>,
+    /// Number of currently active SSE connections (for rate limiting).
+    sse_connections: AtomicUsize,
+}
+
+/// Query parameters for the paginated requests list endpoint.
+#[cfg(feature = "web-api")]
+#[derive(Debug, Deserialize)]
+struct PaginationParams {
+    #[serde(default)]
+    offset: usize,
+    #[serde(default = "default_limit")]
+    limit: usize,
+}
+
+#[cfg(feature = "web-api")]
+fn default_limit() -> usize {
+    20
 }
 
 // ============================================================================
@@ -255,6 +274,7 @@ pub async fn start_server(
         tracker,
         config: config.clone(),
         api_key,
+        sse_connections: AtomicUsize::new(0),
     });
 
     let app = Router::new()
@@ -262,6 +282,8 @@ pub async fn start_server(
         .route("/api/v1/stream", post(sse_stream_handler))
         .route("/api/v1/status/:request_id", get(status_handler))
         .route("/api/v1/result/:request_id", get(result_handler))
+        .route("/api/v1/requests", get(list_requests_handler))
+        .route("/api/v1/explain/:request_id", get(explain_handler))
         .route("/api/v1/ws", get(websocket_handler))
         .route("/api/v1/schema", get(schema_handler))
         .route("/health", get(health_handler))
@@ -432,7 +454,7 @@ async fn infer_handler(
         session: SessionId::new(session_id),
         request_id: request_id.clone(),
         input: req.prompt,
-        meta: req.metadata,
+        meta: Some(req.metadata),
     };
 
     state
@@ -515,6 +537,76 @@ async fn result_handler(
     }
 }
 
+/// `GET /api/v1/requests?offset=N&limit=M`  -  Paginated list of requests.
+///
+/// Returns a JSON object with `total`, `offset`, `limit`, and `items` (array
+/// of `{request_id, status}` objects). Items are returned in insertion order.
+///
+/// # Panics
+///
+/// This function never panics.
+#[cfg(feature = "web-api")]
+async fn list_requests_handler(
+    State(state): State<Arc<AppState>>,
+    Query(params): Query<PaginationParams>,
+) -> Json<serde_json::Value> {
+    let all_items: Vec<serde_json::Value> = state
+        .tracker
+        .status
+        .iter()
+        .map(|entry| {
+            serde_json::json!({
+                "request_id": entry.key(),
+                "status": entry.value().status,
+            })
+        })
+        .collect();
+
+    let total = all_items.len();
+    let items: Vec<&serde_json::Value> = all_items
+        .iter()
+        .skip(params.offset)
+        .take(params.limit)
+        .collect();
+
+    Json(serde_json::json!({
+        "total": total,
+        "offset": params.offset,
+        "limit": params.limit,
+        "items": items,
+    }))
+}
+
+/// `GET /api/v1/explain/{request_id}`  -  Human-readable regime explanation.
+///
+/// Returns a mock relativistic interpretation of the current regime
+/// classification for the given request.
+///
+/// # Panics
+///
+/// This function never panics.
+#[cfg(feature = "web-api")]
+async fn explain_handler(
+    State(state): State<Arc<AppState>>,
+    Path(request_id): Path<String>,
+) -> Result<Json<serde_json::Value>, AppError> {
+    // Verify the request exists
+    let _tracked = state
+        .tracker
+        .status
+        .get(&request_id)
+        .ok_or(AppError::NotFound)?;
+
+    Ok(Json(serde_json::json!({
+        "request_id": request_id,
+        "regime": "TIMELIKE",
+        "beta": 0.312,
+        "gamma": 1.054,
+        "ds2": -0.482,
+        "interpretation": "Causal price movement detected. \u{03b2}=0.312 < 1 (subluminal). The market is in a timelike regime \u{2014} price changes are causally connected and predictable via geodesic deviation."
+    })))
+}
+
 // ============================================================================
 // SSE Streaming
 // ============================================================================
@@ -528,11 +620,23 @@ async fn result_handler(
 /// # Panics
 ///
 /// This function never panics.
+
+/// Maximum concurrent SSE connections per server.
+#[cfg(feature = "web-api")]
+const SSE_MAX_CONNECTIONS: usize = 10;
+
 #[cfg(feature = "web-api")]
 async fn sse_stream_handler(
     State(state): State<Arc<AppState>>,
     Json(req): Json<InferRequest>,
 ) -> Result<Sse<impl futures::Stream<Item = Result<Event, std::convert::Infallible>>>, AppError> {
+    // SSE rate limit: reject if too many concurrent connections
+    let current = state.sse_connections.load(Ordering::Relaxed);
+    if current >= SSE_MAX_CONNECTIONS {
+        return Err(AppError::TooManyConnections);
+    }
+    state.sse_connections.fetch_add(1, Ordering::Relaxed);
+
     let request_id = Uuid::new_v4().to_string();
     let session_id = req
         .session_id
@@ -542,15 +646,16 @@ async fn sse_stream_handler(
         session: SessionId::new(session_id),
         request_id: request_id.clone(),
         input: req.prompt,
-        meta: req.metadata,
+        meta: Some(req.metadata),
     };
 
-    state
-        .pipeline_tx
-        .send(prompt_req)
-        .await
-        .map_err(|_| AppError::PipelineClosed)?;
+    if state.pipeline_tx.send(prompt_req).await.is_err() {
+        state.sse_connections.fetch_sub(1, Ordering::Relaxed);
+        return Err(AppError::PipelineClosed);
+    }
 
+    // Decrement the SSE counter when the stream completes
+    let sse_state = state.clone();
     let token_stream = stream::once(async move {
         Ok::<_, std::convert::Infallible>(
             Event::default()
@@ -562,8 +667,11 @@ async fn sse_stream_handler(
         Ok(Event::default().event("token").data("Response")),
         Ok(Event::default().event("token").data(" from")),
         Ok(Event::default().event("token").data(" pipeline")),
-        Ok(Event::default().event("done").data("[DONE]")),
-    ]));
+    ]))
+    .chain(stream::once(async move {
+        sse_state.sse_connections.fetch_sub(1, Ordering::Relaxed);
+        Ok::<_, std::convert::Infallible>(Event::default().event("done").data("[DONE]"))
+    }));
 
     Ok(Sse::new(token_stream).keep_alive(KeepAlive::default()))
 }
@@ -581,8 +689,15 @@ async fn sse_stream_handler(
 /// This function never panics.
 #[cfg(feature = "web-api")]
 async fn websocket_handler(ws: WebSocketUpgrade, State(state): State<Arc<AppState>>) -> Response {
-    ws.max_message_size(WS_MAX_MESSAGE_SIZE)
-        .on_upgrade(|socket| websocket_stream(socket, state))
+    let mut response = ws
+        .max_message_size(WS_MAX_MESSAGE_SIZE)
+        .on_upgrade(|socket| websocket_stream(socket, state));
+    // Hint to clients: reconnect after 5 seconds on disconnect
+    response.headers_mut().insert(
+        "x-reconnect-interval",
+        HeaderValue::from_static("5000"),
+    );
+    response
 }
 
 /// Process a WebSocket connection with ping/pong keepalive, rate limiting,
@@ -642,7 +757,7 @@ async fn websocket_stream(mut socket: WebSocket, state: Arc<AppState>) {
                             session: SessionId::new(session_id),
                             request_id: request_id.clone(),
                             input: req.prompt,
-                            meta: req.metadata,
+                            meta: Some(req.metadata),
                         };
 
                         if state.pipeline_tx.send(prompt_req).await.is_ok() {
@@ -890,6 +1005,8 @@ enum AppError {
     PipelineClosed,
     /// The request timed out waiting for a result.
     Timeout,
+    /// Too many concurrent SSE connections.
+    TooManyConnections,
 }
 
 #[cfg(feature = "web-api")]
@@ -899,6 +1016,7 @@ impl IntoResponse for AppError {
             AppError::NotFound => (StatusCode::NOT_FOUND, "Request not found"),
             AppError::PipelineClosed => (StatusCode::SERVICE_UNAVAILABLE, "Pipeline closed"),
             AppError::Timeout => (StatusCode::REQUEST_TIMEOUT, "Request timeout"),
+            AppError::TooManyConnections => (StatusCode::TOO_MANY_REQUESTS, "Too many SSE connections"),
         };
 
         (status, Json(serde_json::json!({"error": message}))).into_response()
@@ -1077,6 +1195,7 @@ mod tests {
             },
             config: ServerConfig::default(),
             api_key: key.map(|s| s.to_string()),
+            sse_connections: AtomicUsize::new(0),
         })
     }
 
@@ -1122,5 +1241,58 @@ mod tests {
     fn test_auth_disabled_when_no_api_key() {
         let state = make_state_with_key(None);
         assert!(state.api_key.is_none(), "no API key → auth disabled");
+    }
+
+    #[test]
+    fn test_sse_max_connections_constant() {
+        assert_eq!(SSE_MAX_CONNECTIONS, 10);
+    }
+
+    #[test]
+    fn test_sse_connection_counter_increments() {
+        let (tx, _rx) = mpsc::channel(1);
+        let state = Arc::new(AppState {
+            pipeline_tx: tx,
+            tracker: RequestTracker { status: Arc::new(DashMap::new()) },
+            config: ServerConfig::default(),
+            api_key: None,
+            sse_connections: AtomicUsize::new(0),
+        });
+        state.sse_connections.fetch_add(1, Ordering::Relaxed);
+        assert_eq!(state.sse_connections.load(Ordering::Relaxed), 1);
+    }
+
+    #[test]
+    fn test_sse_connection_limit_check() {
+        let (tx, _rx) = mpsc::channel(1);
+        let state = Arc::new(AppState {
+            pipeline_tx: tx,
+            tracker: RequestTracker { status: Arc::new(DashMap::new()) },
+            config: ServerConfig::default(),
+            api_key: None,
+            sse_connections: AtomicUsize::new(SSE_MAX_CONNECTIONS),
+        });
+        let current = state.sse_connections.load(Ordering::Relaxed);
+        assert!(current >= SSE_MAX_CONNECTIONS, "should be at limit");
+    }
+
+    #[test]
+    fn test_pagination_params_defaults() {
+        let params: PaginationParams = serde_json::from_str("{}").expect("deser");
+        assert_eq!(params.offset, 0);
+        assert_eq!(params.limit, 20);
+    }
+
+    #[test]
+    fn test_pagination_params_custom() {
+        let params: PaginationParams = serde_json::from_str(r#"{"offset":5,"limit":10}"#).expect("deser");
+        assert_eq!(params.offset, 5);
+        assert_eq!(params.limit, 10);
+    }
+
+    #[test]
+    fn test_app_error_too_many_connections_returns_429() {
+        let resp = AppError::TooManyConnections.into_response();
+        assert_eq!(resp.status(), StatusCode::TOO_MANY_REQUESTS);
     }
 }

@@ -441,6 +441,73 @@ impl MockMetrics {
         }
     }
 
+    /// Updates relativistic physics display fields based on story phase.
+    fn update_relativistics(&self, app: &mut App, t: f64, phase_tick: u64) {
+        let wobble = |freq: f64| (t * freq).sin();
+
+        let (beta_base, regime) = match phase_tick {
+            // Warmup: low beta, mostly Timelike
+            0..=29 => (0.3 + 0.05 * wobble(0.07), RegimeType::Timelike),
+            // Load: rising beta, alternates Timelike/Spacelike
+            30..=44 => {
+                let pressure = (phase_tick - 30) as f64 / 15.0;
+                let beta = 0.3 + 0.4 * pressure + 0.05 * wobble(0.11);
+                let regime = if (phase_tick % 2) == 0 {
+                    RegimeType::Timelike
+                } else {
+                    RegimeType::Spacelike
+                };
+                (beta, regime)
+            }
+            // Failure: beta spiking near 0.95, mostly Spacelike
+            45..=59 => {
+                let beta = 0.85 + 0.1 * wobble(0.13).abs();
+                (beta, RegimeType::Spacelike)
+            }
+            // HalfOpen: declining beta, mixed
+            60..=74 => {
+                let recovery = (phase_tick - 60) as f64 / 15.0;
+                let beta = 0.85 - 0.35 * recovery + 0.05 * wobble(0.09);
+                let regime = if wobble(0.17) > 0.0 {
+                    RegimeType::Timelike
+                } else {
+                    RegimeType::Spacelike
+                };
+                (beta, regime)
+            }
+            // Recovery: beta normalizing to ~0.4, Timelike
+            75..=89 => {
+                let settle = (phase_tick - 75) as f64 / 15.0;
+                let beta = 0.5 - 0.1 * settle + 0.04 * wobble(0.07);
+                (beta, RegimeType::Timelike)
+            }
+            // Steady: beta ~0.3-0.5 with oscillation, mostly Timelike
+            _ => {
+                let beta = 0.35 + 0.1 * wobble(0.05) + 0.05 * wobble(0.23);
+                let regime = if wobble(0.07).abs() < 0.1 {
+                    RegimeType::Lightlike
+                } else {
+                    RegimeType::Timelike
+                };
+                (beta, regime)
+            }
+        };
+
+        // Clamp beta to (0, 0.9999) to avoid division by zero
+        let beta = beta_base.clamp(0.01, 0.9999);
+        let gamma = 1.0 / (1.0 - beta * beta).sqrt();
+        let ds2 = match regime {
+            RegimeType::Timelike | RegimeType::Unknown => -0.5,
+            RegimeType::Lightlike => 0.0,
+            RegimeType::Spacelike => 0.5,
+        };
+
+        app.beta_display = beta;
+        app.gamma_display = gamma;
+        app.ds2_display = ds2;
+        app.push_regime(regime);
+    }
+
     /// Updates the active pipeline stage indicator.
     fn update_active_stage(&self, app: &mut App, t: f64) {
         let stage_idx = ((t * 0.5) as usize) % 5;
