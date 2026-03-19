@@ -111,11 +111,31 @@ fn default_data_ms() -> u64 { 1000 }
 fn default_left_col_pct() -> u16 { 50 }
 
 impl Config {
-    /// Load config from `srfm.toml` in the current directory, or return defaults.
+    /// Load config from the first `srfm.toml` found in the standard search paths.
     ///
-    /// Never fails — missing or malformed config falls back to defaults with a warning.
+    /// Search order:
+    /// 1. `./srfm.toml` (current directory)
+    /// 2. `{config_dir}/srfm/srfm.toml` (platform config dir via `dirs`)
+    /// 3. `~/.config/srfm/srfm.toml` (XDG-style fallback)
+    ///
+    /// Never fails — missing or malformed config falls back to defaults.
     pub fn load() -> Self {
-        Self::load_from_path("srfm.toml")
+        let candidates: Vec<std::path::PathBuf> = {
+            let mut paths = vec![std::path::PathBuf::from("srfm.toml")];
+            if let Some(cfg_dir) = dirs::config_dir() {
+                paths.push(cfg_dir.join("srfm").join("srfm.toml"));
+            }
+            if let Some(home_dir) = dirs::home_dir() {
+                paths.push(home_dir.join(".config").join("srfm").join("srfm.toml"));
+            }
+            paths
+        };
+        for candidate in &candidates {
+            if candidate.exists() {
+                return Self::load_from_path(candidate.to_str().unwrap_or("srfm.toml"));
+            }
+        }
+        Self::default()
     }
 
     /// Load config from a specific path.
@@ -161,6 +181,56 @@ impl Config {
         }
         if errors.is_empty() { Ok(()) } else { Err(errors) }
     }
+}
+
+/// Watch `path` for changes and call `on_change` with the newly loaded [`Config`]
+/// whenever the file is modified.
+///
+/// Returns a [`notify::RecommendedWatcher`] that must be kept alive for watching
+/// to continue. Drop it to stop watching.
+///
+/// # Errors
+///
+/// Returns `Err` if the watcher cannot be created or the path cannot be watched.
+#[cfg(feature = "watch-config")]
+pub fn watch_config(
+    path: &str,
+    on_change: impl Fn(Config) + Send + 'static,
+) -> notify::Result<notify::RecommendedWatcher> {
+    use notify::{EventKind, RecommendedWatcher, RecursiveMode, Watcher};
+    use std::path::PathBuf;
+
+    let watch_path = PathBuf::from(path);
+    let config_path = path.to_string();
+
+    let mut watcher = RecommendedWatcher::new(
+        move |result: notify::Result<notify::Event>| {
+            if let Ok(event) = result {
+                let relevant = matches!(
+                    event.kind,
+                    EventKind::Modify(_) | EventKind::Create(_)
+                );
+                if relevant {
+                    let cfg = Config::load_from_path(&config_path);
+                    on_change(cfg);
+                }
+            }
+        },
+        notify::Config::default(),
+    )?;
+
+    watcher.watch(&watch_path, RecursiveMode::NonRecursive)?;
+    Ok(watcher)
+}
+
+/// Watch `path` for changes — no-op stub when `watch-config` feature is disabled.
+#[cfg(not(feature = "watch-config"))]
+pub fn watch_config(
+    path: &str,
+    on_change: impl Fn(Config) + Send + 'static,
+) -> Result<(), String> {
+    let _ = (path, on_change);
+    Err("watch_config requires the `watch-config` feature or the `notify` crate as a regular dependency".into())
 }
 
 #[cfg(test)]

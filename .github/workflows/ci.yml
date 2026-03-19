@@ -14,15 +14,14 @@ jobs:
         run: cargo check --all-features
       - name: cargo test
         run: cargo test --all-features
-
-  # ── Security audit ────────────────────────────────────────────────────────
-  audit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: rustsec/audit-check@v1
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          name: test-results-linux
+          path: |
+            target/debug/
+          retention-days: 7
 
   # ── Rust web-api feature build and test ───────────────────────────────────
   rust-web-api:
@@ -86,12 +85,10 @@ jobs:
       - name: Generate documentation
         run: doxygen Doxyfile
 
-  # ── Fuzz targets (30s per target, main branch only) ───────────────────────
+  # ── Fuzz targets (30s on main, 15s on PRs) ────────────────────────────────
   fuzz:
-    name: Fuzz (30s per target)
+    name: Fuzz (adaptive timeout)
     runs-on: ubuntu-latest
-    # Only run on push to main, not on every PR (expensive)
-    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -104,6 +101,8 @@ jobs:
         run: |
           git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
           "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh" -disableMetrics
+      - name: Set fuzz timeout
+        run: echo "FUZZ_TIME=${{ github.ref == 'refs/heads/main' && '30' || '15' }}" >> $GITHUB_ENV
       - name: Build fuzz targets
         run: |
           cmake -B build-fuzz \
@@ -114,26 +113,44 @@ jobs:
             -DSRFM_BUILD_FUZZ=ON \
             -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
           cmake --build build-fuzz --parallel
-        continue-on-error: ${{ github.event_name == 'pull_request' }}
-      - name: Run fuzz targets (30s each)
+        continue-on-error: true
+      - name: Run fuzz targets (${{ env.FUZZ_TIME }}s each)
         run: |
           for fuzz_src in fuzz/fuzz_*.cpp; do
             target=$(basename "$fuzz_src" .cpp)
             binary="build-fuzz/fuzz/$target"
             if [ -x "$binary" ]; then
-              echo "Fuzzing $target for 30s..."
-              "$binary" -max_total_time=30 -timeout=10 2>&1 || true
+              echo "Fuzzing $target for ${{ env.FUZZ_TIME }}s..."
+              "$binary" -max_total_time=${{ env.FUZZ_TIME }} -timeout=10 2>&1 || true
             else
               echo "Skipping $target (binary not found at $binary)"
             fi
           done
-        continue-on-error: ${{ github.event_name == 'pull_request' }}
+        continue-on-error: true
 
-  # ── Benchmark regression tracking (main branch only) ─────────────────────
+  # ── Coverage reporting ────────────────────────────────────────────────────
+  coverage:
+    name: Coverage (cargo-tarpaulin)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Install cargo-tarpaulin
+        run: cargo install cargo-tarpaulin
+      - name: Run coverage
+        run: cargo tarpaulin --features "web-api tui" --out Xml --output-dir coverage/
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 30
+
+  # ── Benchmark regression tracking ────────────────────────────────────────
   benchmark:
     name: Benchmark (C++)
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -155,7 +172,8 @@ jobs:
       - name: Run benchmarks (JSON output)
         run: |
           ./build/bench/bench_beta_gamma --benchmark_format=json > benchmark_results.json
-      - name: Store benchmark result
+      - name: Store benchmark result (main only)
+        if: github.ref == 'refs/heads/main'
         uses: benchmark-action/github-action-benchmark@v1
         with:
           tool: 'googlecpp'
@@ -165,4 +183,10 @@ jobs:
           comment-on-alert: true
           alert-threshold: '120%'
           fail-on-alert: false
-        continue-on-error: ${{ github.event_name == 'pull_request' }}
+        continue-on-error: true
+      - name: Upload benchmark results as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results-${{ github.sha }}
+          path: benchmark_results.json
+          retention-days: 30

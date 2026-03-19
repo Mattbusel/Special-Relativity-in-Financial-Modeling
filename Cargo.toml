@@ -2,6 +2,7 @@
 name = "tokio-prompt-orchestrator"
 version = "0.1.0"
 edition = "2021"
+rust-version = "1.75"
 description = "Async LLM prompt orchestration layer for the Special Relativity in Financial Modeling pipeline"
 license = "MIT"
 repository = "https://github.com/your-org/Special-Relativity-in-Financial-Modeling"
@@ -18,17 +19,26 @@ name = "srfm-orchestrator"
 path = "src/main.rs"
 required-features = []
 
+# Feature flags:
+#   web-api  – HTTP REST/SSE/WebSocket server via Axum
+#   mcp      – Model Context Protocol server
+#   tui      – Terminal UI dashboard via Ratatui
+#
+# Build examples:
+#   All features:   cargo build --all-features
+#   Web only:       cargo build --features web-api
+#   TUI only:       cargo build --features tui
 [features]
 default = []
-web-api = ["axum", "tower", "tower-http", "dashmap", "futures", "serde_json"]
-mcp = ["serde_json"]
+web-api = ["axum", "tower", "tower-http", "dashmap", "futures", "subtle"]
+mcp = []
 tui = ["ratatui", "crossterm"]
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 async-trait = "0.1"
 serde = { version = "1", features = ["derive"] }
-serde_json = { version = "1", optional = true }
+serde_json = "1"
 toml = "0.8"
 thiserror = "1"
 anyhow = "1"
@@ -38,6 +48,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 prometheus = { version = "0.13", features = ["process"] }
 reqwest = { version = "0.11", features = ["json", "rustls-tls", "stream"], default-features = false }
+dirs = "5"
 
 # Web API dependencies (optional)
 axum = { version = "0.7", features = ["ws"], optional = true }
@@ -45,6 +56,7 @@ tower = { version = "0.4", optional = true }
 tower-http = { version = "0.5", features = ["cors", "trace"], optional = true }
 dashmap = { version = "5", optional = true }
 futures = { version = "0.3", optional = true }
+subtle = { version = "2", optional = true }
 
 # TUI dependencies (optional)
 ratatui = { version = "0.26", optional = true }
@@ -54,8 +66,8 @@ crossterm = { version = "0.27", optional = true }
 tokio-test = "0.4"
 tempfile = "3"
 mockall = "0.12"
-serde_json = "1"
 wiremock = "0.6"
+notify = "6"
 
 [profile.release]
 opt-level = 3

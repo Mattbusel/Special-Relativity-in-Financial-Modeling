@@ -11,8 +11,10 @@
 #include "srfm/normalizer.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <numeric>
+#include <optional>
 
 namespace srfm {
 
@@ -23,7 +25,9 @@ CoordinateNormalizer::CoordinateNormalizer(std::size_t window,
     : window_(window < 1 ? 1 : window)
     , min_samples_(min_samples == 0
                    ? std::max(window_, DEFAULT_MIN_SAMPLES)
-                   : min_samples) {}
+                   : min_samples) {
+    assert(window > 0 && "CoordinateNormalizer: window_size must be > 0");
+}
 
 // ─── push ─────────────────────────────────────────────────────────────────────
 
@@ -82,7 +86,7 @@ double CoordinateNormalizer::zscore(double value,
 
 // ─── normalize ────────────────────────────────────────────────────────────────
 
-manifold::SpacetimeEvent
+std::optional<manifold::SpacetimeEvent>
 CoordinateNormalizer::normalize(const manifold::SpacetimeEvent& raw) noexcept {
     // Update each rolling buffer with the new bar's spatial coordinates.
     push(price_buf_,    raw.price,    window_);
@@ -90,17 +94,11 @@ CoordinateNormalizer::normalize(const manifold::SpacetimeEvent& raw) noexcept {
     push(momentum_buf_, raw.momentum, window_);
     ++total_;
 
-    // Warm-up guard: if fewer than min_samples_ observations have been
-    // accumulated, z-scores would be computed from an insufficient statistical
-    // window and could be wildly inaccurate.  Return zeros for all spatial
-    // coordinates until the normalizer has warmed up.
+    // Warm-up guard: return std::nullopt until min_samples_ observations have
+    // been accumulated.  Callers should check warmed_up() before using the
+    // output of normalize() for trading decisions.
     if (!warmed_up()) {
-        return manifold::SpacetimeEvent{
-            .time     = raw.time,
-            .price    = 0.0,
-            .volume   = 0.0,
-            .momentum = 0.0,
-        };
+        return std::nullopt;
     }
 
     // Z-score each spatial coordinate using the updated window.

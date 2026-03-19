@@ -224,7 +224,9 @@ static std::vector<ClassifiedBar> classify_bars(
     srfm::CoordinateNormalizer normalizer(20);
 
     // Warm up normalizer on first 2 bars (these become the "prev" for pipeline)
-    srfm::manifold::SpacetimeEvent prev_normalized = normalizer.normalize(raw_events[0]);
+    auto maybe_prev0 = normalizer.normalize(raw_events[0]);
+    srfm::manifold::SpacetimeEvent prev_normalized =
+        maybe_prev0.value_or(srfm::manifold::SpacetimeEvent{});
     (void)normalizer.normalize(raw_events[1]);  // warm-up second bar
 
     // Pre-normalize all events for geodesic computation
@@ -232,7 +234,12 @@ static std::vector<ClassifiedBar> classify_bars(
     std::vector<srfm::manifold::SpacetimeEvent> all_normalized;
     all_normalized.reserve(n);
     for (const auto& ev : raw_events) {
-        all_normalized.push_back(norm2.normalize(ev));
+        auto maybe_norm = norm2.normalize(ev);
+        if (maybe_norm.has_value()) {
+            all_normalized.push_back(*maybe_norm);
+        } else {
+            all_normalized.push_back(srfm::manifold::SpacetimeEvent{});
+        }
     }
 
     // ── Geodesic deviation ────────────────────────────────────────────────────
@@ -247,13 +254,19 @@ static std::vector<ClassifiedBar> classify_bars(
 
     // Reset normalizer — re-normalize in order for classify loop
     srfm::CoordinateNormalizer norm3(20);
-    prev_normalized = norm3.normalize(raw_events[0]);
+    {
+        auto maybe_p = norm3.normalize(raw_events[0]);
+        prev_normalized = maybe_p.value_or(srfm::manifold::SpacetimeEvent{});
+    }
 
     for (std::size_t i = 1; i + 1 < n; ++i) {
         // Classify interval i-1 → i
         auto maybe_type = srfm::manifold::MarketManifold::process(
             norm3, prev_normalized, raw_events[i]);
-        prev_normalized = norm3.normalize(raw_events[i]);  // update for next step
+        {
+            auto maybe_p = norm3.normalize(raw_events[i]);  // update for next step
+            prev_normalized = maybe_p.value_or(srfm::manifold::SpacetimeEvent{});
+        }
 
         if (!maybe_type.has_value()) {
             continue;

@@ -48,8 +48,10 @@
 
 #include "srfm/manifold.hpp"
 
+#include <cassert>
 #include <cstddef>
 #include <deque>
+#include <optional>
 
 namespace srfm {
 
@@ -88,7 +90,7 @@ public:
     ///
     /// If stddev < 1e-9 for a coordinate (flat series, no variance),
     /// that coordinate is returned as 0.0.
-    [[nodiscard]] manifold::SpacetimeEvent
+    [[nodiscard]] std::optional<manifold::SpacetimeEvent>
     normalize(const manifold::SpacetimeEvent& raw) noexcept;
 
     /// Number of samples currently in the rolling window (≤ window_size()).

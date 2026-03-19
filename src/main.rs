@@ -18,6 +18,7 @@
 //! | `--web` | Start the HTTP/WebSocket API server (requires `web-api` feature) |
 //! | `--host <HOST>` | Bind host for the web API (default: `0.0.0.0`) |
 //! | `--port <PORT>` | Bind port for the web API (default: `8080`) |
+//! | `--watch-config [PATH]` | Watch srfm.toml (or PATH) and reload on change |
 
 use std::process;
 
@@ -37,6 +38,7 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
 
     // Print help when requested or when no arguments are supplied.
+    // Note: --watch-config may appear alone so we must not treat len==2 as "no args".
     if args.len() == 1 || args.iter().any(|a| a == "--help" || a == "-h") {
         print_help();
         return;
@@ -51,7 +53,14 @@ fn main() {
     if args.iter().any(|a| a == "--mock" || a == "--tui") {
         #[cfg(feature = "tui")]
         {
-            eprintln!("TUI feature enabled. Launching dashboard…");
+            // Parse optional --metrics-url flag.
+            let metrics_url = flag_value(&args, "--metrics-url").map(str::to_string);
+            if let Some(ref url) = metrics_url {
+                tracing::info!(metrics_url = %url, "live metrics URL configured");
+                let _source = tokio_prompt_orchestrator::tui::metrics::LiveMetricsSource::new(url.clone());
+                // TODO: wire LiveMetricsSource into the event loop
+            }
+            eprintln!("TUI feature enabled. Launching dashboard\u{2026}");
             // The TUI event loop is implemented in `src/tui/mod.rs`.
             // Call it on a Tokio runtime.
             let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
@@ -66,6 +75,28 @@ fn main() {
             process::exit(1);
         }
         return;
+    }
+
+    if args.iter().any(|a| a == "--watch-config") {
+        let path = flag_value(&args, "--watch-config").unwrap_or("srfm.toml");
+        tracing::info!("Watching {} for config changes", path);
+        // watch_config is a no-op stub unless the `watch-config` feature is
+        // enabled.  When the feature is active the watcher must be kept alive
+        // for the duration of the process, so we block indefinitely here.
+        match tokio_prompt_orchestrator::config::watch_config(path, |_cfg| {
+            tracing::info!("Config reloaded");
+        }) {
+            Ok(_watcher) => {
+                // Keep the process alive so the watcher can fire.
+                loop {
+                    std::thread::sleep(std::time::Duration::from_secs(60));
+                }
+            }
+            Err(e) => {
+                eprintln!("watch-config error: {e}");
+                process::exit(1);
+            }
+        }
     }
 
     if args.iter().any(|a| a == "--web") {
@@ -122,6 +153,7 @@ OPTIONS:
     --web                    Start the HTTP/WebSocket API server
     --host <HOST>            Web API bind host (default: 0.0.0.0)
     --port <PORT>            Web API bind port (default: 8080)
+    --watch-config [PATH]    Watch srfm.toml (or PATH) and reload on change
     -V, --version            Print version
     -h, --help               Print this help
 

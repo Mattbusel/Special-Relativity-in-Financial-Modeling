@@ -517,6 +517,55 @@ impl MockMetrics {
     }
 }
 
+// ── Section: LiveMetricsSource (thin HTTP/JSON wrapper) ──────────────────────
+
+/// Live metrics source that makes HTTP GET requests to a JSON metrics endpoint.
+///
+/// Intended to be wired via the `--metrics-url` CLI flag.
+///
+/// # TODO: wire via --metrics-url CLI flag
+#[derive(Debug)]
+pub struct LiveMetricsSource {
+    /// URL of the JSON metrics endpoint to poll.
+    pub url: String,
+}
+
+impl LiveMetricsSource {
+    /// Create a new `LiveMetricsSource` pointed at the given URL.
+    pub fn new(url: String) -> Self {
+        Self { url }
+    }
+
+    /// Fetch metrics from `self.url` and parse the JSON into `app` state.
+    ///
+    /// Makes a synchronous HTTP GET via `reqwest::blocking` on a background thread
+    /// (this is a best-effort tick — failures are silently ignored to keep the TUI
+    /// responsive).
+    pub async fn tick(&self, app: &mut App) {
+        match reqwest::get(&self.url).await {
+            Ok(resp) => {
+                if let Ok(json) = resp.json::<serde_json::Value>().await {
+                    // Parse JSON fields into app state where available.
+                    if let Some(rps) = json.get("requests_per_second").and_then(|v| v.as_u64()) {
+                        app.push_throughput(rps);
+                    }
+                    if let Some(cpu) = json.get("cpu_percent").and_then(|v| v.as_f64()) {
+                        app.cpu_percent = cpu.clamp(0.0, 100.0);
+                    }
+                    if let Some(mem) = json.get("mem_percent").and_then(|v| v.as_f64()) {
+                        app.mem_percent = mem.clamp(0.0, 100.0);
+                    }
+                    app.tick_count += 1;
+                    app.uptime_secs += 1;
+                }
+            }
+            Err(_) => {
+                // Network error — degrade gracefully, TUI keeps running.
+            }
+        }
+    }
+}
+
 // ── Section: LiveMetrics (real Prometheus scraping) ───────────────────────────
 
 /// Live metrics source that reads from a Prometheus endpoint.

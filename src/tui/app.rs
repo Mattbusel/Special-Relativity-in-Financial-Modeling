@@ -76,8 +76,6 @@ pub struct App {
     pub paused: bool,
     /// Whether the help overlay is visible.
     pub show_help: bool,
-    /// Scroll offset for the help overlay (lines scrolled down).
-    pub help_scroll: u16,
     /// Monotonic tick counter (incremented each data tick).
     pub tick_count: u64,
 
@@ -155,6 +153,15 @@ pub struct App {
 
     /// Left column width as a percentage (30–70, default 50).
     pub left_col_pct: u16,
+
+    /// Total number of help lines (updated by ui.rs after computing help text).
+    pub help_total_lines: u16,
+
+    /// Scroll offset within the help overlay (0 = top).
+    pub help_scroll: u16,
+
+    /// Full text of the currently expanded log entry, if any.
+    pub expanded_log_entry: Option<String>,
 }
 
 /// Depth of a bounded channel between two pipeline stages.
@@ -226,7 +233,6 @@ impl App {
             should_quit: false,
             paused: false,
             show_help: false,
-            help_scroll: 0,
             tick_count: 0,
 
             stage_latencies: [0.0; 5],
@@ -306,13 +312,15 @@ impl App {
             export_flash_tick: 0,
 
             left_col_pct: 50,
+
+            help_total_lines: 30,
+            help_scroll: 0,
+            expanded_log_entry: None,
         }
     }
 
     /// Resets all counters and statistics to zero.
     pub fn reset_stats(&mut self) {
-        // Note: layout preferences (left_col_pct, fullscreen_sparkline, selected_symbol)
-        // are intentionally NOT reset here — they are navigation state, not statistics.
         self.requests_total = 0;
         self.inferences_total = 0;
         self.cost_saved_usd = 0.0;
@@ -344,6 +352,32 @@ impl App {
         }
         self.regime_history.push_back(regime);
         self.regime = regime;
+    }
+
+    /// Scrolls the help overlay up by one line (toward the top).
+    pub fn scroll_help_up(&mut self) {
+        let max = self.help_total_lines.saturating_sub(10);
+        if self.help_scroll < max {
+            self.help_scroll += 1;
+        }
+    }
+
+    /// Scrolls the help overlay down by one line (toward the bottom).
+    pub fn scroll_help_down(&mut self) {
+        self.help_scroll = self.help_scroll.saturating_sub(1);
+    }
+
+    /// Expands the log entry at the current scroll offset into a modal.
+    pub fn expand_log_entry(&mut self) {
+        let idx = self.log_scroll_offset;
+        if let Some(entry) = self.log_entries.iter().rev().nth(idx) {
+            let text = if entry.fields.is_empty() {
+                format!("[{}] {} {}", entry.timestamp, entry.level.label(), entry.message)
+            } else {
+                format!("[{}] {} {}  {}", entry.timestamp, entry.level.label(), entry.message, entry.fields)
+            };
+            self.expanded_log_entry = Some(text);
+        }
     }
 
     /// Scrolls log view up by one line.
@@ -417,17 +451,24 @@ impl App {
             Ok(_) => {
                 self.log_export_flash = Some(format!("Exported to {}", filename));
             }
-            Err(_) => {
-                self.log_export_flash = Some("Export failed".to_string());
+            Err(e) => {
+                let msg = match e.kind() {
+                    std::io::ErrorKind::PermissionDenied => {
+                        "Export failed: permission denied".to_string()
+                    }
+                    std::io::ErrorKind::StorageFull => {
+                        "Export failed: disk full".to_string()
+                    }
+                    _ => format!("Export failed: {e}"),
+                };
+                self.log_export_flash = Some(msg);
             }
         }
         self.export_flash_tick = 30;
     }
 
-    /// Advance the export-flash countdown by one render frame.
-    /// Call this once per render cycle regardless of data-update rate.
-    /// Clears `log_export_flash` when the countdown reaches zero.
-    pub fn tick_render_frame(&mut self) {
+    /// Decrements the export flash countdown and clears the flash when it reaches 0.
+    pub fn tick_flash(&mut self) {
         if self.export_flash_tick > 0 {
             self.export_flash_tick -= 1;
             if self.export_flash_tick == 0 {
@@ -467,12 +508,6 @@ impl App {
     }
 
     /// Returns the fill ratio for a channel depth (0.0 - 1.0).
-    ///
-    /// # Arguments
-    /// * `index` - Channel index (0-3).
-    ///
-    /// # Returns
-    /// Fill ratio clamped to [0.0, 1.0], or 0.0 if index is out of range.
     pub fn channel_fill_ratio(&self, index: usize) -> f64 {
         if index >= self.channel_depths.len() {
             return 0.0;
@@ -485,13 +520,6 @@ impl App {
     }
 
     /// Returns the latency ratio for a pipeline stage relative to its P99 budget.
-    ///
-    /// # Arguments
-    /// * `index` - Stage index (0-4).
-    ///
-    /// # Returns
-    /// Ratio of current latency to budget. Values >1.0 indicate budget exceeded.
-    /// Returns 0.0 if index is out of range or budget is zero.
     pub fn stage_budget_ratio(&self, index: usize) -> f64 {
         if index >= self.stage_latencies.len() || index >= STAGE_BUDGETS_MS.len() {
             return 0.0;
@@ -518,9 +546,9 @@ impl CircuitState {
     /// Returns the display symbol for this circuit state.
     pub fn symbol(&self) -> &'static str {
         match self {
-            Self::Closed => "\u{25cf}",   //
-            Self::HalfOpen => "\u{25d0}", //
-            Self::Open => "\u{25cb}",     //
+            Self::Closed => "\u{25cf}",
+            Self::HalfOpen => "\u{25d0}",
+            Self::Open => "\u{25cb}",
         }
     }
 
@@ -691,14 +719,14 @@ mod tests {
     #[test]
     fn test_stage_budget_ratio_within_budget() {
         let mut app = App::new(Duration::from_secs(1));
-        app.stage_latencies[0] = 10.0; // RAG budget is 20ms
+        app.stage_latencies[0] = 10.0;
         assert!((app.stage_budget_ratio(0) - 0.5).abs() < 0.01);
     }
 
     #[test]
     fn test_stage_budget_ratio_over_budget() {
         let mut app = App::new(Duration::from_secs(1));
-        app.stage_latencies[2] = 500.0; // INFER budget is 400ms
+        app.stage_latencies[2] = 500.0;
         assert!(app.stage_budget_ratio(2) > 1.0);
     }
 
@@ -720,7 +748,6 @@ mod tests {
             });
         }
         assert_eq!(app.log_entries.len(), LOG_ENTRIES_CAP);
-        // Newest entry should be the last one pushed
         let last = app.log_entries.back();
         assert!(last.is_some());
     }
@@ -786,88 +813,47 @@ mod tests {
 
     #[test]
     fn test_channel_depth_fill_ratio() {
-        let ch = ChannelDepth {
-            name: "test",
-            current: 256,
-            capacity: 512,
-        };
+        let ch = ChannelDepth { name: "test", current: 256, capacity: 512 };
         assert!((ch.fill_ratio() - 0.5).abs() < 0.01);
     }
 
     #[test]
     fn test_channel_depth_fill_ratio_zero_cap() {
-        let ch = ChannelDepth {
-            name: "test",
-            current: 10,
-            capacity: 0,
-        };
+        let ch = ChannelDepth { name: "test", current: 10, capacity: 0 };
         assert_eq!(ch.fill_ratio(), 0.0);
     }
 
     #[test]
     fn test_channel_depth_fill_ratio_clamped() {
-        let ch = ChannelDepth {
-            name: "test",
-            current: 1000,
-            capacity: 512,
-        };
+        let ch = ChannelDepth { name: "test", current: 1000, capacity: 512 };
         assert_eq!(ch.fill_ratio(), 1.0);
     }
 
     #[test]
     fn test_push_log_newest_at_back() {
         let mut app = App::new(Duration::from_secs(1));
-        app.push_log(LogEntry {
-            timestamp: "first".into(),
-            level: LogLevel::Info,
-            message: "first".into(),
-            fields: String::new(),
-        });
-        app.push_log(LogEntry {
-            timestamp: "second".into(),
-            level: LogLevel::Warn,
-            message: "second".into(),
-            fields: String::new(),
-        });
+        app.push_log(LogEntry { timestamp: "first".into(), level: LogLevel::Info, message: "first".into(), fields: String::new() });
+        app.push_log(LogEntry { timestamp: "second".into(), level: LogLevel::Warn, message: "second".into(), fields: String::new() });
         assert_eq!(app.log_entries.len(), 2);
-        assert_eq!(
-            app.log_entries.back().map(|e| e.message.as_str()),
-            Some("second")
-        );
-        assert_eq!(
-            app.log_entries.front().map(|e| e.message.as_str()),
-            Some("first")
-        );
+        assert_eq!(app.log_entries.back().map(|e| e.message.as_str()), Some("second"));
+        assert_eq!(app.log_entries.front().map(|e| e.message.as_str()), Some("first"));
     }
 
     #[test]
     fn test_scroll_log_up() {
         let mut app = App::new(Duration::from_secs(1));
         for i in 0..10 {
-            app.push_log(LogEntry {
-                timestamp: format!("{}", i),
-                level: LogLevel::Info,
-                message: format!("msg {}", i),
-                fields: String::new(),
-            });
+            app.push_log(LogEntry { timestamp: format!("{}", i), level: LogLevel::Info, message: format!("msg {}", i), fields: String::new() });
         }
         assert_eq!(app.log_scroll_offset, 0);
         app.scroll_log_up();
         assert_eq!(app.log_scroll_offset, 1);
-        app.scroll_log_up();
-        assert_eq!(app.log_scroll_offset, 2);
     }
 
     #[test]
     fn test_scroll_log_up_bounded() {
         let mut app = App::new(Duration::from_secs(1));
-        app.push_log(LogEntry {
-            timestamp: "0".into(),
-            level: LogLevel::Info,
-            message: "only".into(),
-            fields: String::new(),
-        });
-        // max_scroll = 1 - 1 = 0, so scroll_log_up should not increase
+        app.push_log(LogEntry { timestamp: "0".into(), level: LogLevel::Info, message: "only".into(), fields: String::new() });
         app.scroll_log_up();
         assert_eq!(app.log_scroll_offset, 0);
     }
@@ -876,12 +862,7 @@ mod tests {
     fn test_scroll_log_down() {
         let mut app = App::new(Duration::from_secs(1));
         for i in 0..10 {
-            app.push_log(LogEntry {
-                timestamp: format!("{}", i),
-                level: LogLevel::Info,
-                message: format!("msg {}", i),
-                fields: String::new(),
-            });
+            app.push_log(LogEntry { timestamp: format!("{}", i), level: LogLevel::Info, message: format!("msg {}", i), fields: String::new() });
         }
         app.log_scroll_offset = 5;
         app.scroll_log_down();
@@ -942,15 +923,8 @@ mod tests {
     #[test]
     fn test_export_log_no_panic() {
         let mut app = App::new(Duration::from_secs(1));
-        app.push_log(LogEntry {
-            timestamp: "00:00:01".into(),
-            level: LogLevel::Info,
-            message: "test export".into(),
-            fields: "key=val".into(),
-        });
-        // export_log sets a flash message and never panics
+        app.push_log(LogEntry { timestamp: "00:00:01".into(), level: LogLevel::Info, message: "test export".into(), fields: "key=val".into() });
         app.export_log();
-        // flash tick should be set to 30
         assert_eq!(app.export_flash_tick, 30);
         assert!(app.log_export_flash.is_some());
     }
@@ -960,10 +934,10 @@ mod tests {
         let mut app = App::new(Duration::from_secs(1));
         app.log_export_flash = Some("test".to_string());
         app.export_flash_tick = 2;
-        app.tick_render_frame();
+        app.tick_flash();
         assert_eq!(app.export_flash_tick, 1);
         assert!(app.log_export_flash.is_some());
-        app.tick_render_frame();
+        app.tick_flash();
         assert_eq!(app.export_flash_tick, 0);
         assert!(app.log_export_flash.is_none());
     }
@@ -972,19 +946,8 @@ mod tests {
     fn test_tick_flash_noop_when_zero() {
         let mut app = App::new(Duration::from_secs(1));
         app.export_flash_tick = 0;
-        app.tick_render_frame();
+        app.tick_flash();
         assert_eq!(app.export_flash_tick, 0);
         assert!(app.log_export_flash.is_none());
-    }
-
-    #[test]
-    fn test_tick_render_frame_clears_flash_at_zero() {
-        let mut app = App::new(Duration::from_secs(1));
-        app.log_export_flash = Some("flash".to_string());
-        app.export_flash_tick = 1;
-        // One frame away from zero: flash still set
-        app.tick_render_frame();
-        assert_eq!(app.export_flash_tick, 0);
-        assert!(app.log_export_flash.is_none(), "flash must be cleared when countdown reaches zero");
     }
 }

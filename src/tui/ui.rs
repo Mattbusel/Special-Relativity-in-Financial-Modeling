@@ -25,8 +25,8 @@ use super::widgets;
 ///
 /// # Arguments
 /// * `f` - The Ratatui frame to render into.
-/// * `app` - The application state to display.
-pub fn draw(f: &mut Frame, app: &App) {
+/// * `app` - The application state to display (mutable for updating computed display state).
+pub fn draw(f: &mut Frame, app: &mut App) {
     let size = f.size();
 
     // Minimum size guard
@@ -133,16 +133,8 @@ pub fn draw(f: &mut Frame, app: &App) {
         .split(top_chunks[1]);
 
     if app.fullscreen_sparkline {
-        // Fullscreen sparkline: top 80% sparkline, bottom regime timeline.
-        let fs_chunks = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints([
-                Constraint::Percentage(80),
-                Constraint::Length(3),
-            ])
-            .split(inner);
-        widgets::sparkline::render(f, fs_chunks[0], app);
-        widgets::regime::render(f, fs_chunks[1], app);
+        // Fullscreen sparkline: fill entire inner area
+        widgets::sparkline::render(f, inner, app);
     } else {
         // Render all widgets
         widgets::pipeline::render(f, left_chunks[0], app);
@@ -158,6 +150,11 @@ pub fn draw(f: &mut Frame, app: &App) {
     // Loading overlay
     if let Some(progress) = app.loading_progress {
         draw_loading_overlay(f, size, progress);
+    }
+
+    // Expanded log entry modal
+    if let Some(ref text) = app.expanded_log_entry.clone() {
+        draw_expanded_log(f, size, text);
     }
 }
 
@@ -217,7 +214,7 @@ fn draw_too_small(f: &mut Frame, area: Rect) {
 }
 
 /// Renders the help overlay.
-fn draw_help_overlay(f: &mut Frame, area: Rect, app: &App) {
+fn draw_help_overlay(f: &mut Frame, area: Rect, app: &mut App) {
     // Center the help popup
     let popup_width = 52.min(area.width.saturating_sub(4));
     let popup_height = 22.min(area.height.saturating_sub(4));
@@ -274,15 +271,11 @@ fn draw_help_overlay(f: &mut Frame, area: Rect, app: &App) {
         ]),
         Line::from(vec![
             Span::styled("    \u{2191}\u{2193} ", Style::default().fg(Color::Cyan)),
-            Span::styled("Scroll log / this help", Style::default().fg(Color::DarkGray)),
+            Span::styled("Scroll log", Style::default().fg(Color::DarkGray)),
         ]),
         Line::from(vec![
             Span::styled("    [  ", Style::default().fg(Color::Cyan)),
             Span::styled("[[] widen left  []] narrow left", Style::default().fg(Color::DarkGray)),
-        ]),
-        Line::from(vec![
-            Span::styled(" wheel ", Style::default().fg(Color::Cyan)),
-            Span::styled("[scroll wheel] log scroll", Style::default().fg(Color::DarkGray)),
         ]),
         Line::from(""),
         Line::from(Span::styled(
@@ -294,19 +287,55 @@ fn draw_help_overlay(f: &mut Frame, area: Rect, app: &App) {
             Style::default().fg(Color::DarkGray),
         )),
         Line::from(Span::styled(
-            "  [\u{2191}\u{2193}] scroll   Press any key to close",
+            "  Press any key to close",
             Style::default().fg(Color::Yellow),
         )),
     ];
 
+    // Update the app with actual line count for scroll clamping.
+    let total_lines = help_text.len() as u16;
+    app.help_total_lines = total_lines;
+
+    let scroll_offset = app.help_scroll;
+    let scroll_indicator = format!(
+        " Line {} / {} ",
+        scroll_offset + 1,
+        total_lines,
+    );
+
     let block = Block::default()
         .title(" Help ")
+        .title_bottom(Line::from(Span::styled(
+            scroll_indicator,
+            Style::default().fg(Color::DarkGray),
+        )))
         .borders(Borders::ALL)
         .border_style(Style::default().fg(Color::Cyan));
 
     let para = Paragraph::new(help_text)
         .block(block)
-        .scroll((app.help_scroll, 0));
+        .scroll((scroll_offset, 0));
+    f.render_widget(para, popup_area);
+}
+
+/// Renders the expanded log entry modal popup.
+fn draw_expanded_log(f: &mut Frame, area: Rect, text: &str) {
+    let popup_width = (area.width.saturating_sub(8)).min(100);
+    let popup_height = 7.min(area.height.saturating_sub(4));
+    let popup_x = (area.width.saturating_sub(popup_width)) / 2;
+    let popup_y = (area.height.saturating_sub(popup_height)) / 2;
+    let popup_area = Rect::new(popup_x, popup_y, popup_width, popup_height);
+
+    f.render_widget(Clear, popup_area);
+
+    let block = Block::default()
+        .title(" Log Entry (Esc to close) ")
+        .borders(Borders::ALL)
+        .border_style(Style::default().fg(Color::Yellow));
+
+    let para = Paragraph::new(text.to_owned())
+        .block(block)
+        .wrap(Wrap { trim: false });
     f.render_widget(para, popup_area);
 }
 
@@ -372,7 +401,6 @@ mod tests {
 
     #[test]
     fn test_effective_min_size_guard_80x24() {
-        // The draw function guards at 80x24
         let area = Rect::new(0, 0, 79, 24);
         assert!(area.width < 80, "width 79 < 80 should trigger guard");
     }
@@ -381,5 +409,23 @@ mod tests {
     fn test_effective_min_size_passes_80x24() {
         let area = Rect::new(0, 0, 80, 24);
         assert!(area.width >= 80 && area.height >= 24);
+    }
+
+    #[test]
+    fn test_draw_does_not_panic_at_min_size() {
+        use ratatui::{backend::TestBackend, Terminal};
+        let backend = TestBackend::new(80, 24);
+        let mut terminal = Terminal::new(backend).unwrap();
+        let mut app = super::super::app::App::new(std::time::Duration::from_secs(1));
+        terminal.draw(|f| super::draw(f, &mut app)).unwrap();
+    }
+
+    #[test]
+    fn test_draw_does_not_panic_at_large_size() {
+        use ratatui::{backend::TestBackend, Terminal};
+        let backend = TestBackend::new(200, 60);
+        let mut terminal = Terminal::new(backend).unwrap();
+        let mut app = super::super::app::App::new(std::time::Duration::from_secs(1));
+        terminal.draw(|f| super::draw(f, &mut app)).unwrap();
     }
 }

@@ -86,6 +86,18 @@ public:
     /// The 4×4 metric matrix at x.
     MetricMatrix evaluate(const SpacetimePoint& x) const;
 
+    /// Evaluate g_μν at x and store the result into `out` (in-place overload).
+    ///
+    /// Avoids an extra copy compared to `evaluate()` when the caller already
+    /// holds a `MetricMatrix` to overwrite.
+    ///
+    /// # Arguments
+    /// * `x`   — Position in the 4D financial spacetime manifold
+    /// * `out` — Output matrix to overwrite with g_μν(x)
+    void evaluate_into(const SpacetimePoint& x, MetricMatrix& out) const {
+        out = evaluate(x);
+    }
+
     /// Compute the inverse metric g^μν at point x.
     ///
     /// # Returns

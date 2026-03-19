@@ -11,7 +11,14 @@
 
 use std::time::Duration;
 
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent};
+use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers};
+
+/// Step size for panel width adjustment (percentage points).
+const PANEL_WIDTH_STEP: u16 = 5;
+/// Minimum left column width percentage.
+const PANEL_WIDTH_MIN: u16 = 25;
+/// Maximum left column width percentage.
+const PANEL_WIDTH_MAX: u16 = 75;
 
 use super::app::App;
 
@@ -26,9 +33,9 @@ pub enum InputEvent {
     Reset,
     /// User toggled help overlay.
     Help,
-    /// User pressed up arrow to scroll log (or scroll help up when help is open).
+    /// User pressed up arrow to scroll log.
     ScrollUp,
-    /// User pressed down arrow to scroll log (or scroll help down when help is open).
+    /// User pressed down arrow to scroll log.
     ScrollDown,
     /// User requested log export to file.
     LogExport,
@@ -42,10 +49,8 @@ pub enum InputEvent {
     PanelNarrow,
     /// A terminal resize occurred.
     Resize(u16, u16),
-    /// Mouse scroll up on the log widget.
-    MouseScrollUp,
-    /// Mouse scroll down on the log widget.
-    MouseScrollDown,
+    /// User pressed Enter to expand the selected log entry.
+    ExpandLog,
     /// No actionable event within the poll window.
     None,
 }
@@ -71,7 +76,6 @@ pub fn poll_event(timeout: Duration) -> InputEvent {
 
     match event::read() {
         Ok(Event::Key(key)) => translate_key(key),
-        Ok(Event::Mouse(mouse)) => translate_mouse(mouse),
         Ok(Event::Resize(w, h)) => InputEvent::Resize(w, h),
         _ => InputEvent::None,
     }
@@ -84,25 +88,27 @@ pub fn poll_event(timeout: Duration) -> InputEvent {
 /// * `event` - The input event to apply.
 pub fn apply_event(app: &mut App, event: InputEvent) {
     match event {
-        InputEvent::Quit => app.should_quit = true,
-        InputEvent::Pause => app.paused = !app.paused,
-        InputEvent::Reset => app.reset_stats(),
-        InputEvent::Help => {
-            app.show_help = !app.show_help;
-            if !app.show_help {
-                app.help_scroll = 0;
+        InputEvent::Quit => {
+            // If a log entry modal is open, close it instead of quitting.
+            if app.expanded_log_entry.is_some() {
+                app.expanded_log_entry = None;
+            } else {
+                app.should_quit = true;
             }
         }
+        InputEvent::Pause => app.paused = !app.paused,
+        InputEvent::Reset => app.reset_stats(),
+        InputEvent::Help => app.show_help = !app.show_help,
         InputEvent::ScrollUp => {
             if app.show_help {
-                app.help_scroll = app.help_scroll.saturating_sub(1);
+                app.scroll_help_up();
             } else {
                 app.scroll_log_up();
             }
         }
         InputEvent::ScrollDown => {
             if app.show_help {
-                app.help_scroll += 1;
+                app.scroll_help_down();
             } else {
                 app.scroll_log_down();
             }
@@ -111,17 +117,16 @@ pub fn apply_event(app: &mut App, event: InputEvent) {
         InputEvent::FullscreenToggle => app.fullscreen_sparkline = !app.fullscreen_sparkline,
         InputEvent::NextSymbol => app.next_symbol(),
         InputEvent::PanelWider => {
-            if app.left_col_pct > 30 {
-                app.left_col_pct -= 5;
+            if app.left_col_pct > PANEL_WIDTH_MIN {
+                app.left_col_pct -= PANEL_WIDTH_STEP;
             }
         }
         InputEvent::PanelNarrow => {
-            if app.left_col_pct < 70 {
-                app.left_col_pct += 5;
+            if app.left_col_pct < PANEL_WIDTH_MAX {
+                app.left_col_pct += PANEL_WIDTH_STEP;
             }
         }
-        InputEvent::MouseScrollUp => app.scroll_log_up(),
-        InputEvent::MouseScrollDown => app.scroll_log_down(),
+        InputEvent::ExpandLog => app.expand_log_entry(),
         InputEvent::Resize(_, _) | InputEvent::None => {}
     }
 }
@@ -146,18 +151,9 @@ fn translate_key(key: KeyEvent) -> InputEvent {
         KeyCode::Char('[') => InputEvent::PanelWider,
         KeyCode::Char(']') => InputEvent::PanelNarrow,
         KeyCode::Esc => InputEvent::Quit,
-        KeyCode::Up | KeyCode::PageUp => InputEvent::ScrollUp,
-        KeyCode::Down | KeyCode::PageDown => InputEvent::ScrollDown,
-        _ => InputEvent::None,
-    }
-}
-
-/// Translates a crossterm mouse event to an `InputEvent`.
-fn translate_mouse(mouse: MouseEvent) -> InputEvent {
-    use crossterm::event::MouseEventKind;
-    match mouse.kind {
-        MouseEventKind::ScrollUp => InputEvent::MouseScrollUp,
-        MouseEventKind::ScrollDown => InputEvent::MouseScrollDown,
+        KeyCode::Enter => InputEvent::ExpandLog,
+        KeyCode::Up => InputEvent::ScrollUp,
+        KeyCode::Down => InputEvent::ScrollDown,
         _ => InputEvent::None,
     }
 }
@@ -393,19 +389,19 @@ mod tests {
     }
 
     #[test]
-    fn test_panel_wider_clamped_at_30() {
+    fn test_panel_wider_clamped_at_min() {
         let mut app = App::new(Duration::from_secs(1));
-        app.left_col_pct = 30;
+        app.left_col_pct = PANEL_WIDTH_MIN;
         apply_event(&mut app, InputEvent::PanelWider);
-        assert_eq!(app.left_col_pct, 30);
+        assert_eq!(app.left_col_pct, PANEL_WIDTH_MIN);
     }
 
     #[test]
-    fn test_panel_narrow_clamped_at_70() {
+    fn test_panel_narrow_clamped_at_max() {
         let mut app = App::new(Duration::from_secs(1));
-        app.left_col_pct = 70;
+        app.left_col_pct = PANEL_WIDTH_MAX;
         apply_event(&mut app, InputEvent::PanelNarrow);
-        assert_eq!(app.left_col_pct, 70);
+        assert_eq!(app.left_col_pct, PANEL_WIDTH_MAX);
     }
 
     #[test]
@@ -418,104 +414,5 @@ mod tests {
     fn test_translate_key_bracket_close_panel_narrow() {
         let key = KeyEvent::new(KeyCode::Char(']'), KeyModifiers::NONE);
         assert_eq!(translate_key(key), InputEvent::PanelNarrow);
-    }
-
-    // ── Help scroll tests ────────────────────────────────────────────────────
-
-    #[test]
-    fn test_help_scroll_increments_when_help_open() {
-        let mut app = App::new(Duration::from_secs(1));
-        app.show_help = true;
-        apply_event(&mut app, InputEvent::ScrollDown);
-        assert_eq!(app.help_scroll, 1);
-        apply_event(&mut app, InputEvent::ScrollDown);
-        assert_eq!(app.help_scroll, 2);
-    }
-
-    #[test]
-    fn test_help_scroll_resets_on_close() {
-        let mut app = App::new(Duration::from_secs(1));
-        app.show_help = true;
-        app.help_scroll = 5;
-        // Toggle help off
-        apply_event(&mut app, InputEvent::Help);
-        assert!(!app.show_help);
-        assert_eq!(app.help_scroll, 0, "help_scroll must be reset to 0 when help is closed");
-    }
-
-    #[test]
-    fn test_scroll_up_scrolls_log_when_help_closed() {
-        let mut app = App::new(Duration::from_secs(1));
-        for i in 0..10 {
-            app.push_log(crate::tui::app::LogEntry {
-                timestamp: format!("{}", i),
-                level: crate::tui::app::LogLevel::Info,
-                message: format!("msg {}", i),
-                fields: String::new(),
-            });
-        }
-        assert!(!app.show_help);
-        apply_event(&mut app, InputEvent::ScrollUp);
-        assert_eq!(app.log_scroll_offset, 1);
-        assert_eq!(app.help_scroll, 0);
-    }
-
-    #[test]
-    fn test_scroll_down_goes_to_log_when_help_closed() {
-        let mut app = App::new(Duration::from_secs(1));
-        app.log_scroll_offset = 3;
-        assert!(!app.show_help);
-        apply_event(&mut app, InputEvent::ScrollDown);
-        assert_eq!(app.log_scroll_offset, 2);
-        assert_eq!(app.help_scroll, 0);
-    }
-
-    // ── Mouse scroll tests ───────────────────────────────────────────────────
-
-    #[test]
-    fn test_mouse_scroll_up_scrolls_log() {
-        let mut app = App::new(Duration::from_secs(1));
-        for i in 0..10 {
-            app.push_log(crate::tui::app::LogEntry {
-                timestamp: format!("{}", i),
-                level: crate::tui::app::LogLevel::Info,
-                message: format!("msg {}", i),
-                fields: String::new(),
-            });
-        }
-        apply_event(&mut app, InputEvent::MouseScrollUp);
-        assert_eq!(app.log_scroll_offset, 1);
-    }
-
-    #[test]
-    fn test_mouse_scroll_down_scrolls_log() {
-        let mut app = App::new(Duration::from_secs(1));
-        app.log_scroll_offset = 3;
-        apply_event(&mut app, InputEvent::MouseScrollDown);
-        assert_eq!(app.log_scroll_offset, 2);
-    }
-
-    #[test]
-    fn test_translate_mouse_scroll_up() {
-        use crossterm::event::{MouseEventKind, MouseButton, KeyModifiers as KM};
-        let mouse = MouseEvent {
-            kind: MouseEventKind::ScrollUp,
-            column: 0,
-            row: 0,
-            modifiers: KM::NONE,
-        };
-        assert_eq!(translate_mouse(mouse), InputEvent::MouseScrollUp);
-    }
-
-    #[test]
-    fn test_translate_mouse_scroll_down() {
-        use crossterm::event::{MouseEventKind, KeyModifiers as KM};
-        let mouse = MouseEvent {
-            kind: MouseEventKind::ScrollDown,
-            column: 0,
-            row: 0,
-            modifiers: KM::NONE,
-        };
-        assert_eq!(translate_mouse(mouse), InputEvent::MouseScrollDown);
     }
 }

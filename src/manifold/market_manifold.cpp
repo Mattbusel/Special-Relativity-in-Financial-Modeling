@@ -76,7 +76,13 @@ MarketManifold::process(srfm::CoordinateNormalizer& normalizer,
                          const SpacetimeEvent& curr_raw) noexcept {
     // Normalize the incoming raw event using the rolling window.
     // This updates the normalizer's internal state with curr_raw's coordinates.
-    const SpacetimeEvent curr_norm = normalizer.normalize(curr_raw);
+    auto maybe_curr_norm = normalizer.normalize(curr_raw);
+
+    // If the normalizer has not yet warmed up, return no classification.
+    if (!maybe_curr_norm.has_value()) {
+        return std::nullopt;
+    }
+    const SpacetimeEvent& curr_norm = *maybe_curr_norm;
 
     // Compute interval on the normalized coordinate pair.
     // With z-scored coordinates each spatial axis contributes equally to ds².

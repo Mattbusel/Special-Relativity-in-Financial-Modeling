@@ -51,6 +51,10 @@ if(NOT (Eigen3_FOUND OR TARGET Eigen3::Eigen))
     endif()
 endif()
 
+if(NOT TARGET Eigen3::Eigen)
+    message(FATAL_ERROR "Eigen3 not found. Install it (e.g. 'apt install libeigen3-dev') or ensure FetchContent has network access.")
+endif()
+
 # GTest: used by test_interval_gaps and any other GTest-based suites.
 # Try system package first; fall back to FetchContent so the build works
 # without vcpkg or a pre-installed libgtest-dev.

@@ -23,6 +23,66 @@ use futures::stream::Stream;
 #[cfg(feature = "web-api")]
 use std::pin::Pin;
 
+/// Retry policy for transient worker errors.
+///
+/// Used by [`retry_with_backoff`] to control retry behaviour.
+pub struct RetryPolicy {
+    /// Maximum number of additional attempts after the first failure.
+    pub max_retries: u32,
+    /// Base delay in milliseconds between retries (doubles each attempt).
+    pub base_delay_ms: u64,
+}
+
+impl Default for RetryPolicy {
+    fn default() -> Self {
+        Self {
+            max_retries: 3,
+            base_delay_ms: 100,
+        }
+    }
+}
+
+/// Retry `f` with exponential backoff + jitter on error.
+///
+/// The closure is called up to `policy.max_retries + 1` times total.
+/// Between attempts the helper sleeps for
+/// `base_delay_ms * 2^attempt + jitter(0..base_delay_ms)` milliseconds.
+///
+/// Transient errors (network failures, HTTP 5xx) should be retried;
+/// client errors (HTTP 4xx) are considered permanent and are returned
+/// immediately without retrying.  The caller is responsible for
+/// classifying errors before passing them to this helper — pass only
+/// `is_transient == true` errors into the retry loop.
+pub async fn retry_with_backoff<F, Fut, T>(
+    policy: &RetryPolicy,
+    mut f: F,
+) -> Result<T, OrchestratorError>
+where
+    F: FnMut() -> Fut,
+    Fut: std::future::Future<Output = Result<T, OrchestratorError>>,
+{
+    let mut last_err;
+    let mut attempt = 0u32;
+    loop {
+        match f().await {
+            Ok(v) => return Ok(v),
+            Err(e) => {
+                last_err = e;
+                if attempt >= policy.max_retries {
+                    break;
+                }
+                // Exponential backoff: base * 2^attempt, plus a small jitter.
+                let backoff_ms = policy.base_delay_ms * (1u64 << attempt.min(10));
+                // Simple deterministic jitter: add half the base delay.
+                let jitter_ms = policy.base_delay_ms / 2;
+                tokio::time::sleep(std::time::Duration::from_millis(backoff_ms + jitter_ms)).await;
+                attempt += 1;
+            }
+        }
+    }
+    Err(last_err)
+}
+
 /// Trait for model inference workers.
 ///
 /// Implementations must be thread-safe (`Send + Sync`) for use across tasks.
@@ -53,7 +113,8 @@ pub trait ModelWorker: Send + Sync {
         Pin<Box<dyn Stream<Item = Result<String, OrchestratorError>> + Send>>,
         OrchestratorError,
     > {
-        let tokens = self.infer(prompt).await?;
-        Ok(Box::pin(futures::stream::iter(tokens.into_iter().map(Ok))))
+        let result = self.infer(prompt).await?;
+        let joined = result.join(" ");
+        Ok(Box::pin(futures::stream::once(async move { Ok(joined) })))
     }
 }

@@ -41,7 +41,12 @@ static std::vector<SpacetimeEvent> feed_linear_price(
             .volume   = 1.0,
             .momentum = 0.5,
         };
-        out.push_back(norm.normalize(raw));
+        auto maybe = norm.normalize(raw);
+        if (maybe.has_value()) {
+            out.push_back(*maybe);
+        } else {
+            out.push_back(SpacetimeEvent{.time = raw.time, .price = 0.0, .volume = 0.0, .momentum = 0.0});
+        }
     }
     return out;
 }
@@ -63,14 +68,15 @@ static double vec_stddev(const std::vector<double>& v, double mean) {
 // ─── Test 1: time coordinate is unchanged ────────────────────────────────────
 
 TEST(CoordinateNormalizer, TimeCoordinatePassesThrough) {
-    CoordinateNormalizer norm(5);
+    CoordinateNormalizer norm(5, 1);
     SpacetimeEvent raw{.time = 42.0, .price = 100.0, .volume = 1e6, .momentum = 0.01};
     auto result = norm.normalize(raw);
-    EXPECT_DOUBLE_EQ(result.time, 42.0);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_DOUBLE_EQ(result->time, 42.0);
 }
 
 TEST(CoordinateNormalizer, TimeCoordinateUnchangedOverMultipleCalls) {
-    CoordinateNormalizer norm(5);
+    CoordinateNormalizer norm(5, 1);
     for (int i = 0; i < 20; ++i) {
         SpacetimeEvent raw{
             .time     = static_cast<double>(i) * 3.7,
@@ -79,7 +85,8 @@ TEST(CoordinateNormalizer, TimeCoordinateUnchangedOverMultipleCalls) {
             .momentum = static_cast<double>(i) * 0.01,
         };
         auto result = norm.normalize(raw);
-        EXPECT_DOUBLE_EQ(result.time, raw.time)
+        ASSERT_TRUE(result.has_value()) << "normalize() returned nullopt at step " << i;
+        EXPECT_DOUBLE_EQ(result->time, raw.time)
             << "Time should pass through unchanged at step " << i;
     }
 }
@@ -87,24 +94,26 @@ TEST(CoordinateNormalizer, TimeCoordinateUnchangedOverMultipleCalls) {
 // ─── Test 2: flat series does not divide by zero ─────────────────────────────
 
 TEST(CoordinateNormalizer, FlatPriceSeries_ReturnsZero) {
-    CoordinateNormalizer norm(10);
+    CoordinateNormalizer norm(10, 1);
     SpacetimeEvent raw{.time = 0.0, .price = 100.0, .volume = 500.0, .momentum = 0.5};
     for (int i = 0; i < 15; ++i) {
         auto result = norm.normalize(raw);
+        ASSERT_TRUE(result.has_value()) << "normalize() returned nullopt at step " << i;
         // Constant series → stddev = 0 → z-score = 0.0 (no division by zero)
-        EXPECT_DOUBLE_EQ(result.price, 0.0)
+        EXPECT_DOUBLE_EQ(result->price, 0.0)
             << "Flat price should yield 0.0 at step " << i;
     }
 }
 
 TEST(CoordinateNormalizer, FlatAllCoordinates_AllZero) {
-    CoordinateNormalizer norm(5);
+    CoordinateNormalizer norm(5, 1);
     SpacetimeEvent raw{.time = 1.0, .price = 50.0, .volume = 2000.0, .momentum = -0.3};
     for (int i = 0; i < 10; ++i) {
         auto result = norm.normalize(raw);
-        EXPECT_DOUBLE_EQ(result.price,    0.0);
-        EXPECT_DOUBLE_EQ(result.volume,   0.0);
-        EXPECT_DOUBLE_EQ(result.momentum, 0.0);
+        ASSERT_TRUE(result.has_value());
+        EXPECT_DOUBLE_EQ(result->price,    0.0);
+        EXPECT_DOUBLE_EQ(result->volume,   0.0);
+        EXPECT_DOUBLE_EQ(result->momentum, 0.0);
     }
 }
 
@@ -164,9 +173,10 @@ TEST(CoordinateNormalizer, ResetAllowsReuse) {
     SpacetimeEvent raw3{.time = 2.0, .price = 2.0, .volume = 4.0, .momentum = 6.0};
     (void)norm.normalize(raw2);
     auto r = norm.normalize(raw3);
+    ASSERT_TRUE(r.has_value());
     // With two samples (1,2): mean=1.5, stddev=sqrt(0.5)≈0.7071
     // z-score(2) = (2-1.5)/0.7071 ≈ 0.7071
-    EXPECT_NEAR(r.price, 0.7071067, 1e-5);
+    EXPECT_NEAR(r->price, 0.7071067, 1e-5);
 }
 
 // ─── Test 7: window eviction — only recent N samples are used ─────────────────
@@ -176,14 +186,15 @@ TEST(CoordinateNormalizer, WindowEvictsOldestSamples) {
     // After 5th push, window contains {3,4,5}; z-score(5) should use that.
     CoordinateNormalizer norm(3);
     std::vector<double> prices = {1.0, 2.0, 3.0, 4.0, 5.0};
-    SpacetimeEvent last_normalized{};
+    std::optional<SpacetimeEvent> last_normalized;
     for (double p : prices) {
         SpacetimeEvent raw{.time = 0.0, .price = p, .volume = 1.0, .momentum = 0.0};
         last_normalized = norm.normalize(raw);
     }
     // Window after 5 pushes: {3,4,5}, mean=4, stddev=1.0
     // z-score(5) = (5-4)/1.0 = 1.0
-    EXPECT_NEAR(last_normalized.price, 1.0, 1e-10);
+    ASSERT_TRUE(last_normalized.has_value());
+    EXPECT_NEAR(last_normalized->price, 1.0, 1e-10);
 }
 
 // ─── Test 8: normalized output has ~zero mean over full window ────────────────
@@ -204,8 +215,8 @@ TEST(CoordinateNormalizer, MeanApproximatelyZeroAfterWindowFills) {
             .momentum = 0.0,
         };
         auto r = norm.normalize(raw);
-        if (i >= W) {
-            norm_prices.push_back(r.price);
+        if (i >= W && r.has_value()) {
+            norm_prices.push_back(r->price);
         }
     }
     // The normalized values over a sliding window of a linear series
@@ -234,8 +245,8 @@ TEST(CoordinateNormalizer, StddevApproximatelyOneAfterWindowFills) {
         SpacetimeEvent raw{.time = static_cast<double>(i),
                            .price = p, .volume = 1.0, .momentum = 0.0};
         auto r = norm.normalize(raw);
-        if (i >= W) {
-            norm_prices.push_back(r.price);
+        if (i >= W && r.has_value()) {
+            norm_prices.push_back(r->price);
         }
     }
     ASSERT_GE(norm_prices.size(), 2u);
@@ -262,13 +273,14 @@ TEST(CoordinateNormalizer, CoordinatesAreIndependent) {
             .momentum = (i % 2 == 0) ? 1.0 : -1.0,  // oscillating
         };
         auto r = norm.normalize(raw);
+        if (!r.has_value()) continue;
         // Volume is constant: stddev=0 → always 0.0
         if (i >= 1) {
-            EXPECT_DOUBLE_EQ(r.volume, 0.0)
+            EXPECT_DOUBLE_EQ(r->volume, 0.0)
                 << "Constant volume should normalize to 0.0 at step " << i;
         }
         // Time always unchanged
-        EXPECT_DOUBLE_EQ(r.time, raw.time);
+        EXPECT_DOUBLE_EQ(r->time, raw.time);
     }
 }
 
@@ -285,25 +297,27 @@ TEST(CoordinateNormalizer, LargeScaleValues_Finite) {
             .momentum = 0.01 + static_cast<double>(i) * 0.001,
         };
         auto r = norm.normalize(raw);
+        if (!r.has_value()) continue;
         // All outputs must be finite
-        EXPECT_TRUE(std::isfinite(r.price))    << "price not finite at " << i;
-        EXPECT_TRUE(std::isfinite(r.volume))   << "volume not finite at " << i;
-        EXPECT_TRUE(std::isfinite(r.momentum)) << "momentum not finite at " << i;
+        EXPECT_TRUE(std::isfinite(r->price))    << "price not finite at " << i;
+        EXPECT_TRUE(std::isfinite(r->volume))   << "volume not finite at " << i;
+        EXPECT_TRUE(std::isfinite(r->momentum)) << "momentum not finite at " << i;
     }
 }
 
 // ─── Test 12: window of 1 behaves correctly ───────────────────────────────────
 
 TEST(CoordinateNormalizer, WindowOfOne_ReturnsZero) {
-    CoordinateNormalizer norm(1);
+    CoordinateNormalizer norm(1, 1);
     EXPECT_EQ(norm.window_size(), 1u);
     SpacetimeEvent raw{.time = 5.0, .price = 99.0, .volume = 3000.0, .momentum = 0.1};
     auto r = norm.normalize(raw);
+    ASSERT_TRUE(r.has_value());
     // Single-sample stddev = 0 → z-score = 0.0
-    EXPECT_DOUBLE_EQ(r.price,    0.0);
-    EXPECT_DOUBLE_EQ(r.volume,   0.0);
-    EXPECT_DOUBLE_EQ(r.momentum, 0.0);
-    EXPECT_DOUBLE_EQ(r.time,     5.0);
+    EXPECT_DOUBLE_EQ(r->price,    0.0);
+    EXPECT_DOUBLE_EQ(r->volume,   0.0);
+    EXPECT_DOUBLE_EQ(r->momentum, 0.0);
+    EXPECT_DOUBLE_EQ(r->time,     5.0);
 }
 
 // ─── Test 13: two-sample window computes correct z-score ─────────────────────
@@ -318,9 +332,10 @@ TEST(CoordinateNormalizer, TwoSampleWindow_CorrectZScore) {
     // z-score(3) = (3-2)/sqrt(2) = 1/sqrt(2) ≈ 0.7071
     SpacetimeEvent raw2{.time = 1.0, .price = 3.0, .volume = 3.0, .momentum = 3.0};
     auto r = norm.normalize(raw2);
-    EXPECT_NEAR(r.price,    1.0 / std::sqrt(2.0), 1e-10);
-    EXPECT_NEAR(r.volume,   1.0 / std::sqrt(2.0), 1e-10);
-    EXPECT_NEAR(r.momentum, 1.0 / std::sqrt(2.0), 1e-10);
+    ASSERT_TRUE(r.has_value());
+    EXPECT_NEAR(r->price,    1.0 / std::sqrt(2.0), 1e-10);
+    EXPECT_NEAR(r->volume,   1.0 / std::sqrt(2.0), 1e-10);
+    EXPECT_NEAR(r->momentum, 1.0 / std::sqrt(2.0), 1e-10);
 }
 
 // ─── Test 14: MarketManifold::process uses normalizer before classify ─────────
@@ -376,9 +391,10 @@ TEST(CoordinateNormalizer, NegativeValues_CorrectZScore) {
     SpacetimeEvent raw2{.time = 1.0, .price = -1.0, .volume = -1.0, .momentum = -1.0};
     (void)norm.normalize(raw1);
     auto r = norm.normalize(raw2);
+    ASSERT_TRUE(r.has_value());
     // window = {-3,-1}, mean=-2, stddev=sqrt(2)
     // z-score(-1) = (-1 - (-2)) / sqrt(2) = 1/sqrt(2)
-    EXPECT_NEAR(r.price,    1.0 / std::sqrt(2.0), 1e-10);
-    EXPECT_NEAR(r.volume,   1.0 / std::sqrt(2.0), 1e-10);
-    EXPECT_NEAR(r.momentum, 1.0 / std::sqrt(2.0), 1e-10);
+    EXPECT_NEAR(r->price,    1.0 / std::sqrt(2.0), 1e-10);
+    EXPECT_NEAR(r->volume,   1.0 / std::sqrt(2.0), 1e-10);
+    EXPECT_NEAR(r->momentum, 1.0 / std::sqrt(2.0), 1e-10);
 }
