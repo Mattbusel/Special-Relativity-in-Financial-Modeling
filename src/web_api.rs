@@ -3,6 +3,17 @@
 //! Provides HTTP REST API, SSE streaming, and WebSocket streaming for the
 //! orchestrator pipeline.
 //!
+//! ## Module layout
+//!
+//! The implementation is split into focused private sub-modules:
+//! - [`types`]      — `ServerConfig`, `InferRequest`, `InferResponse`,
+//!                    `RequestStatus`, `AppError`, `PaginationParams`
+//! - [`middleware`] — `auth_middleware`, `request_id_middleware`,
+//!                    `body_size_middleware`
+//! - [`routes`]     — all handler functions
+//!
+//! `AppState`, `start_server`, and re-exports remain at this level.
+//!
 //! ## Endpoints
 //!
 //! ### REST API

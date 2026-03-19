@@ -25,7 +25,7 @@
 //!
 //! #[tokio::main]
 //! async fn main() {
-//!     let worker = EchoWorker;
+//!     let worker = EchoWorker::new();
 //!     let tokens = worker.infer("Hello, world!").await.unwrap();
 //!     println!("{}", tokens.join(""));
 //! }
@@ -82,7 +82,7 @@ pub enum OrchestratorError {
 pub mod metrics;
 
 // Re-export the most commonly used types at the crate root.
-pub use worker::{EchoWorker, ModelWorker};
+pub use worker::{AnthropicWorker, EchoWorker, LlamaCppWorker, ModelWorker, OpenAiWorker, VllmWorker};
 
 /// A stable identifier for an agent/session.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
