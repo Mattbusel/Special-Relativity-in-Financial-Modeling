@@ -25,6 +25,7 @@
 
 #include "../../include/srfm/stream/signal_processor.hpp"
 
+#include <cmath>
 #include <thread>
 
 namespace srfm::stream {
@@ -99,6 +100,20 @@ void SignalProcessor::run_loop() noexcept {
         }
 
         ++counters_.ticks_processed;
+
+        // ── NaN/Inf propagation guard ───────────────────────────────────────
+        // Reject any tick whose signal-relevant fields are non-finite,
+        // non-positive (close) or negative (volume).  This prevents NaN/Inf
+        // from propagating through the normalizer and Lorentz chain.
+        {
+            const OHLCVTick& t = *maybe_tick;
+            const bool close_ok  = std::isfinite(t.close)  && t.close  > 0.0;
+            const bool volume_ok = std::isfinite(t.volume) && t.volume >= 0.0;
+            if (!close_ok || !volume_ok) {
+                ++counters_.ticks_rejected_invalid;
+                continue;
+            }
+        }
 
         const auto sig = process_one(*maybe_tick, bar_counter_++);
 

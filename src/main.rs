@@ -71,20 +71,17 @@ fn main() {
     if args.iter().any(|a| a == "--web") {
         #[cfg(feature = "web-api")]
         {
-            let host = flag_value(&args, "--host").unwrap_or("0.0.0.0");
-            let port: u16 = flag_value(&args, "--port")
-                .and_then(|s| s.parse().ok())
-                .unwrap_or(8080);
+            let config = tokio_prompt_orchestrator::config::Config::load();
+            let cfg = tokio_prompt_orchestrator::web_api::ServerConfig {
+                host: flag_value(&args, "--host").map(str::to_string).unwrap_or(config.server.host),
+                port: flag_value(&args, "--port").and_then(|s| s.parse().ok()).unwrap_or(config.server.port),
+                ..Default::default()
+            };
 
-            eprintln!("Starting web API on {}:{}", host, port);
+            eprintln!("Starting web API on {}:{}", cfg.host, cfg.port);
 
             let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
             let (tx, _rx) = tokio::sync::mpsc::channel(256);
-            let cfg = tokio_prompt_orchestrator::web_api::ServerConfig {
-                host: host.to_string(),
-                port,
-                ..Default::default()
-            };
             if let Err(e) = rt.block_on(tokio_prompt_orchestrator::web_api::start_server(cfg, tx)) {
                 eprintln!("Web API error: {e}");
                 process::exit(1);

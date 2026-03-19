@@ -73,6 +73,7 @@ pub async fn run_mock() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         terminal.draw(|f| ui::draw(f, &app_state))?;
+        app_state.tick_flash();
 
         let event = events::poll_event(RENDER_RATE);
         events::apply_event(&mut app_state, event);

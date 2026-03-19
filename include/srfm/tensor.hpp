@@ -35,9 +35,12 @@
 #include "srfm/constants.hpp"
 
 #include <Eigen/Dense>
+#include <algorithm>
 #include <array>
+#include <execution>
 #include <functional>
 #include <optional>
+#include <utility>
 #include <vector>
 
 namespace srfm::tensor {
@@ -135,6 +138,100 @@ public:
 
 private:
     MetricFunction metric_fn_;
+};
+
+// ─── CachedMetricTensor ───────────────────────────────────────────────────────
+
+/// Cache wrapper around MetricTensor::evaluate().
+///
+/// MetricTensor::evaluate() is called many times per geodesic integration step
+/// (once per Christoffel finite-difference probe).  When the probe points are
+/// close together, the metric value changes negligibly.  This wrapper avoids
+/// redundant computation by caching the most recently evaluated (point, result)
+/// pair and returning the cached result whenever the requested point is within
+/// `tol` (L∞ norm) of the cached point.
+///
+/// All other MetricTensor operations (inverse, is_lorentzian,
+/// spacetime_interval) are delegated directly to the inner MetricTensor without
+/// caching, as they are called far less frequently.
+///
+/// ## Usage
+/// ```cpp
+/// auto cached = CachedMetricTensor::make_minkowski(1.0, 0.2);
+/// auto g = cached.evaluate(pt);  // fast on repeated nearby calls
+/// cached.invalidate();            // force re-evaluation on next call
+/// ```
+///
+/// ## Thread safety
+/// NOT thread-safe — one instance per thread / per GeodesicSolver.
+class CachedMetricTensor {
+public:
+    /// Construct wrapping an existing MetricTensor with an optional tolerance.
+    ///
+    /// @param metric  MetricTensor to wrap (copied by value).
+    /// @param tol     L∞ distance threshold for cache hit (default 1e-8).
+    explicit CachedMetricTensor(MetricTensor metric, double tol = 1e-8)
+        : inner_(std::move(metric)), tol_(tol) {}
+
+    /// Evaluate g_μν at x, returning a cached result when the point is close
+    /// enough to the previously cached point (L∞ distance < tol).
+    MetricMatrix evaluate(const SpacetimePoint& x) const {
+        if (valid_ && (x - pt_).cwiseAbs().maxCoeff() < tol_) {
+            return cached_;
+        }
+        cached_ = inner_.evaluate(x);
+        pt_     = x;
+        valid_  = true;
+        return cached_;
+    }
+
+    /// Delegate: compute g^μν (inverse metric) at x.
+    std::optional<MetricMatrix> inverse(const SpacetimePoint& x) const {
+        return inner_.inverse(x);
+    }
+
+    /// Delegate: return true iff metric has Lorentzian signature (−,+,+,+) at x.
+    bool is_lorentzian(const SpacetimePoint& x) const {
+        return inner_.is_lorentzian(x);
+    }
+
+    /// Delegate: compute ds² = g_μν dx^μ dx^ν at x.
+    double spacetime_interval(const SpacetimePoint& x,
+                               const FourVelocity&   dx) const {
+        return inner_.spacetime_interval(x, dx);
+    }
+
+    /// Invalidate the cache, forcing re-evaluation on the next call to evaluate().
+    void invalidate() const noexcept { valid_ = false; }
+
+    // ── Factories ────────────────────────────────────────────────────────────
+
+    /// Flat Minkowski-like metric: g = diag(−time_scale², σ², σ², σ²).
+    static CachedMetricTensor make_minkowski(double time_scale   = 1.0,
+                                              double spatial_scale = 1.0) {
+        return CachedMetricTensor(MetricTensor::make_minkowski(time_scale,
+                                                               spatial_scale));
+    }
+
+    /// Diagonal metric from per-asset volatilities.
+    static CachedMetricTensor make_diagonal(double time_scale,
+                                             const std::array<double, 3>& vol) {
+        return CachedMetricTensor(MetricTensor::make_diagonal(time_scale, vol));
+    }
+
+    /// Full covariance-based metric from a 3×3 asset covariance matrix.
+    static CachedMetricTensor make_from_covariance(double time_scale,
+                                                    const Eigen::Matrix3d& cov) {
+        return CachedMetricTensor(
+            MetricTensor::make_from_covariance(time_scale, cov));
+    }
+
+private:
+    MetricTensor              inner_;
+    double                    tol_;
+    mutable bool              valid_{false};
+    mutable SpacetimePoint    pt_{SpacetimePoint::Zero()};
+    mutable MetricMatrix      cached_{};
 };
 
 // ─── ChristoffelSymbols ───────────────────────────────────────────────────────
@@ -317,5 +414,57 @@ private:
     ChristoffelSymbols  christoffel_;
     double              step_size_;
 };
+
+// ─── integrate_batch ──────────────────────────────────────────────────────────
+
+/// Integrate a batch of geodesics in parallel using std::execution::par_unseq.
+///
+/// Each geodesic is independent (different initial conditions), so the
+/// per-geodesic integrations can be run concurrently without any shared mutable
+/// state.  The solver object itself is read-only; each lambda call operates on
+/// its own trajectory vector.
+///
+/// This provides a straightforward way to amortise the overhead of
+/// multiple-asset geodesic integration — one call per portfolio rebalance
+/// instead of a sequential for-loop.
+///
+/// # Requirements
+/// The C++ standard library parallel STL backend must be available.
+/// - On Linux with libstdc++: link with -ltbb (Intel TBB).
+/// - On MSVC: std::execution::par_unseq works out of the box.
+/// - On libc++ (macOS/LLVM): may require -fexperimental-library and TBB.
+///
+/// # Arguments
+/// * `solver`             — Configured GeodesicSolver (read-only).
+/// * `initial_conditions` — Vector of (initial_position, initial_velocity) pairs.
+/// * `steps`              — Number of RK4 steps per trajectory.
+///
+/// # Returns
+/// Vector of trajectories (one per initial condition), each containing
+/// `steps + 1` GeodesicState entries in proper-time order.
+///
+/// # Thread safety
+/// The GeodesicSolver and MetricTensor are accessed as const; parallel calls
+/// are safe provided the MetricFunction stored in the solver's MetricTensor is
+/// itself thread-safe for concurrent const calls.
+inline std::vector<std::vector<GeodesicState>>
+integrate_batch(
+    const GeodesicSolver& solver,
+    const std::vector<std::pair<SpacetimePoint, FourVelocity>>& initial_conditions,
+    int steps)
+{
+    std::vector<std::vector<GeodesicState>> results(initial_conditions.size());
+
+    std::transform(
+        std::execution::par_unseq,
+        initial_conditions.begin(),
+        initial_conditions.end(),
+        results.begin(),
+        [&solver, steps](const std::pair<SpacetimePoint, FourVelocity>& ic) {
+            return solver.integrate(ic.first, ic.second, steps);
+        });
+
+    return results;
+}
 
 } // namespace srfm::tensor

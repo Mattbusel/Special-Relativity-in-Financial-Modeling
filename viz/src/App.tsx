@@ -268,7 +268,11 @@ function AppInner() {
       </div>
 
       {/* Tab content */}
-      <div style={styles.tabContent}>
+      <div
+        style={styles.tabContent}
+        role="tabpanel"
+        aria-labelledby={`tab-${activeTab}`}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -303,6 +307,7 @@ interface TabButtonProps {
 function TabButton({ tab, active, onClick }: TabButtonProps) {
   return (
     <button
+      id={`tab-${tab.id}`}
       onClick={onClick}
       aria-selected={active}
       role="tab"

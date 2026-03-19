@@ -63,3 +63,84 @@ jobs:
           sudo apt-get install -y doxygen graphviz
       - name: Generate documentation
         run: doxygen Doxyfile
+
+  # ── Fuzz targets (30s per target, main branch only) ───────────────────────
+  fuzz:
+    name: Fuzz (30s per target)
+    runs-on: ubuntu-latest
+    # Only run on push to main, not on every PR (expensive)
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y build-essential cmake ninja-build clang
+      - name: Bootstrap vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
+          "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh" -disableMetrics
+      - name: Build fuzz targets
+        run: |
+          cmake -B build-fuzz \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_C_COMPILER=clang \
+            -DCMAKE_CXX_COMPILER=clang++ \
+            -DSRFM_BUILD_FUZZ=ON \
+            -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+          cmake --build build-fuzz --parallel
+        continue-on-error: true
+      - name: Run fuzz targets (30s each)
+        run: |
+          for fuzz_src in fuzz/fuzz_*.cpp; do
+            target=$(basename "$fuzz_src" .cpp)
+            binary="build-fuzz/fuzz/$target"
+            if [ -x "$binary" ]; then
+              echo "Fuzzing $target for 30s..."
+              "$binary" -max_total_time=30 -timeout=10 2>&1 || true
+            else
+              echo "Skipping $target (binary not found at $binary)"
+            fi
+          done
+        continue-on-error: true
+
+  # ── Benchmark regression tracking (main branch only) ─────────────────────
+  benchmark:
+    name: Benchmark (C++)
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install dependencies
+        run: sudo apt-get install -y cmake ninja-build libeigen3-dev
+      - name: Bootstrap vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
+          "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh" -disableMetrics
+      - name: Build benchmarks
+        run: |
+          cmake -B build \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DSRFM_BUILD_BENCHMARKS=ON \
+            -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+          cmake --build build --target bench_beta_gamma -j$(nproc)
+      - name: Run benchmarks (JSON output)
+        run: |
+          ./build/bench/bench_beta_gamma --benchmark_format=json > benchmark_results.json
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'googlecpp'
+          output-file-path: benchmark_results.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          comment-on-alert: true
+          alert-threshold: '120%'
+          fail-on-alert: false
+        continue-on-error: true

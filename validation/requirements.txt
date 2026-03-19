@@ -12,3 +12,6 @@ scipy>=1.12.0
 # Plotting
 matplotlib>=3.8.0
 seaborn>=0.13.0
+
+# Property-based testing
+hypothesis>=6.100.0

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { useWebSocket } from '../hooks/useWebSocket';
+import { useWebSocket, InferResponse } from '../hooks/useWebSocket';
+import { HARDCODED_STATS, BH_STATS } from '../data/mockData';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -18,28 +19,6 @@ import {
 interface BacktestPanelProps {
   beta: number;
 }
-
-const HARDCODED_STATS = {
-  sharpe: 1.84,
-  sortino: 2.31,
-  maxDrawdown: -0.127,
-  winRate: 0.587,
-  totalReturn: 2.847,
-  calmar: 2.18,
-  annualizedReturn: 0.847,
-  volatility: 0.142,
-};
-
-const BH_STATS = {
-  sharpe: 0.67,
-  sortino: 0.89,
-  maxDrawdown: -0.341,
-  winRate: 0.523,
-  totalReturn: 0.612,
-  calmar: 0.48,
-  annualizedReturn: 0.198,
-  volatility: 0.218,
-};
 
 const CYAN = '#00ffff';
 const GREEN = '#00ff41';
@@ -224,7 +203,7 @@ function EquityTooltip({ active, payload, label }: {
 // ─── Main component ────────────────────────────────────────────────────────────
 
 export default function BacktestPanel({ beta }: BacktestPanelProps) {
-  const { isConnected } = useWebSocket('ws://localhost:8080/api/v1/ws');
+  const { isConnected } = useWebSocket<InferResponse>('ws://localhost:8080/api/v1/ws');
 
   const stats = HARDCODED_STATS;
   const bh = BH_STATS;

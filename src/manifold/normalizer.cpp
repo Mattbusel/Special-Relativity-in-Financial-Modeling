@@ -18,8 +18,12 @@ namespace srfm {
 
 // ─── Constructor ──────────────────────────────────────────────────────────────
 
-CoordinateNormalizer::CoordinateNormalizer(std::size_t window) noexcept
-    : window_(window < 1 ? 1 : window) {}
+CoordinateNormalizer::CoordinateNormalizer(std::size_t window,
+                                            std::size_t min_samples) noexcept
+    : window_(window < 1 ? 1 : window)
+    , min_samples_(min_samples == 0
+                   ? std::max(window_, DEFAULT_MIN_SAMPLES)
+                   : min_samples) {}
 
 // ─── push ─────────────────────────────────────────────────────────────────────
 
@@ -84,6 +88,20 @@ CoordinateNormalizer::normalize(const manifold::SpacetimeEvent& raw) noexcept {
     push(price_buf_,    raw.price,    window_);
     push(volume_buf_,   raw.volume,   window_);
     push(momentum_buf_, raw.momentum, window_);
+    ++total_;
+
+    // Warm-up guard: if fewer than min_samples_ observations have been
+    // accumulated, z-scores would be computed from an insufficient statistical
+    // window and could be wildly inaccurate.  Return zeros for all spatial
+    // coordinates until the normalizer has warmed up.
+    if (!warmed_up()) {
+        return manifold::SpacetimeEvent{
+            .time     = raw.time,
+            .price    = 0.0,
+            .volume   = 0.0,
+            .momentum = 0.0,
+        };
+    }
 
     // Z-score each spatial coordinate using the updated window.
     // Time coordinate is always passed through unchanged.
@@ -106,10 +124,19 @@ std::size_t CoordinateNormalizer::window_size() const noexcept {
     return window_;
 }
 
+std::size_t CoordinateNormalizer::total_samples() const noexcept {
+    return total_;
+}
+
+bool CoordinateNormalizer::warmed_up() const noexcept {
+    return total_ >= min_samples_;
+}
+
 void CoordinateNormalizer::reset() noexcept {
     price_buf_.clear();
     volume_buf_.clear();
     momentum_buf_.clear();
+    total_ = 0;
 }
 
 }  // namespace srfm

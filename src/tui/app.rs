@@ -25,10 +25,10 @@ pub const LOG_ENTRIES_CAP: usize = 50;
 pub const REGIME_HISTORY_CAP: usize = 60;
 
 /// Minimum terminal width for the dashboard to render.
-pub const MIN_COLS: u16 = 60;
+pub const MIN_COLS: u16 = 80;
 
 /// Minimum terminal height for the dashboard to render.
-pub const MIN_ROWS: u16 = 20;
+pub const MIN_ROWS: u16 = 24;
 
 /// Pipeline stage names in order.
 pub const STAGE_NAMES: [&str; 5] = ["RAG", "ASSEMBLE", "INFER", "POST", "STREAM"];
@@ -145,6 +145,14 @@ pub struct App {
     pub selected_symbol: usize,
     /// Startup loading progress (0–100). `None` = fully loaded.
     pub loading_progress: Option<u8>,
+
+    /// Flash message for log export status (shown briefly in the footer).
+    pub log_export_flash: Option<String>,
+    /// Countdown ticks for the export flash message (decremented each render).
+    pub export_flash_tick: u8,
+
+    /// Left column width as a percentage (30–70, default 50).
+    pub left_col_pct: u16,
 }
 
 /// Depth of a bounded channel between two pipeline stages.
@@ -290,6 +298,11 @@ impl App {
             fullscreen_sparkline: false,
             selected_symbol: 0,
             loading_progress: None,
+
+            log_export_flash: None,
+            export_flash_tick: 0,
+
+            left_col_pct: 50,
         }
     }
 
@@ -376,8 +389,8 @@ impl App {
     /// Exports the current log entries to a timestamped file.
     ///
     /// Writes all log entries to `srfm-log-YYYYMMDD-HHMMSS.txt` in the current
-    /// working directory. Silently ignores write errors so callers never panic.
-    pub fn export_log(&self) {
+    /// working directory. Sets `log_export_flash` with status on success or failure.
+    pub fn export_log(&mut self) {
         let filename = Local::now()
             .format("srfm-log-%Y%m%d-%H%M%S.txt")
             .to_string();
@@ -395,7 +408,25 @@ impl App {
                 }
             ));
         }
-        let _ = std::fs::write(&filename, contents);
+        match std::fs::write(&filename, contents) {
+            Ok(_) => {
+                self.log_export_flash = Some(format!("Exported to {}", filename));
+            }
+            Err(_) => {
+                self.log_export_flash = Some("Export failed".to_string());
+            }
+        }
+        self.export_flash_tick = 30;
+    }
+
+    /// Decrements the export flash countdown and clears the flash when it reaches 0.
+    pub fn tick_flash(&mut self) {
+        if self.export_flash_tick > 0 {
+            self.export_flash_tick -= 1;
+            if self.export_flash_tick == 0 {
+                self.log_export_flash = None;
+            }
+        }
     }
 
     /// Computes the deduplication savings percentage.
@@ -910,7 +941,32 @@ mod tests {
             message: "test export".into(),
             fields: "key=val".into(),
         });
-        // export_log silently ignores I/O errors, must never panic
+        // export_log sets a flash message and never panics
         app.export_log();
+        // flash tick should be set to 30
+        assert_eq!(app.export_flash_tick, 30);
+        assert!(app.log_export_flash.is_some());
+    }
+
+    #[test]
+    fn test_tick_flash_decrements_and_clears() {
+        let mut app = App::new(Duration::from_secs(1));
+        app.log_export_flash = Some("test".to_string());
+        app.export_flash_tick = 2;
+        app.tick_flash();
+        assert_eq!(app.export_flash_tick, 1);
+        assert!(app.log_export_flash.is_some());
+        app.tick_flash();
+        assert_eq!(app.export_flash_tick, 0);
+        assert!(app.log_export_flash.is_none());
+    }
+
+    #[test]
+    fn test_tick_flash_noop_when_zero() {
+        let mut app = App::new(Duration::from_secs(1));
+        app.export_flash_tick = 0;
+        app.tick_flash();
+        assert_eq!(app.export_flash_tick, 0);
+        assert!(app.log_export_flash.is_none());
     }
 }

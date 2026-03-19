@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { AppError, makeError } from '../types/errors';
+import type { InferResponse } from '../types/api';
 
-export interface UseWebSocketReturn<T = unknown> {
+export type { InferResponse };
+
+export interface UseWebSocketReturn<T = InferResponse> {
   data: T | null;
   isConnected: boolean;
-  error: string | null;
+  error: AppError | null;
   send: (payload: unknown) => void;
 }
 
@@ -19,13 +23,13 @@ const BACKOFF_FACTOR = 2;
  *   Client sends: { prompt: string, session_id?: string, metadata?: object, stream: true }
  *   Server sends: { request_id, status, result?, error? }
  */
-export function useWebSocket<T = unknown>(
+export function useWebSocket<T = InferResponse>(
   url: string,
   enabled = true,
 ): UseWebSocketReturn<T> {
   const [data, setData] = useState<T | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<AppError | null>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
   const backoffRef = useRef(BASE_BACKOFF_MS);
@@ -69,12 +73,13 @@ export function useWebSocket<T = unknown>(
           setData(parsed);
         } catch {
           // Non-JSON frame — ignore silently
+          setError(makeError('WEBSOCKET_PARSE_ERROR', 'Received non-JSON WebSocket frame'));
         }
       };
 
       ws.onerror = () => {
         if (!mountedRef.current) return;
-        setError('WebSocket connection error');
+        setError(makeError('WEBSOCKET_CONNECTION_ERROR', 'WebSocket connection error'));
       };
 
       ws.onclose = () => {
@@ -88,7 +93,8 @@ export function useWebSocket<T = unknown>(
         reconnectTimerRef.current = setTimeout(connect, delay);
       };
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to open WebSocket');
+      const message = err instanceof Error ? err.message : 'Failed to open WebSocket';
+      setError(makeError('WEBSOCKET_CONNECTION_ERROR', message));
       const delay = Math.min(backoffRef.current, MAX_BACKOFF_MS);
       backoffRef.current = Math.min(backoffRef.current * BACKOFF_FACTOR, MAX_BACKOFF_MS);
       reconnectTimerRef.current = setTimeout(connect, delay);

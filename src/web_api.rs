@@ -180,6 +180,8 @@ struct AppState {
     api_key: Option<String>,
     /// Number of currently active SSE connections (for rate limiting).
     sse_connections: AtomicUsize,
+    /// Per-IP rate limit map for `POST /api/v1/infer`: maps IP → (request_count, window_start).
+    infer_rate_limit: Arc<DashMap<String, (u64, std::time::Instant)>>,
 }
 
 /// Query parameters for the paginated requests list endpoint.
@@ -275,6 +277,7 @@ pub async fn start_server(
         config: config.clone(),
         api_key,
         sse_connections: AtomicUsize::new(0),
+        infer_rate_limit: Arc::new(DashMap::new()),
     });
 
     let app = Router::new()
@@ -424,6 +427,10 @@ async fn auth_middleware(
 // REST Handlers
 // ============================================================================
 
+/// Maximum infer requests per IP per 60-second window.
+#[cfg(feature = "web-api")]
+const INFER_RATE_LIMIT_MAX: u64 = 60;
+
 /// `POST /api/v1/infer`  -  Submit an inference request.
 ///
 /// Accepts an [`InferRequest`] JSON body and forwards it to the pipeline.
@@ -434,8 +441,41 @@ async fn auth_middleware(
 #[cfg(feature = "web-api")]
 async fn infer_handler(
     State(state): State<Arc<AppState>>,
-    Json(req): Json<InferRequest>,
+    req_parts: axum::http::Request<Body>,
 ) -> Result<Json<InferResponse>, AppError> {
+    // Extract client IP: prefer X-Forwarded-For, fall back to "unknown".
+    let client_ip = req_parts
+        .headers()
+        .get("x-forwarded-for")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|s| s.split(',').next())
+        .map(|s| s.trim().to_string())
+        .unwrap_or_else(|| "unknown".to_string());
+
+    // Per-IP rate limiting: 60 requests per 60-second window.
+    {
+        let now = std::time::Instant::now();
+        let mut entry = state
+            .infer_rate_limit
+            .entry(client_ip.clone())
+            .or_insert_with(|| (0, now));
+        if entry.1.elapsed() >= Duration::from_secs(60) {
+            *entry = (0, now);
+        }
+        entry.0 += 1;
+        if entry.0 > INFER_RATE_LIMIT_MAX {
+            return Err(AppError::TooManyConnections);
+        }
+    }
+
+    // Extract body as Json<InferRequest>.
+    let (_, body) = req_parts.into_parts();
+    let bytes = axum::body::to_bytes(body, usize::MAX)
+        .await
+        .map_err(|_| AppError::PipelineClosed)?;
+    let req: InferRequest =
+        serde_json::from_slice(&bytes).map_err(|_| AppError::PipelineClosed)?;
+
     let request_id = Uuid::new_v4().to_string();
     let session_id = req
         .session_id
@@ -489,7 +529,7 @@ async fn status_handler(
         .tracker
         .status
         .get(&request_id)
-        .ok_or(AppError::NotFound)?;
+        .ok_or_else(|| AppError::NotFound(request_id.clone()))?;
 
     Ok(Json(InferResponse {
         request_id,
@@ -526,7 +566,7 @@ async fn result_handler(
                 _ => {}
             }
         } else {
-            return Err(AppError::NotFound);
+            return Err(AppError::NotFound(request_id.clone()));
         }
 
         if start.elapsed() > timeout {
@@ -595,7 +635,7 @@ async fn explain_handler(
         .tracker
         .status
         .get(&request_id)
-        .ok_or(AppError::NotFound)?;
+        .ok_or_else(|| AppError::NotFound(request_id.clone()))?;
 
     Ok(Json(serde_json::json!({
         "request_id": request_id,
@@ -843,147 +883,52 @@ async fn metrics_handler() -> String {
 ///
 /// This function never panics.
 #[cfg(feature = "web-api")]
-async fn schema_handler() -> (
-    StatusCode,
-    [(header::HeaderName, &'static str); 1],
-    &'static str,
-) {
-    (
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "application/json")],
-        OPENAPI_SCHEMA,
-    )
+async fn schema_handler() -> Json<serde_json::Value> {
+    let schema = serde_json::json!({
+      "openapi": "3.0.0",
+      "info": {
+        "title": "SRFM Orchestrator API",
+        "version": env!("CARGO_PKG_VERSION"),
+        "description": "Async LLM prompt orchestration with relativistic market regime classification"
+      },
+      "paths": {
+        "/health": { "get": { "summary": "Health check", "responses": { "200": { "description": "OK" } } } },
+        "/metrics": { "get": { "summary": "Prometheus metrics", "responses": { "200": { "description": "Prometheus text format" } } } },
+        "/api/v1/infer": {
+          "post": {
+            "summary": "Submit inference request",
+            "security": [{"bearerAuth": []}],
+            "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InferRequest" } } } },
+            "responses": { "200": { "description": "Request accepted" }, "429": { "description": "Rate limit exceeded" } }
+          }
+        },
+        "/api/v1/stream": { "post": { "summary": "SSE token streaming", "security": [{"bearerAuth": []}], "responses": { "200": { "description": "SSE stream" }, "429": { "description": "Too many SSE connections" } } } },
+        "/api/v1/status/{request_id}": { "get": { "summary": "Check request status", "security": [{"bearerAuth": []}], "responses": { "200": { "description": "Status object" }, "404": { "description": "Not found" } } } },
+        "/api/v1/result/{request_id}": { "get": { "summary": "Block until result ready", "security": [{"bearerAuth": []}], "responses": { "200": { "description": "Result" } } } },
+        "/api/v1/requests": { "get": { "summary": "Paginated request list", "security": [{"bearerAuth": []}], "parameters": [{ "name": "offset", "in": "query", "schema": { "type": "integer", "default": 0 } }, { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20, "maximum": 100 } }], "responses": { "200": { "description": "Paginated list" } } } },
+        "/api/v1/explain/{request_id}": { "get": { "summary": "Regime explanation for request", "security": [{"bearerAuth": []}], "responses": { "200": { "description": "Explanation JSON" }, "404": { "description": "Not found" } } } },
+        "/api/v1/ws": { "get": { "summary": "WebSocket streaming", "responses": { "101": { "description": "WebSocket upgrade" } } } }
+      },
+      "components": {
+        "schemas": {
+          "InferRequest": {
+            "type": "object",
+            "required": ["prompt"],
+            "properties": {
+              "prompt": { "type": "string" },
+              "session_id": { "type": "string" },
+              "stream": { "type": "boolean", "default": false },
+              "metadata": { "type": "object", "additionalProperties": { "type": "string" } }
+            }
+          }
+        },
+        "securitySchemes": {
+          "bearerAuth": { "type": "http", "scheme": "bearer" }
+        }
+      }
+    });
+    Json(schema)
 }
-
-/// Static OpenAPI 3.0 specification.
-#[cfg(feature = "web-api")]
-const OPENAPI_SCHEMA: &str = r##"{
-  "openapi": "3.0.0",
-  "info": {
-    "title": "tokio-prompt-orchestrator",
-    "version": "1.0.0",
-    "description": "Production-grade multi-stage LLM pipeline orchestrator"
-  },
-  "paths": {
-    "/api/v1/infer": {
-      "post": {
-        "summary": "Submit inference request",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["prompt"],
-                "properties": {
-                  "prompt": { "type": "string" },
-                  "session_id": { "type": "string" },
-                  "metadata": { "type": "object", "additionalProperties": { "type": "string" } },
-                  "stream": { "type": "boolean", "default": false }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Request accepted" },
-          "400": { "description": "Invalid request body" },
-          "503": { "description": "Pipeline closed" }
-        }
-      }
-    },
-    "/api/v1/stream": {
-      "post": {
-        "summary": "SSE token streaming",
-        "description": "Streams tokens as Server-Sent Events",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/InferRequest" }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "SSE stream of token events" },
-          "503": { "description": "Pipeline closed" }
-        }
-      }
-    },
-    "/api/v1/status/{request_id}": {
-      "get": {
-        "summary": "Check request status",
-        "parameters": [
-          { "name": "request_id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "Request status" },
-          "404": { "description": "Request not found" }
-        }
-      }
-    },
-    "/api/v1/result/{request_id}": {
-      "get": {
-        "summary": "Get result (blocks until complete)",
-        "parameters": [
-          { "name": "request_id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "responses": {
-          "200": { "description": "Inference result" },
-          "404": { "description": "Request not found" },
-          "408": { "description": "Request timeout" }
-        }
-      }
-    },
-    "/api/v1/ws": {
-      "get": {
-        "summary": "WebSocket streaming inference",
-        "description": "Upgrade to WebSocket for real-time bidirectional streaming. Max message size: 1MB. Ping/pong keepalive: 30s.",
-        "responses": {
-          "101": { "description": "WebSocket upgrade" }
-        }
-      }
-    },
-    "/api/v1/schema": {
-      "get": {
-        "summary": "OpenAPI 3.0 schema",
-        "responses": {
-          "200": { "description": "This schema document" }
-        }
-      }
-    },
-    "/health": {
-      "get": {
-        "summary": "Health check",
-        "responses": {
-          "200": { "description": "Service healthy" }
-        }
-      }
-    },
-    "/metrics": {
-      "get": {
-        "summary": "Prometheus metrics",
-        "responses": {
-          "200": { "description": "Prometheus text format metrics" }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "InferRequest": {
-        "type": "object",
-        "required": ["prompt"],
-        "properties": {
-          "prompt": { "type": "string" },
-          "session_id": { "type": "string" },
-          "metadata": { "type": "object", "additionalProperties": { "type": "string" } },
-          "stream": { "type": "boolean", "default": false }
-        }
-      }
-    }
-  }
-}"##;
 
 // ============================================================================
 // Error Type
@@ -999,27 +944,43 @@ const OPENAPI_SCHEMA: &str = r##"{
 #[cfg(feature = "web-api")]
 #[derive(Debug)]
 enum AppError {
-    /// The requested resource was not found.
-    NotFound,
+    /// The requested resource was not found (carries the request ID).
+    NotFound(String),
     /// The pipeline channel is closed and cannot accept requests.
     PipelineClosed,
     /// The request timed out waiting for a result.
     Timeout,
-    /// Too many concurrent SSE connections.
+    /// Too many concurrent SSE connections or rate limit exceeded.
     TooManyConnections,
 }
 
 #[cfg(feature = "web-api")]
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        let (status, message) = match self {
-            AppError::NotFound => (StatusCode::NOT_FOUND, "Request not found"),
-            AppError::PipelineClosed => (StatusCode::SERVICE_UNAVAILABLE, "Pipeline closed"),
-            AppError::Timeout => (StatusCode::REQUEST_TIMEOUT, "Request timeout"),
-            AppError::TooManyConnections => (StatusCode::TOO_MANY_REQUESTS, "Too many SSE connections"),
+        let (status, code, message) = match &self {
+            AppError::NotFound(id) => (
+                StatusCode::NOT_FOUND,
+                "not_found",
+                format!("Request {} not found", id),
+            ),
+            AppError::PipelineClosed => (
+                StatusCode::SERVICE_UNAVAILABLE,
+                "pipeline_closed",
+                "Pipeline is not accepting requests".into(),
+            ),
+            AppError::Timeout => (
+                StatusCode::REQUEST_TIMEOUT,
+                "timeout",
+                "Request timed out".into(),
+            ),
+            AppError::TooManyConnections => (
+                StatusCode::TOO_MANY_REQUESTS,
+                "too_many_connections",
+                "SSE connection limit reached".into(),
+            ),
         };
-
-        (status, Json(serde_json::json!({"error": message}))).into_response()
+        let body = serde_json::json!({"error": {"code": code, "message": message}});
+        (status, Json(body)).into_response()
     }
 }
 
@@ -1054,25 +1015,25 @@ pub async fn start_server(
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_openapi_schema_is_valid_json() {
-        let parsed: serde_json::Value =
-            serde_json::from_str(OPENAPI_SCHEMA).expect("OPENAPI_SCHEMA must be valid JSON");
+    #[tokio::test]
+    async fn test_openapi_schema_is_valid_json() {
+        let Json(parsed) = schema_handler().await;
         assert_eq!(parsed["openapi"], "3.0.0");
     }
 
-    #[test]
-    fn test_openapi_schema_contains_all_endpoints() {
-        let parsed: serde_json::Value = serde_json::from_str(OPENAPI_SCHEMA).expect("valid JSON");
+    #[tokio::test]
+    async fn test_openapi_schema_contains_all_endpoints() {
+        let Json(parsed) = schema_handler().await;
         let paths = parsed["paths"].as_object().expect("paths is object");
         assert!(paths.contains_key("/api/v1/infer"));
         assert!(paths.contains_key("/api/v1/stream"));
         assert!(paths.contains_key("/api/v1/status/{request_id}"));
         assert!(paths.contains_key("/api/v1/result/{request_id}"));
         assert!(paths.contains_key("/api/v1/ws"));
-        assert!(paths.contains_key("/api/v1/schema"));
         assert!(paths.contains_key("/health"));
         assert!(paths.contains_key("/metrics"));
+        assert!(paths.contains_key("/api/v1/requests"));
+        assert!(paths.contains_key("/api/v1/explain/{request_id}"));
     }
 
     #[test]
@@ -1165,7 +1126,7 @@ mod tests {
 
     #[test]
     fn test_app_error_not_found_returns_404_json() {
-        let resp = AppError::NotFound.into_response();
+        let resp = AppError::NotFound("test-id".into()).into_response();
         assert_eq!(resp.status(), StatusCode::NOT_FOUND);
     }
 
@@ -1196,6 +1157,7 @@ mod tests {
             config: ServerConfig::default(),
             api_key: key.map(|s| s.to_string()),
             sse_connections: AtomicUsize::new(0),
+            infer_rate_limit: Arc::new(DashMap::new()),
         })
     }
 
@@ -1257,6 +1219,7 @@ mod tests {
             config: ServerConfig::default(),
             api_key: None,
             sse_connections: AtomicUsize::new(0),
+            infer_rate_limit: Arc::new(DashMap::new()),
         });
         state.sse_connections.fetch_add(1, Ordering::Relaxed);
         assert_eq!(state.sse_connections.load(Ordering::Relaxed), 1);
@@ -1271,6 +1234,7 @@ mod tests {
             config: ServerConfig::default(),
             api_key: None,
             sse_connections: AtomicUsize::new(SSE_MAX_CONNECTIONS),
+            infer_rate_limit: Arc::new(DashMap::new()),
         });
         let current = state.sse_connections.load(Ordering::Relaxed);
         assert!(current >= SSE_MAX_CONNECTIONS, "should be at limit");
@@ -1294,5 +1258,56 @@ mod tests {
     fn test_app_error_too_many_connections_returns_429() {
         let resp = AppError::TooManyConnections.into_response();
         assert_eq!(resp.status(), StatusCode::TOO_MANY_REQUESTS);
+    }
+
+    // ------------------------------------------------------------------
+    // New tests required by web API improvements
+    // ------------------------------------------------------------------
+
+    #[tokio::test]
+    async fn test_structured_error_not_found_returns_json() {
+        use axum::body::to_bytes;
+        let resp = AppError::NotFound("abc".into()).into_response();
+        assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+        let body_bytes = to_bytes(resp.into_body(), usize::MAX).await.unwrap();
+        let json: serde_json::Value = serde_json::from_slice(&body_bytes).expect("valid JSON");
+        assert_eq!(json["error"]["code"], "not_found");
+        assert!(
+            json["error"]["message"].as_str().unwrap().contains("abc"),
+            "message should include the request id"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_structured_error_pipeline_closed_returns_json() {
+        use axum::body::to_bytes;
+        let resp = AppError::PipelineClosed.into_response();
+        assert_eq!(resp.status(), StatusCode::SERVICE_UNAVAILABLE);
+        let body_bytes = to_bytes(resp.into_body(), usize::MAX).await.unwrap();
+        let json: serde_json::Value = serde_json::from_slice(&body_bytes).expect("valid JSON");
+        assert_eq!(json["error"]["code"], "pipeline_closed");
+    }
+
+    #[tokio::test]
+    async fn test_schema_endpoint_has_version() {
+        let Json(schema) = schema_handler().await;
+        let version = schema["info"]["version"].as_str().expect("version string");
+        assert_eq!(version, env!("CARGO_PKG_VERSION"));
+    }
+
+    #[test]
+    fn test_infer_rate_limit_state_initialized() {
+        let (tx, _rx) = mpsc::channel(1);
+        let state = AppState {
+            pipeline_tx: tx,
+            tracker: RequestTracker {
+                status: Arc::new(DashMap::new()),
+            },
+            config: ServerConfig::default(),
+            api_key: None,
+            sse_connections: AtomicUsize::new(0),
+            infer_rate_limit: Arc::new(DashMap::new()),
+        };
+        assert!(state.infer_rate_limit.is_empty(), "infer_rate_limit should start empty");
     }
 }

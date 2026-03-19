@@ -20,6 +20,24 @@ if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
     target_link_libraries(srfm_tensor PUBLIC Eigen3::Eigen)
 endif()
 
+# ── Parallel STL (std::execution::par_unseq) support ─────────────────────────
+# MSVC: parallel execution works out of the box — no extra library needed.
+# GCC/Clang on Linux: requires Intel TBB as the parallel back-end.
+# Try find_package(TBB) first; fall back to a manual -ltbb link flag so that
+# the build still works on systems where TBB headers aren't installed under a
+# CMake-known prefix (e.g. Ubuntu's libtbb-dev package).
+if(NOT MSVC)
+    find_package(TBB QUIET)
+    if(TBB_FOUND)
+        target_link_libraries(srfm_tensor PUBLIC TBB::tbb)
+    else()
+        # Attempt a bare -ltbb; the linker will ignore it gracefully if TBB is
+        # not present, and the parallel STL will fall back to sequential on
+        # implementations (like libc++) that do not require it.
+        target_link_libraries(srfm_tensor PUBLIC -ltbb)
+    endif()
+endif()
+
 # ── SIMD compiler flags ───────────────────────────────────────────────────────
 
 if(MSVC)

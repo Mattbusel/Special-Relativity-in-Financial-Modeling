@@ -13,7 +13,8 @@ import {
   Cell,
   ReferenceLine,
 } from 'recharts';
-import { generateOHLCV, computeGeodesicPath, geodesicDeviation } from '../utils/physics';
+import { computeGeodesicPath, geodesicDeviation } from '../utils/physics';
+import { DEMO_BARS } from '../data/mockData';
 
 interface GeodesicVizProps {
   beta: number;
@@ -59,7 +60,7 @@ export default function GeodesicViz({ beta }: GeodesicVizProps) {
   const [animSpeed, setAnimSpeed] = useState(80);
   const animRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const allBars = useMemo(() => generateOHLCV(200, 42), []);
+  const allBars = useMemo(() => DEMO_BARS, []);
 
   const geodesicPath = useMemo(() => computeGeodesicPath(allBars, beta), [allBars, beta]);
 

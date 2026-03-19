@@ -34,6 +34,7 @@
 #![warn(missing_docs)]
 #![warn(clippy::all)]
 
+pub mod config;
 pub mod worker;
 
 #[cfg(feature = "tui")]

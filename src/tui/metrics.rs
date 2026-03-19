@@ -11,7 +11,9 @@
 //! - No panics on network errors in live mode (graceful degradation)
 //! - Story loop is deterministic and visually compelling
 
+// ── Section: shared constants ─────────────────────────────────────────────────
 use super::app::{App, CircuitState, LogEntry, LogLevel, RegimeType};
+// ── Section: MockMetrics (scripted 2-minute story) ────────────────────────────
 
 /// Cost per inference call in USD (used for savings estimate).
 const COST_PER_INFERENCE: f64 = 0.012;
@@ -514,6 +516,8 @@ impl MockMetrics {
         app.active_stage = Some(stage_idx);
     }
 }
+
+// ── Section: LiveMetrics (real Prometheus scraping) ───────────────────────────
 
 /// Live metrics source that reads from a Prometheus endpoint.
 ///

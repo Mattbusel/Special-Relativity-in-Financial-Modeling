@@ -36,6 +36,10 @@ pub enum InputEvent {
     FullscreenToggle,
     /// User advanced to the next tracked symbol.
     NextSymbol,
+    /// Widen the left panel ([).
+    PanelWider,
+    /// Narrow the left panel (]).
+    PanelNarrow,
     /// A terminal resize occurred.
     Resize(u16, u16),
     /// No actionable event within the poll window.
@@ -84,6 +88,16 @@ pub fn apply_event(app: &mut App, event: InputEvent) {
         InputEvent::LogExport => app.export_log(),
         InputEvent::FullscreenToggle => app.fullscreen_sparkline = !app.fullscreen_sparkline,
         InputEvent::NextSymbol => app.next_symbol(),
+        InputEvent::PanelWider => {
+            if app.left_col_pct > 30 {
+                app.left_col_pct -= 5;
+            }
+        }
+        InputEvent::PanelNarrow => {
+            if app.left_col_pct < 70 {
+                app.left_col_pct += 5;
+            }
+        }
         InputEvent::Resize(_, _) | InputEvent::None => {}
     }
 }
@@ -105,6 +119,8 @@ fn translate_key(key: KeyEvent) -> InputEvent {
         KeyCode::Tab => InputEvent::NextSymbol,
         KeyCode::Char('j') => InputEvent::ScrollDown,
         KeyCode::Char('k') => InputEvent::ScrollUp,
+        KeyCode::Char('[') => InputEvent::PanelWider,
+        KeyCode::Char(']') => InputEvent::PanelNarrow,
         KeyCode::Esc => InputEvent::Quit,
         KeyCode::Up => InputEvent::ScrollUp,
         KeyCode::Down => InputEvent::ScrollDown,
@@ -324,5 +340,49 @@ mod tests {
         let initial = app.selected_symbol;
         apply_event(&mut app, InputEvent::NextSymbol);
         assert_eq!(app.selected_symbol, (initial + 1) % crate::tui::app::SYMBOLS.len());
+    }
+
+    #[test]
+    fn test_panel_wider_decrements() {
+        let mut app = App::new(Duration::from_secs(1));
+        app.left_col_pct = 50;
+        apply_event(&mut app, InputEvent::PanelWider);
+        assert_eq!(app.left_col_pct, 45);
+    }
+
+    #[test]
+    fn test_panel_narrow_increments() {
+        let mut app = App::new(Duration::from_secs(1));
+        app.left_col_pct = 50;
+        apply_event(&mut app, InputEvent::PanelNarrow);
+        assert_eq!(app.left_col_pct, 55);
+    }
+
+    #[test]
+    fn test_panel_wider_clamped_at_30() {
+        let mut app = App::new(Duration::from_secs(1));
+        app.left_col_pct = 30;
+        apply_event(&mut app, InputEvent::PanelWider);
+        assert_eq!(app.left_col_pct, 30);
+    }
+
+    #[test]
+    fn test_panel_narrow_clamped_at_70() {
+        let mut app = App::new(Duration::from_secs(1));
+        app.left_col_pct = 70;
+        apply_event(&mut app, InputEvent::PanelNarrow);
+        assert_eq!(app.left_col_pct, 70);
+    }
+
+    #[test]
+    fn test_translate_key_bracket_open_panel_wider() {
+        let key = KeyEvent::new(KeyCode::Char('['), KeyModifiers::NONE);
+        assert_eq!(translate_key(key), InputEvent::PanelWider);
+    }
+
+    #[test]
+    fn test_translate_key_bracket_close_panel_narrow() {
+        let key = KeyEvent::new(KeyCode::Char(']'), KeyModifiers::NONE);
+        assert_eq!(translate_key(key), InputEvent::PanelNarrow);
     }
 }

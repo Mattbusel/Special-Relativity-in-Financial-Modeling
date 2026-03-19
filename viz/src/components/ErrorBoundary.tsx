@@ -1,4 +1,5 @@
 import React from 'react';
+import { AppError, makeError } from '../types/errors';
 
 interface Props {
   children: React.ReactNode;
@@ -8,16 +9,22 @@ interface Props {
 interface State {
   hasError: boolean;
   error: Error | null;
+  appError: AppError | null;
 }
 
 export default class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, appError: null };
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+    const appError = makeError(
+      'RENDER_ERROR',
+      error.message || 'Unknown render error',
+      error.stack,
+    );
+    return { hasError: true, error, appError };
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
@@ -25,26 +32,30 @@ export default class ErrorBoundary extends React.Component<Props, State> {
   }
 
   handleReset = () => {
-    this.setState({ hasError: false, error: null });
+    this.setState({ hasError: false, error: null, appError: null });
   };
 
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) return <>{this.props.fallback}</>;
+      const { appError } = this.state;
       return (
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '100%',
-          height: '100%',
-          background: '#0a0a0a',
-          color: '#e0e0e0',
-          fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-          gap: 16,
-          padding: 32,
-        }}>
+        <div
+          role="alert"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            height: '100%',
+            background: '#0a0a0a',
+            color: '#e0e0e0',
+            fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+            gap: 16,
+            padding: 32,
+          }}
+        >
           <div style={{ fontSize: 13, color: '#ff3333', letterSpacing: '0.1em', fontWeight: 700 }}>
             COMPONENT ERROR
           </div>
@@ -58,10 +69,13 @@ export default class ErrorBoundary extends React.Component<Props, State> {
             maxWidth: 480,
             wordBreak: 'break-word',
           }}>
-            {this.state.error?.message ?? 'Unknown error'}
+            {appError
+              ? `[${appError.code}] ${appError.message}`
+              : (this.state.error?.message ?? 'Unknown error')}
           </div>
           <button
             onClick={this.handleReset}
+            aria-label="Retry — dismiss error and re-render children"
             style={{
               background: 'rgba(0,255,255,0.1)',
               border: '1px solid #00ffff44',

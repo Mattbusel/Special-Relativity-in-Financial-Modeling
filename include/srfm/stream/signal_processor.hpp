@@ -59,12 +59,13 @@ namespace srfm::stream {
  * @brief Diagnostic counters for the signal-processing thread.
  */
 struct SignalProcessorCounters {
-    std::uint64_t ticks_processed{0};      ///< Ticks popped from input ring.
-    std::uint64_t signals_emitted{0};       ///< Signals pushed to output ring.
-    std::uint64_t signals_dropped_ring_full{0}; ///< Dropped: output ring full.
-    std::uint64_t timelike_count{0};        ///< TIMELIKE regime events.
-    std::uint64_t lightlike_count{0};       ///< LIGHTLIKE regime events.
-    std::uint64_t spacelike_count{0};       ///< SPACELIKE regime events.
+    std::uint64_t ticks_processed{0};           ///< Ticks popped from input ring.
+    std::uint64_t signals_emitted{0};            ///< Signals pushed to output ring.
+    std::uint64_t signals_dropped_ring_full{0};  ///< Dropped: output ring full.
+    std::uint64_t ticks_rejected_invalid{0};     ///< Dropped: NaN/Inf/non-positive field.
+    std::uint64_t timelike_count{0};             ///< TIMELIKE regime events.
+    std::uint64_t lightlike_count{0};            ///< LIGHTLIKE regime events.
+    std::uint64_t spacelike_count{0};            ///< SPACELIKE regime events.
 };
 
 // ── SignalProcessor ───────────────────────────────────────────────────────────

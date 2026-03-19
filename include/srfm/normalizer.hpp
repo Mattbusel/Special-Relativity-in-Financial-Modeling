@@ -26,9 +26,18 @@
 ///
 /// Time coordinate passes through unchanged.
 ///
+/// ## Warm-up Guard
+/// Before at least `min_samples` data points have been accumulated (default =
+/// window_size, minimum 20), the z-scores are potentially unreliable due to
+/// insufficient statistical history.  warmed_up() returns false during this
+/// period, and normalize() returns a zero-valued event (all spatial coordinates
+/// set to 0.0 with time unchanged) instead of a potentially wild z-score.
+/// Callers should check warmed_up() before using the output of normalize() for
+/// trading decisions.
+///
 /// ## Edge Cases
 /// - stddev < 1e-9 (flat / constant series): returns 0.0 (no variance to normalize)
-/// - Window not yet full: normalizes using all available samples (≥1)
+/// - Window not yet full OR min_samples not yet reached: returns 0.0 for spatial coords
 /// - Single-sample window: mean = x, stddev = 0 → returns 0.0
 ///
 /// ## Guarantees
@@ -50,12 +59,19 @@ namespace srfm {
 /// Each call to normalize() updates the windows and returns a z-scored event.
 class CoordinateNormalizer {
 public:
-    /// Construct with a given window size.
+    /// Minimum number of samples required before warmed_up() returns true.
+    static constexpr std::size_t DEFAULT_MIN_SAMPLES = 20;
+
+    /// Construct with a given window size and optional min_samples warm-up guard.
     ///
     /// # Arguments
-    /// * `window` — Number of bars to use for rolling statistics.
-    ///              Minimum 1. Default: 20.
-    explicit CoordinateNormalizer(std::size_t window = 20) noexcept;
+    /// * `window`      — Number of bars to use for rolling statistics.
+    ///                   Minimum 1. Default: 20.
+    /// * `min_samples` — Number of samples that must be seen before warmed_up()
+    ///                   returns true and normalize() emits non-zero z-scores.
+    ///                   Defaults to max(window, DEFAULT_MIN_SAMPLES).
+    explicit CoordinateNormalizer(std::size_t window      = 20,
+                                  std::size_t min_samples = 0) noexcept;
 
     /// Normalize the spatial coordinates of a SpacetimeEvent.
     ///
@@ -81,11 +97,22 @@ public:
     /// Configured maximum window size.
     [[nodiscard]] std::size_t window_size() const noexcept;
 
+    /// Total number of samples seen so far (does not saturate at window_size()).
+    [[nodiscard]] std::size_t total_samples() const noexcept;
+
+    /// Returns true once at least min_samples data points have been accumulated.
+    ///
+    /// Before warmed_up() is true, normalize() returns a zero-valued event to
+    /// avoid producing wild z-scores from an insufficient statistical window.
+    [[nodiscard]] bool warmed_up() const noexcept;
+
     /// Reset the normalizer, clearing all buffered observations.
     void reset() noexcept;
 
 private:
     std::size_t        window_;
+    std::size_t        min_samples_;  ///< Warm-up threshold.
+    std::size_t        total_{0};     ///< Total samples ingested (unbounded).
     std::deque<double> price_buf_;
     std::deque<double> volume_buf_;
     std::deque<double> momentum_buf_;

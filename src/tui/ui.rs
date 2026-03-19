@@ -29,8 +29,8 @@ use super::widgets;
 pub fn draw(f: &mut Frame, app: &App) {
     let size = f.size();
 
-    // Minimum size guard (80x24 effective minimum)
-    if size.width < 80 || size.height < 24 {
+    // Minimum size guard
+    if size.width < MIN_COLS || size.height < MIN_ROWS {
         draw_too_small(f, size);
         return;
     }
@@ -64,7 +64,7 @@ pub fn draw(f: &mut Frame, app: &App) {
         " [q]uit [p]ause [r]eset [h]elp [f]ullscreen [Tab]symbol [e]xport [j/k]scroll  {} \u{03b2}={:.3} \u{03b3}={:.2} v{} ",
         symbol, app.beta_display, app.gamma_display, ver
     );
-    let footer = Line::from(vec![
+    let mut footer_spans = vec![
         Span::styled(footer_text, Style::default().fg(Color::DarkGray)),
         if app.paused {
             Span::styled(
@@ -76,7 +76,16 @@ pub fn draw(f: &mut Frame, app: &App) {
         } else {
             Span::raw("")
         },
-    ]);
+    ];
+    if let Some(ref flash) = app.log_export_flash {
+        footer_spans.push(Span::styled(
+            format!(" {} ", flash),
+            Style::default()
+                .fg(Color::Green)
+                .add_modifier(Modifier::BOLD),
+        ));
+    }
+    let footer = Line::from(footer_spans);
 
     let footer_block = Block::default().title_bottom(footer).borders(Borders::NONE);
 
@@ -84,12 +93,13 @@ pub fn draw(f: &mut Frame, app: &App) {
     f.render_widget(outer_block, size);
     f.render_widget(footer_block, size);
 
-    // Main layout: top section, sparkline, log
+    // Main layout: top section, sparkline, regime timeline, log
     let main_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
             Constraint::Min(14), // Top section (pipeline + health + channels + circuit + dedup)
             Constraint::Length(8), // Throughput sparkline
+            Constraint::Length(3), // Regime timeline
             Constraint::Length(10), // Log tail
         ])
         .split(inner);
@@ -98,8 +108,8 @@ pub fn draw(f: &mut Frame, app: &App) {
     let top_chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([
-            Constraint::Percentage(50), // Left column
-            Constraint::Percentage(50), // Right column
+            Constraint::Percentage(app.left_col_pct),
+            Constraint::Percentage(100 - app.left_col_pct),
         ])
         .split(main_chunks[0]);
 
@@ -133,7 +143,8 @@ pub fn draw(f: &mut Frame, app: &App) {
         widgets::circuit::render(f, right_chunks[1], app);
         widgets::dedup::render(f, right_chunks[2], app);
         widgets::sparkline::render_multi_sparkline(f, main_chunks[1], app);
-        widgets::log::render(f, main_chunks[2], app);
+        widgets::regime::render(f, main_chunks[2], app);
+        widgets::log::render(f, main_chunks[3], app);
     }
 
     // Loading overlay
@@ -170,8 +181,8 @@ fn draw_loading_overlay(f: &mut Frame, area: Rect, progress: u8) {
 /// Renders the "terminal too small" warning.
 fn draw_too_small(f: &mut Frame, area: Rect) {
     let msg = format!(
-        "Terminal too small \u{2014} resize to at least 80x24 (currently {}x{})",
-        area.width, area.height
+        "Terminal too small \u{2014} resize to at least {}x{} (currently {}x{})",
+        MIN_COLS, MIN_ROWS, area.width, area.height
     );
     let current_size = format!("Current size: {}x{}", area.width, area.height);
 
@@ -257,6 +268,10 @@ fn draw_help_overlay(f: &mut Frame, area: Rect) {
             Span::styled("    \u{2191}\u{2193} ", Style::default().fg(Color::Cyan)),
             Span::styled("Scroll log", Style::default().fg(Color::DarkGray)),
         ]),
+        Line::from(vec![
+            Span::styled("    [  ", Style::default().fg(Color::Cyan)),
+            Span::styled("[[] widen left  []] narrow left", Style::default().fg(Color::DarkGray)),
+        ]),
         Line::from(""),
         Line::from(Span::styled(
             "  --mock  Synthetic 2-min story (default)",
@@ -287,19 +302,19 @@ mod tests {
 
     #[test]
     fn test_min_size_constants() {
-        assert_eq!(MIN_COLS, 60);
-        assert_eq!(MIN_ROWS, 20);
+        assert_eq!(MIN_COLS, 80);
+        assert_eq!(MIN_ROWS, 24);
     }
 
     #[test]
     fn test_too_small_detection_width() {
-        let area = Rect::new(0, 0, 50, 30);
+        let area = Rect::new(0, 0, 70, 30);
         assert!(area.width < MIN_COLS);
     }
 
     #[test]
     fn test_too_small_detection_height() {
-        let area = Rect::new(0, 0, 120, 15);
+        let area = Rect::new(0, 0, 120, 20);
         assert!(area.height < MIN_ROWS);
     }
 

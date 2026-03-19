@@ -7,7 +7,8 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
+      aria-label="Toggle dark/light theme"
+      aria-pressed={isDark}
       title={`Switch to ${isDark ? 'light' : 'dark'} theme`}
       style={{
         background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',

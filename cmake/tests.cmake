@@ -252,6 +252,7 @@ if(RapidCheck_FOUND)
         prop_interval_invariant
         prop_metric_positive_definite
         prop_christoffel_symmetry
+        prop_lorentz_invariance
     )
 
     foreach(test_name IN LISTS PROPERTY_TESTS)
