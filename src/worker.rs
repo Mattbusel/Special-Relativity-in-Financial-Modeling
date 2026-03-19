@@ -19,6 +19,7 @@
 //! - `LLAMA_CPP_URL`: llama.cpp server URL (default: http://localhost:8080)
 //! - `VLLM_URL`: vLLM server URL (default: http://localhost:8000)
 
+#[path = "workers/mod.rs"]
 pub mod workers;
 
 pub use workers::{
@@ -27,6 +28,41 @@ pub use workers::{
 
 #[cfg(test)]
 mod tests {
+    /// Verify that `EchoWorker` is accessible through the re-export shim in
+    /// `src/worker.rs` (which delegates to `src/workers/`).
+    #[tokio::test]
+    async fn test_worker_reexport_echo_worker_accessible() {
+        use super::EchoWorker;
+        use crate::workers::ModelWorker;
+        let worker = EchoWorker::with_delay(0);
+        let tokens = worker.infer("hello world").await.unwrap();
+        assert_eq!(tokens, vec!["hello", "world"],
+            "EchoWorker re-exported via worker.rs must split on whitespace");
+    }
+
+    /// Verify that `infer_stream` yields one item per token, not a single
+    /// space-joined item.  Requires the `web-api` feature for `infer_stream`.
+    #[cfg(feature = "web-api")]
+    #[tokio::test]
+    async fn test_infer_stream_yields_individual_tokens() {
+        use super::EchoWorker;
+        use crate::workers::ModelWorker;
+        use futures::StreamExt;
+
+        let worker = EchoWorker::with_delay(0);
+        let mut stream = worker.infer_stream("one two three").await.unwrap();
+
+        let mut items = Vec::new();
+        while let Some(item) = stream.next().await {
+            items.push(item.unwrap());
+        }
+
+        assert_eq!(items, vec!["one", "two", "three"],
+            "infer_stream must yield each token individually, not joined");
+        assert_eq!(items.len(), 3,
+            "stream must yield exactly N items for an N-token prompt");
+    }
+
     use super::*;
     use crate::OrchestratorError;
     use std::sync::Mutex;

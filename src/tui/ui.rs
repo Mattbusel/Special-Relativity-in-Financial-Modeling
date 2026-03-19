@@ -37,7 +37,7 @@ pub fn draw(f: &mut Frame, app: &App) {
 
     // Help overlay
     if app.show_help {
-        draw_help_overlay(f, size);
+        draw_help_overlay(f, size, app);
         return;
     }
 
@@ -133,8 +133,16 @@ pub fn draw(f: &mut Frame, app: &App) {
         .split(top_chunks[1]);
 
     if app.fullscreen_sparkline {
-        // Fullscreen sparkline: fill entire inner area
-        widgets::sparkline::render(f, inner, app);
+        // Fullscreen sparkline: top 80% sparkline, bottom regime timeline.
+        let fs_chunks = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Percentage(80),
+                Constraint::Length(3),
+            ])
+            .split(inner);
+        widgets::sparkline::render(f, fs_chunks[0], app);
+        widgets::regime::render(f, fs_chunks[1], app);
     } else {
         // Render all widgets
         widgets::pipeline::render(f, left_chunks[0], app);
@@ -209,7 +217,7 @@ fn draw_too_small(f: &mut Frame, area: Rect) {
 }
 
 /// Renders the help overlay.
-fn draw_help_overlay(f: &mut Frame, area: Rect) {
+fn draw_help_overlay(f: &mut Frame, area: Rect, app: &App) {
     // Center the help popup
     let popup_width = 52.min(area.width.saturating_sub(4));
     let popup_height = 22.min(area.height.saturating_sub(4));
@@ -266,11 +274,15 @@ fn draw_help_overlay(f: &mut Frame, area: Rect) {
         ]),
         Line::from(vec![
             Span::styled("    \u{2191}\u{2193} ", Style::default().fg(Color::Cyan)),
-            Span::styled("Scroll log", Style::default().fg(Color::DarkGray)),
+            Span::styled("Scroll log / this help", Style::default().fg(Color::DarkGray)),
         ]),
         Line::from(vec![
             Span::styled("    [  ", Style::default().fg(Color::Cyan)),
             Span::styled("[[] widen left  []] narrow left", Style::default().fg(Color::DarkGray)),
+        ]),
+        Line::from(vec![
+            Span::styled(" wheel ", Style::default().fg(Color::Cyan)),
+            Span::styled("[scroll wheel] log scroll", Style::default().fg(Color::DarkGray)),
         ]),
         Line::from(""),
         Line::from(Span::styled(
@@ -282,7 +294,7 @@ fn draw_help_overlay(f: &mut Frame, area: Rect) {
             Style::default().fg(Color::DarkGray),
         )),
         Line::from(Span::styled(
-            "  Press any key to close",
+            "  [\u{2191}\u{2193}] scroll   Press any key to close",
             Style::default().fg(Color::Yellow),
         )),
     ];
@@ -292,7 +304,9 @@ fn draw_help_overlay(f: &mut Frame, area: Rect) {
         .borders(Borders::ALL)
         .border_style(Style::default().fg(Color::Cyan));
 
-    let para = Paragraph::new(help_text).block(block);
+    let para = Paragraph::new(help_text)
+        .block(block)
+        .scroll((app.help_scroll, 0));
     f.render_widget(para, popup_area);
 }
 

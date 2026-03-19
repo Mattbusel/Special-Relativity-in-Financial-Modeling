@@ -48,7 +48,7 @@ fn default_port() -> u16 { 8080 }
 fn default_timeout_seconds() -> u64 { 300 }
 
 /// LLM worker settings parsed from `[workers]` in `srfm.toml`.
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkersConfig {
     /// Override OpenAI base URL (default: https://api.openai.com).
     pub openai_base_url: Option<String>,
@@ -64,6 +64,19 @@ pub struct WorkersConfig {
     /// Default temperature.
     #[serde(default = "default_temperature")]
     pub temperature: f64,
+}
+
+impl Default for WorkersConfig {
+    fn default() -> Self {
+        Self {
+            openai_base_url: None,
+            anthropic_base_url: None,
+            llama_cpp_url: None,
+            vllm_url: None,
+            max_tokens: default_max_tokens(),
+            temperature: default_temperature(),
+        }
+    }
 }
 
 fn default_max_tokens() -> u32 { 512 }
@@ -118,6 +131,36 @@ impl Config {
             Err(_) => Self::default(), // file not found is normal
         }
     }
+
+    /// Validate all config fields are within acceptable ranges.
+    ///
+    /// Returns `Ok(())` if all fields are valid, or `Err(Vec<String>)` listing
+    /// every validation error found.
+    pub fn validate(&self) -> Result<(), Vec<String>> {
+        let mut errors = Vec::new();
+        if self.server.port == 0 {
+            errors.push("server.port must be > 0".into());
+        }
+        if self.tui.render_ms == 0 {
+            errors.push("tui.render_ms must be > 0".into());
+        }
+        if self.tui.left_col_pct < 30 || self.tui.left_col_pct > 70 {
+            errors.push(format!(
+                "tui.left_col_pct must be 30-70, got {}",
+                self.tui.left_col_pct
+            ));
+        }
+        if self.workers.temperature < 0.0 || self.workers.temperature > 2.0 {
+            errors.push(format!(
+                "workers.temperature must be 0.0-2.0, got {}",
+                self.workers.temperature
+            ));
+        }
+        if self.server.timeout_seconds == 0 {
+            errors.push("server.timeout_seconds must be > 0".into());
+        }
+        if errors.is_empty() { Ok(()) } else { Err(errors) }
+    }
 }
 
 #[cfg(test)]
@@ -169,6 +212,50 @@ temperature = 0.5
     }
 
     #[test]
+    fn test_config_validate_valid() {
+        let cfg = Config::default();
+        assert!(cfg.validate().is_ok(), "default config should be valid");
+    }
+
+    #[test]
+    fn test_config_validate_invalid_port() {
+        let mut cfg = Config::default();
+        cfg.server.port = 0;
+        let result = cfg.validate();
+        assert!(result.is_err());
+        let errors = result.unwrap_err();
+        assert!(
+            errors.iter().any(|e| e.contains("server.port")),
+            "errors should mention server.port, got {:?}",
+            errors
+        );
+    }
+
+    #[test]
+    fn test_config_validate_invalid_col_pct() {
+        let mut cfg = Config::default();
+        cfg.tui.left_col_pct = 20; // below minimum of 30
+        let result = cfg.validate();
+        assert!(result.is_err());
+        let errors = result.unwrap_err();
+        assert!(
+            errors.iter().any(|e| e.contains("left_col_pct")),
+            "errors should mention left_col_pct, got {:?}",
+            errors
+        );
+
+        cfg.tui.left_col_pct = 80; // above maximum of 70
+        let result = cfg.validate();
+        assert!(result.is_err());
+        let errors = result.unwrap_err();
+        assert!(
+            errors.iter().any(|e| e.contains("left_col_pct")),
+            "errors should mention left_col_pct, got {:?}",
+            errors
+        );
+    }
+
+    #[test]
     fn test_config_malformed_toml_returns_defaults() {
         use tempfile::NamedTempFile;
         use std::io::Write;
@@ -176,5 +263,70 @@ temperature = 0.5
         writeln!(f, "this is not valid toml !!!").unwrap();
         let cfg = Config::load_from_path(f.path().to_str().unwrap());
         assert_eq!(cfg.server.port, 8080);
+    }
+
+    #[test]
+    fn test_config_validate_multiple_simultaneous_errors() {
+        let mut cfg = Config::default();
+        cfg.server.port = 0;                // triggers port error
+        cfg.tui.left_col_pct = 10;          // triggers left_col_pct error
+        let result = cfg.validate();
+        assert!(result.is_err());
+        let errors = result.unwrap_err();
+        assert!(errors.len() >= 2, "expected at least 2 errors, got {:?}", errors);
+        assert!(errors.iter().any(|e| e.contains("server.port")));
+        assert!(errors.iter().any(|e| e.contains("left_col_pct")));
+    }
+
+    #[test]
+    fn test_config_validate_temperature_out_of_range() {
+        let mut cfg = Config::default();
+        cfg.workers.temperature = -0.1; // below minimum 0.0
+        let result = cfg.validate();
+        assert!(result.is_err());
+        let errors = result.unwrap_err();
+        assert!(
+            errors.iter().any(|e| e.contains("workers.temperature")),
+            "errors should mention workers.temperature, got {:?}",
+            errors
+        );
+
+        cfg.workers.temperature = 2.5; // above maximum 2.0
+        let result = cfg.validate();
+        assert!(result.is_err());
+        let errors = result.unwrap_err();
+        assert!(
+            errors.iter().any(|e| e.contains("workers.temperature")),
+            "errors should mention workers.temperature, got {:?}",
+            errors
+        );
+    }
+
+    #[test]
+    fn test_config_validate_timeout_seconds_zero() {
+        let mut cfg = Config::default();
+        cfg.server.timeout_seconds = 0;
+        let result = cfg.validate();
+        assert!(result.is_err());
+        let errors = result.unwrap_err();
+        assert!(
+            errors.iter().any(|e| e.contains("server.timeout_seconds")),
+            "errors should mention server.timeout_seconds, got {:?}",
+            errors
+        );
+    }
+
+    #[test]
+    fn test_config_load_malformed_toml_falls_back_to_defaults() {
+        use tempfile::NamedTempFile;
+        use std::io::Write;
+        let mut f = NamedTempFile::new().unwrap();
+        // Write clearly malformed TOML
+        writeln!(f, "[server]\nport = !!!invalid").unwrap();
+        let cfg = Config::load_from_path(f.path().to_str().unwrap());
+        // Must fall back to defaults gracefully
+        assert_eq!(cfg.server.port, 8080, "malformed TOML should yield default port");
+        assert_eq!(cfg.server.host, "0.0.0.0");
+        assert!(cfg.validate().is_ok(), "default config should be valid");
     }
 }

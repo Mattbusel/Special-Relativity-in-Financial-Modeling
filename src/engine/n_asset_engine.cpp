@@ -54,7 +54,12 @@ NAssetEngine::estimate_covariance() const noexcept {
     const int N = universe_.n();
     const int T = static_cast<int>(history_.size());
 
-    // Need at least 2 bars to compute one log-return, and T-1 >= lookback_bars - 1.
+    // Warm-up guard: prevents wild z-scores before sufficient data.
+    // Require at least lookback_bars bars so covariance is estimated from a
+    // statistically meaningful window, mirroring CoordinateNormalizer::warmed_up().
+    if (T < cfg_.lookback_bars) { return std::nullopt; }
+
+    // Need at least 2 bars to compute one log-return.
     if (T < 2) { return std::nullopt; }
 
     const int n_returns = T - 1;

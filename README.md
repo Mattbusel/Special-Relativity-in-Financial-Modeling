@@ -434,6 +434,30 @@ Send JSON matching the `POST /api/v1/infer` body. The server replies with:
 
 Rate limit: 60 messages per minute per connection.
 
+### Rate Limits
+
+| Endpoint | Limit | Window | Scope |
+|----------|-------|--------|-------|
+| `POST /api/v1/infer` | 60 requests | 60 seconds | Per IP address |
+| `WS /api/v1/ws` | 60 messages | 60 seconds | Per connection |
+| `POST /api/v1/stream` | 10 concurrent connections | — | Per server |
+
+Rate limit response headers (on `POST /api/v1/infer`):
+
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | Maximum requests allowed in the window |
+| `X-RateLimit-Remaining` | Requests remaining in the current window |
+| `X-RateLimit-Reset` | Unix timestamp when the window resets |
+
+When a rate limit is exceeded the server responds with HTTP `429 Too Many Requests` and a structured error body:
+
+```json
+{"error": {"code": "too_many_connections", "message": "SSE connection limit reached"}}
+```
+
+The SSE connection limit (default: 10) is configurable at startup.
+
 ---
 
 ## Changelog

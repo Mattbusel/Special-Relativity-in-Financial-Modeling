@@ -27,9 +27,11 @@
 
 #include "tick.hpp"
 
+#include <chrono>
 #include <deque>
 #include <optional>
 #include <string>
+#include <thread>
 
 #ifdef _WIN32
 #  define WIN32_LEAN_AND_MEAN
@@ -86,6 +88,10 @@ public:
 
 // ── QueueTickSource ───────────────────────────────────────────────────────────
 
+#ifdef SRFM_TESTING
+// QueueTickSource is for unit tests only. Include this class only when
+// SRFM_TESTING is defined (set by CMake for test targets).
+
 /**
  * @brief In-process tick source backed by a std::deque.
  *
@@ -136,6 +142,8 @@ private:
     std::deque<OHLCVTick> queue_;
     bool                  open_{true};
 };
+
+#endif // SRFM_TESTING
 
 // ── PipeTickSource ────────────────────────────────────────────────────────────
 
@@ -249,6 +257,78 @@ private:
 #else
     int    fd_{-1};
 #endif
+};
+
+// ── ReconnectingTickSource ────────────────────────────────────────────────────
+
+/**
+ * @brief Wraps any TickSource with automatic reconnection on read failure.
+ *
+ * Uses exponential backoff starting at @p initial_delay (default 100 ms),
+ * doubling each attempt up to @p max_delay (default 30 000 ms = 30 s).
+ * After a successful read the delay resets to @p initial_delay.
+ *
+ * Thread safety: same as the wrapped Source type.
+ *
+ * @par Example
+ * @code{.cpp}
+ * // Create a QueueTickSource wrapped with reconnect logic.
+ * // (Useful in tests to simulate transient read failures.)
+ * QueueTickSource inner;
+ * inner.push(OHLCVTick{...});
+ *
+ * ReconnectingTickSource<QueueTickSource> src(
+ *     std::move(inner),
+ *     std::chrono::milliseconds{50},   // initial backoff
+ *     std::chrono::milliseconds{5000}  // max backoff
+ * );
+ *
+ * // Returns nullopt (and sleeps briefly) when the queue is empty;
+ * // returns the tick and resets backoff on success.
+ * while (true) {
+ *     auto tick = src.read();
+ *     if (tick) process(*tick);
+ * }
+ * @endcode
+ */
+template<typename Source>
+class ReconnectingTickSource {
+public:
+    explicit ReconnectingTickSource(Source source,
+                                    std::chrono::milliseconds initial_delay = std::chrono::milliseconds{100},
+                                    std::chrono::milliseconds max_delay     = std::chrono::milliseconds{30'000})
+        : source_(std::move(source))
+        , initial_delay_(initial_delay)
+        , max_delay_(max_delay)
+        , current_delay_(initial_delay)
+    {}
+
+    /// Read the next tick. Returns std::nullopt on transient failure (after
+    /// sleeping current_delay_). Reconnect is attempted automatically.
+    std::optional<OHLCVTick> read() {
+        auto result = source_.read();
+        if (result) {
+            current_delay_ = initial_delay_;  // reset on success
+            return result;
+        }
+        // Back off and signal caller to retry
+        std::this_thread::sleep_for(current_delay_);
+        current_delay_ = std::min(current_delay_ * 2, max_delay_);
+        return std::nullopt;
+    }
+
+    /// Reset the backoff state without reconnecting the underlying source.
+    void reset_backoff() noexcept { current_delay_ = initial_delay_; }
+
+    /// Access the underlying source (e.g. to re-open a pipe).
+    Source& source() noexcept { return source_; }
+    const Source& source() const noexcept { return source_; }
+
+private:
+    Source                    source_;
+    std::chrono::milliseconds initial_delay_;
+    std::chrono::milliseconds max_delay_;
+    std::chrono::milliseconds current_delay_;
 };
 
 } // namespace srfm::stream

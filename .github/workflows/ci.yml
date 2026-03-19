@@ -15,6 +15,15 @@ jobs:
       - name: cargo test
         run: cargo test --all-features
 
+  # ── Security audit ────────────────────────────────────────────────────────
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: rustsec/audit-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
   # ── Rust web-api feature build and test ───────────────────────────────────
   rust-web-api:
     name: Rust (web-api feature)
@@ -105,7 +114,7 @@ jobs:
             -DSRFM_BUILD_FUZZ=ON \
             -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
           cmake --build build-fuzz --parallel
-        continue-on-error: true
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
       - name: Run fuzz targets (30s each)
         run: |
           for fuzz_src in fuzz/fuzz_*.cpp; do
@@ -118,7 +127,7 @@ jobs:
               echo "Skipping $target (binary not found at $binary)"
             fi
           done
-        continue-on-error: true
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
 
   # ── Benchmark regression tracking (main branch only) ─────────────────────
   benchmark:
@@ -156,4 +165,4 @@ jobs:
           comment-on-alert: true
           alert-threshold: '120%'
           fail-on-alert: false
-        continue-on-error: true
+        continue-on-error: ${{ github.event_name == 'pull_request' }}

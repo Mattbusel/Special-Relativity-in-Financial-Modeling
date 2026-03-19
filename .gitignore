@@ -47,6 +47,7 @@ paper/*.out
 
 # Logs and misc
 *.log
+srfm-log-*.txt
 --help
 build_test/
 tests/*/build/

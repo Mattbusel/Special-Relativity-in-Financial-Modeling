@@ -53,8 +53,7 @@ pub trait ModelWorker: Send + Sync {
         Pin<Box<dyn Stream<Item = Result<String, OrchestratorError>> + Send>>,
         OrchestratorError,
     > {
-        let result = self.infer(prompt).await?;
-        let joined = result.join(" ");
-        Ok(Box::pin(futures::stream::once(async move { Ok(joined) })))
+        let tokens = self.infer(prompt).await?;
+        Ok(Box::pin(futures::stream::iter(tokens.into_iter().map(Ok))))
     }
 }

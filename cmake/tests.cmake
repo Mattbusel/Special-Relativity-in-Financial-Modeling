@@ -219,6 +219,8 @@ foreach(_st IN LISTS _STREAM_TESTS)
     add_executable(stream_${_st} tests/stream/${_st}.cpp)
     target_include_directories(stream_${_st} PRIVATE src include tests/stream)
     target_link_libraries(stream_${_st} PRIVATE srfm_stream)
+    # Enable QueueTickSource (test-only class guarded by SRFM_TESTING).
+    target_compile_definitions(stream_${_st} PRIVATE SRFM_TESTING=1)
     add_test(NAME stream_${_st} COMMAND stream_${_st})
 endforeach()
 

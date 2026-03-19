@@ -30,9 +30,10 @@ cmake -S . -B build -G Ninja \
 # Build all targets
 cmake --build build --parallel
 
-# Run CLI
-./build/srfm --help
-./build/srfm --backtest data/sample_btc_ohlcv.csv
+# Run benchmarks (the C++ project builds libraries; the CLI is the Rust binary)
+./build/bench/bench_beta_gamma --benchmark_format=json
+# For the Rust CLI:
+cargo run --release -- --help
 ```
 
 ## Build (Windows, MSVC)
@@ -164,8 +165,8 @@ target_link_libraries(my_target PRIVATE srfm::srfm_engine)
 - [ ] `cmake -S . -B build` succeeds with no errors
 - [ ] `cmake --build build` succeeds
 - [ ] `ctest --test-dir build --output-on-failure` — all tests pass
-- [ ] `./build/srfm --help` prints usage
-- [ ] `./build/srfm --backtest data/sample_btc_ohlcv.csv` produces a backtest report
+- [ ] `cargo run --release -- --help` prints usage (Rust CLI)
+- [ ] `./build/bench/bench_beta_gamma` runs benchmarks (C++ benchmark binary)
 - [ ] `clang-format --dry-run` passes (no style violations)
 - [ ] Doxygen generates without `WARN_IF_UNDOCUMENTED` warnings
 

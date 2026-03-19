@@ -32,6 +32,7 @@ pub mod widgets;
 /// Returns an error if the terminal cannot be initialised or if rendering fails.
 pub async fn run_mock() -> Result<(), Box<dyn std::error::Error>> {
     use crossterm::{
+        event::{DisableMouseCapture, EnableMouseCapture},
         execute,
         terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     };
@@ -42,6 +43,7 @@ pub async fn run_mock() -> Result<(), Box<dyn std::error::Error>> {
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen)?;
+    execute!(stdout, EnableMouseCapture)?;
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
@@ -49,6 +51,7 @@ pub async fn run_mock() -> Result<(), Box<dyn std::error::Error>> {
     let default_panic = std::panic::take_hook();
     std::panic::set_hook(Box::new(move |info| {
         let _ = disable_raw_mode();
+        let _ = execute!(io::stdout(), DisableMouseCapture);
         let _ = execute!(io::stdout(), LeaveAlternateScreen);
         default_panic(info);
     }));
@@ -73,7 +76,7 @@ pub async fn run_mock() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         terminal.draw(|f| ui::draw(f, &app_state))?;
-        app_state.tick_flash();
+        app_state.tick_render_frame();
 
         let event = events::poll_event(RENDER_RATE);
         events::apply_event(&mut app_state, event);
@@ -92,6 +95,7 @@ pub async fn run_mock() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let _ = disable_raw_mode();
+    let _ = execute!(terminal.backend_mut(), DisableMouseCapture);
     let _ = execute!(terminal.backend_mut(), LeaveAlternateScreen);
     let _ = terminal.show_cursor();
     Ok(())

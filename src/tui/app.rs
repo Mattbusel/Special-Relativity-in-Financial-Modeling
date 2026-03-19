@@ -76,6 +76,8 @@ pub struct App {
     pub paused: bool,
     /// Whether the help overlay is visible.
     pub show_help: bool,
+    /// Scroll offset for the help overlay (lines scrolled down).
+    pub help_scroll: u16,
     /// Monotonic tick counter (incremented each data tick).
     pub tick_count: u64,
 
@@ -224,6 +226,7 @@ impl App {
             should_quit: false,
             paused: false,
             show_help: false,
+            help_scroll: 0,
             tick_count: 0,
 
             stage_latencies: [0.0; 5],
@@ -308,6 +311,8 @@ impl App {
 
     /// Resets all counters and statistics to zero.
     pub fn reset_stats(&mut self) {
+        // Note: layout preferences (left_col_pct, fullscreen_sparkline, selected_symbol)
+        // are intentionally NOT reset here — they are navigation state, not statistics.
         self.requests_total = 0;
         self.inferences_total = 0;
         self.cost_saved_usd = 0.0;
@@ -419,8 +424,10 @@ impl App {
         self.export_flash_tick = 30;
     }
 
-    /// Decrements the export flash countdown and clears the flash when it reaches 0.
-    pub fn tick_flash(&mut self) {
+    /// Advance the export-flash countdown by one render frame.
+    /// Call this once per render cycle regardless of data-update rate.
+    /// Clears `log_export_flash` when the countdown reaches zero.
+    pub fn tick_render_frame(&mut self) {
         if self.export_flash_tick > 0 {
             self.export_flash_tick -= 1;
             if self.export_flash_tick == 0 {
@@ -953,10 +960,10 @@ mod tests {
         let mut app = App::new(Duration::from_secs(1));
         app.log_export_flash = Some("test".to_string());
         app.export_flash_tick = 2;
-        app.tick_flash();
+        app.tick_render_frame();
         assert_eq!(app.export_flash_tick, 1);
         assert!(app.log_export_flash.is_some());
-        app.tick_flash();
+        app.tick_render_frame();
         assert_eq!(app.export_flash_tick, 0);
         assert!(app.log_export_flash.is_none());
     }
@@ -965,8 +972,19 @@ mod tests {
     fn test_tick_flash_noop_when_zero() {
         let mut app = App::new(Duration::from_secs(1));
         app.export_flash_tick = 0;
-        app.tick_flash();
+        app.tick_render_frame();
         assert_eq!(app.export_flash_tick, 0);
         assert!(app.log_export_flash.is_none());
+    }
+
+    #[test]
+    fn test_tick_render_frame_clears_flash_at_zero() {
+        let mut app = App::new(Duration::from_secs(1));
+        app.log_export_flash = Some("flash".to_string());
+        app.export_flash_tick = 1;
+        // One frame away from zero: flash still set
+        app.tick_render_frame();
+        assert_eq!(app.export_flash_tick, 0);
+        assert!(app.log_export_flash.is_none(), "flash must be cleared when countdown reaches zero");
     }
 }
