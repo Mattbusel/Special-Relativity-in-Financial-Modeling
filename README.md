@@ -857,6 +857,86 @@ Every public function must satisfy:
 
 ---
 
+## Python Quickstart
+
+```python
+from srfm import SpacetimeInterval, LorentzTransform, Backtester
+
+# 1. Classify an OHLCV bar interval
+#    ds² = -c²Δt² + ΔP² + ΔV¹/⁴² + ΔM¹/³²
+label = SpacetimeInterval.classify(dt=1.0, dp=0.3, dv=0.05, dm=0.02)
+print(label)  # 'TIMELIKE'
+
+# 2. Compute Lorentz factor
+gamma = LorentzTransform.gamma(beta=0.6)
+print(gamma)  # 1.25
+
+# 3. Relativistic backtest
+prices = [100, 101.5, 99.8, 102.4, 101.1, 103.5, 102.0, 105.0]
+result = Backtester().run(prices)
+print(f"Sharpe: {result.sharpe:.4f}")
+print(f"Relativistic lift: {result.relativistic_lift:.3f}x")
+print(result.to_string())
+```
+
+## C++ Quickstart
+
+```cpp
+#include "srfm/manifold.hpp"
+#include "srfm/engine.hpp"
+#include "srfm/multi_asset.hpp"
+
+// Single-asset interval classification
+auto ds2 = srfm::manifold::SpacetimeInterval::interval(event_a, event_b);
+if (ds2) {
+    auto t = srfm::manifold::SpacetimeInterval::classify(*ds2);
+    std::cout << srfm::manifold::to_string(t) << "\n"; // TIMELIKE
+}
+
+// Full pipeline
+srfm::core::Engine engine;
+auto bars = srfm::core::DataLoader::load_csv("prices.csv");
+if (bars) {
+    auto result = engine.run_backtest(*bars);
+    if (result) fmt::print("{}\n", result->to_string());
+}
+
+// Multi-asset spacetime
+srfm::multi_asset::CorrelationMetric cm(3 /*n_assets*/);
+for (auto& row : price_history)
+    if (auto metric = cm.update(row)) {
+        auto ds2 = srfm::multi_asset::MultiAssetInterval::compute(ev_a, ev_b, *metric);
+        // ds2 < 0 → TIMELIKE portfolio move
+    }
+```
+
+---
+
+## FAQ
+
+**Q: What does "financial speed of light" mean?**
+A: It is the normalised unit velocity `c = 1.0` that sets the boundary between TIMELIKE (causal, β < 1) and SPACELIKE (stochastic, β > 1) market movements.  Unlike physical light speed, its numerical value is arbitrary and is calibrated to the instrument's volatility scale.
+
+**Q: Is this model physically rigorous?**
+A: No — it is a mathematical analogy.  Special relativity's mathematical formalism (Lorentz transforms, spacetime intervals, geodesics) is borrowed and applied to price series because the invariant interval equation ds² = −c²dt² + dP² + dV² + dM² produces empirically useful market-regime labels.  We make no claim that financial markets literally obey special relativity.
+
+**Q: Why does TIMELIKE imply lower next-bar variance?**
+A: The Bartlett test result (p = 6×10⁻¹⁶, Q1 2025) shows this empirically.  The intuition is that TIMELIKE intervals correspond to price moves where |ΔP| < c·Δt — i.e., the price change is "sub-light", meaning the move is small relative to the time elapsed.  Such bars tend to be in momentum-driven, low-noise regimes, which exhibit lower variance.
+
+**Q: Can I use this in production?**
+A: The C++ library is production-quality (no exceptions in hot paths, lock-free where possible, zero raw pointers, 100% optional-returning fallible ops).  The trading logic itself is experimental — always backtest thoroughly on your own data before deploying.
+
+**Q: What is the difference between `SpacetimeInterval` and `MultiAssetInterval`?**
+A: `SpacetimeInterval` handles a single asset embedded in 4D spacetime `(t, P, V, M)` with a fixed Minkowski metric.  `MultiAssetInterval` handles N assets in an (N+1)-dimensional spacetime where the spatial block of the metric is the rolling sample covariance matrix of asset log-returns.
+
+**Q: How do I extend the metric to time-varying correlations?**
+A: Call `CorrelationMetric::update()` with each new price bar.  The metric is recomputed over the rolling window on every call.  For stochastic volatility models, you can subclass `CorrelationMetric` and override `compute_covariance()`.
+
+**Q: Do I need Rust to build the C++ library?**
+A: No.  The Rust crate (`src/main.rs`, `src/lib.rs`) provides the optional Tokio orchestration layer for async prompt dispatching and the TUI dashboard.  The core C++ library (`CMakeLists.txt`) builds independently.
+
+---
+
 ## License
 
 MIT License. See [LICENSE](LICENSE).
@@ -873,6 +953,6 @@ If you use this library in academic work, please cite:
   title   = {Special Relativity in Financial Modeling},
   year    = {2025},
   url     = {https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling},
-  version = {1.1.0}
+  version = {1.2.0}
 }
 ```
