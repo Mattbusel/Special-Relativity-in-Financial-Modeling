@@ -121,6 +121,7 @@ pub mod gauge_field;
 pub mod renormalization;
 pub mod causal_structure;
 pub mod quantum_gravity;
+pub mod thermodynamic_market;
 
 #[cfg(feature = "viz")]
 pub mod viz;
