@@ -124,6 +124,8 @@ pub mod quantum_gravity;
 pub mod thermodynamic_market;
 pub mod field_theory;
 pub mod statistical_mechanics;
+pub mod causal_sets;
+pub mod spin_foam;
 
 #[cfg(feature = "viz")]
 pub mod viz;
