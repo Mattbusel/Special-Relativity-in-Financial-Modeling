@@ -134,6 +134,8 @@ pub mod loop_quantum_gravity;
 pub mod conformal_field_theory;
 pub mod quantum_chromodynamics;
 pub mod inflation_theory;
+pub mod supersymmetry;
+pub mod topological_defects;
 
 #[cfg(feature = "viz")]
 pub mod viz;
