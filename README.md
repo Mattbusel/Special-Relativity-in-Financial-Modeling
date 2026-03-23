@@ -851,9 +851,28 @@ The `tokio-prompt-orchestrator` crate coordinates LLM inference workers and
 integrates with the C++ signal-processing library. It runs with no external
 services (mock mode).
 
+### Feature Flags
+
+| Flag | Description |
+|------|-------------|
+| `tui` | Ratatui terminal dashboard |
+| `web-api` | Axum HTTP/WebSocket server |
+| `viz` | egui interactive spacetime plotter (new in v2.0) |
+
+### Rust Modules
+
+| Module | Description |
+|--------|-------------|
+| `relativistic_options` | Options pricing via spacetime metric (new v2.0) |
+| `viz` | Interactive Minkowski diagram + portfolio scatter plot (new v2.0) |
+| `geodesic_signals` | Geodesic curvature trading signals |
+| `proper_time` | Proper-time portfolio correlation |
+| `gravitational_waves` | Matched-filter shock propagation |
+| `penrose` | Penrose diagram causal structure |
+
 ```bash
-# Build
-cargo build --release
+# Build all features
+cargo build --release --all-features
 
 # TUI dashboard (mock data, no API keys needed)
 cargo run --release --features tui -- --mock
@@ -861,7 +880,13 @@ cargo run --release --features tui -- --mock
 # HTTP/WebSocket API server
 cargo run --release --features web-api -- --web --port 8080
 
-# Test inference
+# Interactive spacetime plotter
+cargo run --release --features viz -- --viz
+
+# Run all Rust tests (including options pricing and viz unit tests)
+cargo test
+
+# Test inference via web API
 curl -s -X POST http://localhost:8080/api/v1/infer \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer my-secret-token" \
@@ -871,6 +896,8 @@ curl -s -X POST http://localhost:8080/api/v1/infer \
 ---
 
 ## Empirical Validation
+
+### Q1 2025 Equity Results
 
 Evaluated on 10 liquid S&P 500 instruments at 1-minute resolution over Q1 2025:
 
@@ -894,6 +921,32 @@ python validation/analyze_q1.py --results-dir validation/results/
 
 # Run backtest strategy comparison
 python validation/backtest_comparison.py
+```
+
+### Crypto Markets (v2.0, Binance API)
+
+Extended validation across BTC, ETH, and configurable altcoins using
+public Binance kline data.  Tests whether the TIMELIKE/SPACELIKE
+classification replicates the equity variance result in 24/7 crypto markets.
+
+Statistical pipeline:
+- **Bootstrap CI** (10,000 replications) on mean next-bar |return| per regime.
+- **Permutation test** (10,000 shuffles) for the TIMELIKE vs SPACELIKE mean-vol
+  null hypothesis.
+- **RSI and MACD benchmarks** via Mann-Whitney U — allows direct comparison of
+  SRFM predictive power against standard technical analysis.
+- **LaTeX + Markdown report** with full confidence intervals.
+
+```bash
+python validation/empirical_extended.py \
+    --symbols BTCUSDT ETHUSDT SOLUSDT \
+    --interval 1h --limit 1000 \
+    --n-boot 10000 --n-perm 10000 \
+    --format both
+
+# Output files:
+#   validation/crypto_validation_report.md
+#   validation/crypto_validation_report.tex
 ```
 
 ---
@@ -1059,6 +1112,110 @@ A: Call `CorrelationMetric::update()` with each new price bar.  The metric is re
 **Q: Do I need Rust to build the C++ library?**
 A: No.  The Rust crate provides the optional Tokio orchestration layer and TUI dashboard.  The C++ library (`CMakeLists.txt`) builds independently.
 
+**Q: How does relativistic options pricing differ from classical Black-Scholes?**
+A: Three key changes: (1) the effective volatility σ_eff is derived from the Minkowski spacetime interval rather than being a constant — TIMELIKE regimes get σ_eff = σ_base · √(1−β²), reducing vol in causal markets; (2) time-to-expiry is measured in proper time τ = T·√(1−β²), so options decay faster in TIMELIKE regimes; (3) the delta hedge ratio is multiplied by γ(β), amplifying the hedge in fast-moving markets.
+
+**Q: What is `relfinance.py` vs `python/srfm/__init__.py`?**
+A: `srfm/__init__.py` is a comprehensive Python/pybind11 binding for the full SRFM C++ library.  `relfinance.py` is a simpler, higher-level API focused on ease of use — it wraps `srfm` internally and adds the v2.0 options pricing and portfolio manifold APIs in a single flat module.
+
+**Q: How do I use the spacetime plotter interactively?**
+A: Build with `--features viz` and run `cargo run --features viz -- --viz`.  The plotter window has a controls panel (left) for zoom/geodesic toggle and an inspect panel showing event details on hover.  Feed price data via `SpacetimePlotter::push_raw(coord_time, log_price, beta)` from any source.
+
+---
+
+## Round 2 Features
+
+### Causal Cone Filter (`include/srfm/causal_cone.hpp` + `src/causal_cone.cpp`)
+
+Applies the light-cone causality concept to financial OHLCV bar sequences.
+For each bar B, only past bars A with `ds²(A→B) < 0` (TIMELIKE) are considered
+causally connected — SPACELIKE bars are excluded as "causally disconnected" noise.
+
+**Core types**:
+
+| Type | Responsibility |
+|------|----------------|
+| `CausalHistory` | Causal predecessors of one bar; `causal_fraction()` metric |
+| `CausalConeFilter` | Scans a bar sequence and builds `CausalHistory` for every bar |
+| `CausalSignal` | Feature vector built only from causal bars (mean return, vol, momentum) |
+| `CausalBacktest` | Comparison: `CausalSignal` strategy vs all-bars baseline |
+
+**Hypothesis**: signals derived exclusively from causally-connected bars should
+exhibit higher predictive accuracy because they exclude stochastic SPACELIKE noise.
+
+```cpp
+CausalConeFilter::Config cfg;
+cfg.look_back = 20;
+CausalConeFilter filter(cfg);
+
+auto histories = filter.build_histories(bars, events);
+for (std::size_t i = 0; i < bars.size(); ++i) {
+    auto sig = filter.compute_signal(histories[i], returns, i);
+    if (sig) {
+        // sig->causal_mean_return   — mean return of causal-only bars
+        // sig->causal_fraction      — fraction of look-back bars that are causal
+        // sig->all_bars_mean_return — baseline (for comparison)
+    }
+}
+
+// Full comparison backtest:
+CausalBacktest cb;
+auto result = cb.run(bars);
+fmt::print("{}\n", result->to_string());
+// e.g.: CausalSharpe=1.24 BaselineSharpe=1.06 SharpeImprovement=+0.18
+```
+
+---
+
+### Hawking Radiation Analogy (`include/srfm/hawking.hpp` + `src/hawking.cpp`)
+
+Applies the Hawking radiation concept to detect price "event horizons":
+points of no return where a trend exhausts itself.
+
+**Hawking Temperature formula**:
+
+```
+T_H(t) = z(t) × Δz(t)
+```
+
+where `z = (P − μ) / σ` is the Bollinger Band z-score.
+
+- **High T_H** → price accelerating towards the band edge → high entropy → reversal
+- **Low T_H** → price decelerating → continuation
+- **Event horizon** → `|z| ≥ bb_sigma` (outside the 3σ Bollinger Band)
+
+**Signal classification**:
+
+| T_H | Direction | Action |
+|-----|-----------|--------|
+| `> +2.0` | Reversal | Fade the extreme move |
+| `< −2.0` | Continuation | Follow the trend |
+| `[−2, +2]` | Neutral | No position |
+
+```cpp
+HawkingSignalGenerator gen;
+for (const auto& bar : bars) {
+    auto sig = gen.update(bar.close);
+    if (sig && sig->direction != HawkingDirection::Neutral) {
+        // sig->action:     +1 (buy), -1 (sell)
+        // sig->strength:   normalised |T_H| in [0, 1]
+        // sig->temperature.z_score: current Bollinger z-score
+    }
+}
+
+// Backtest vs TIMELIKE classifier:
+HawkingBacktest hb;
+auto result = hb.run(bars);
+fmt::print("{}\n", result->to_string());
+// e.g.: HawkingSharpe=1.31 TimelikeSharpe=1.18 SharpeImprovement=+0.13
+```
+
+**Key types**:
+- `HawkingTemperature { temperature, z_score, delta_z, bollinger_mean, bollinger_std, near_horizon }`
+- `HawkingSignal { temperature, direction, strength, action }`
+- `PriceEventHorizon` — stateful Bollinger Band tracker
+- `HawkingBacktest` — comparison against the TIMELIKE baseline
+
 ---
 
 ## Changelog
@@ -1081,6 +1238,6 @@ MIT License. See [LICENSE](LICENSE).
   title   = {Special Relativity in Financial Modeling},
   year    = {2025},
   url     = {https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling},
-  version = {1.2.0}
+  version = {2.0.0}
 }
 ```
