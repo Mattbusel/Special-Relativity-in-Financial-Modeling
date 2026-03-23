@@ -26,6 +26,7 @@ use std::pin::Pin;
 /// Retry policy for transient worker errors.
 ///
 /// Used by [`retry_with_backoff`] to control retry behaviour.
+#[derive(Debug, Clone)]
 pub struct RetryPolicy {
     /// Maximum number of additional attempts after the first failure.
     pub max_retries: u32,

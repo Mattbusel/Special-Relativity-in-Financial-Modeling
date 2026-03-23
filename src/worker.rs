@@ -19,9 +19,7 @@
 //! - `LLAMA_CPP_URL`: llama.cpp server URL (default: http://localhost:8080)
 //! - `VLLM_URL`: vLLM server URL (default: http://localhost:8000)
 
-pub mod workers;
-
-pub use workers::{
+pub use crate::workers::{
     retry_with_backoff, AnthropicWorker, EchoWorker, LlamaCppWorker, ModelWorker, OpenAiWorker,
     RetryPolicy, VllmWorker,
 };

@@ -35,6 +35,7 @@
 #![warn(clippy::all)]
 
 pub mod config;
+pub mod workers;
 pub mod worker;
 pub mod relativistic_options;
 
@@ -90,6 +91,8 @@ pub mod holographic;
 pub mod entanglement;
 pub mod information_geometry;
 pub mod causal_inference;
+pub mod light_cone;
+pub mod relativistic_momentum_factor;
 
 #[cfg(feature = "viz")]
 pub mod viz;
