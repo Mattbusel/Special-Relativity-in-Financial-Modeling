@@ -399,3 +399,14 @@ target_link_libraries(test_relativistic_optimizer PRIVATE
     GTest::gtest_main
 )
 add_test(NAME RelativisticOptimizerTests COMMAND test_relativistic_optimizer)
+
+# ── Geodesic Portfolio Path tests (Round 5) ──────────────────────────────────
+add_executable(test_geodesic_path
+    tests/portfolio/test_geodesic_path.cpp
+)
+target_include_directories(test_geodesic_path PRIVATE src include)
+target_link_libraries(test_geodesic_path PRIVATE
+    srfm_geodesic_path
+    GTest::gtest_main
+)
+add_test(NAME GeodesicPathTests COMMAND test_geodesic_path)

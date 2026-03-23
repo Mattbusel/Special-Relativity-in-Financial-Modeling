@@ -94,7 +94,7 @@ include(CMakePackageConfigHelpers)
 
 # Patch include dirs on core targets to use generator expressions so that
 # the same target works both in the build tree and after installation.
-foreach(_tgt srfm_momentum srfm_beta_calculator srfm_manifold srfm_geodesic srfm_engine srfm_portfolio)
+foreach(_tgt srfm_momentum srfm_beta_calculator srfm_manifold srfm_geodesic srfm_engine srfm_portfolio srfm_geodesic_path)
     get_target_property(_cur_incs ${_tgt} INTERFACE_INCLUDE_DIRECTORIES)
     set_target_properties(${_tgt} PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES
@@ -109,6 +109,7 @@ install(TARGETS
         srfm_geodesic
         srfm_engine
         srfm_portfolio
+        srfm_geodesic_path
     EXPORT srfmTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}

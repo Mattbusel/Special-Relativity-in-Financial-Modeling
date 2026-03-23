@@ -84,3 +84,12 @@ target_link_libraries(srfm_portfolio PUBLIC srfm_manifold srfm_tensor)
 if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
     target_link_libraries(srfm_portfolio PUBLIC Eigen3::Eigen)
 endif()
+
+# ── Geodesic Portfolio Path (Round 5) ─────────────────────────────────────────
+# GeodesicSolver (harmonic-oscillator Euler-Lagrange solution) and
+# GeodesicLength (arc-length computation on discretised paths).
+add_library(srfm_geodesic_path STATIC
+    src/geodesic_path.cpp
+)
+target_include_directories(srfm_geodesic_path PUBLIC include src)
+target_link_libraries(srfm_geodesic_path PUBLIC srfm_manifold)

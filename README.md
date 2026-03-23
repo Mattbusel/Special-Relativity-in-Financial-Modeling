@@ -23,6 +23,51 @@ with real-time streaming signal generation.
 
 ---
 
+## Round 5: Geodesic Portfolio Path
+
+### Header: `include/srfm/geodesic_path.hpp`  |  Source: `src/geodesic_path.cpp`
+
+In financial spacetime, the **geodesic** between two portfolio states is the path of minimum action under the Lagrangian:
+
+```
+L = (1/2) ||dw/dt||^2 - V(w),   V(w) = lambda * sum(w_i^2)
+```
+
+The Euler-Lagrange equations yield simple harmonic oscillator motion per weight dimension:
+
+```
+d^2w_i/dt^2 = -2 * lambda * w_i    (omega = sqrt(2 * lambda))
+```
+
+**Analytical solution** with boundary conditions `w_i(0) = start[i]`, `w_i(1) = end[i]`:
+
+```
+w_i(t) = A_i * cos(omega * t) + B_i * sin(omega * t)
+```
+
+| Class | Role |
+|---|---|
+| `PortfolioState` | `weights: vector<double>` + `timestamp_ms: int64_t` |
+| `Geodesic` | `states: vector<PortfolioState>` — discretised path from start to end |
+| `GeodesicSolver::solve(start, end, n_steps, lambda)` | Returns a `Geodesic` with `n_steps+1` waypoints satisfying boundary conditions |
+| `GeodesicLength::compute(geodesic)` | Integrated arc length `sum(||dw_i - dw_{i-1}||)` |
+
+**Library target:** `srfm_geodesic_path`
+**Tests:** `tests/portfolio/test_geodesic_path.cpp` (20+ GTest tests, `test_geodesic_path` binary)
+
+```cpp
+#include "srfm/geodesic_path.hpp"
+using namespace srfm::portfolio;
+
+PortfolioState start{{0.2, 0.5, 0.3}, 0};
+PortfolioState end  {{0.4, 0.3, 0.3}, 1000};
+
+Geodesic path = GeodesicSolver::solve(start, end, /*n_steps=*/50, /*lambda=*/0.5);
+double length = GeodesicLength::compute(path);
+```
+
+---
+
 ## Lorentz Portfolio Transformation
 
 ### Header: `include/srfm/lorentz_portfolio.hpp`  |  Source: `src/lorentz_portfolio.cpp`
