@@ -800,6 +800,31 @@ cd paper && make arxiv      # arXiv submission tarball
 
 ---
 
+## FAQ
+
+**Q: What does "financial speed of light" mean?**
+A: It is the normalised unit velocity `c = 1.0` that sets the boundary between TIMELIKE (causal, β < 1) and SPACELIKE (stochastic, β > 1) market movements.  Its numerical value is calibrated to the instrument's volatility scale.
+
+**Q: Is this model physically rigorous?**
+A: No — it is a mathematical analogy.  Special relativity's formalism (Lorentz transforms, spacetime intervals, geodesics) is borrowed because the invariant interval ds² = −c²dt² + dP² + dV² + dM² produces empirically useful market-regime labels.  We make no claim that financial markets obey special relativity.
+
+**Q: Why does TIMELIKE imply lower next-bar variance?**
+A: The Bartlett test (p = 6×10⁻¹⁶, Q1 2025) shows this empirically.  TIMELIKE bars have |ΔP| < c·Δt — the price change is "sub-light" relative to the time elapsed, characteristic of momentum-driven, low-noise regimes.
+
+**Q: Can I use the Python package without building the C++ extension?**
+A: Yes.  `python/srfm/__init__.py` provides a complete pure-Python fallback for all classes.  Install with `pip install -e python/` — no compiler or CMake required.
+
+**Q: What is the difference between `SpacetimeInterval` and `MultiAssetInterval`?**
+A: `SpacetimeInterval` handles a single asset in 4D spacetime `(t, P, V, M)` with a fixed Minkowski metric.  `MultiAssetInterval` handles N assets in (N+1)-dimensional spacetime where the spatial block is the rolling sample covariance matrix.
+
+**Q: How do I extend the metric to time-varying correlations?**
+A: Call `CorrelationMetric::update()` with each new price bar.  The metric is recomputed over the rolling window on every update.
+
+**Q: Do I need Rust to build the C++ library?**
+A: No.  The Rust crate provides the optional Tokio orchestration layer and TUI dashboard.  The C++ library (`CMakeLists.txt`) builds independently.
+
+---
+
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version history.
