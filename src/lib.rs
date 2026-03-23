@@ -103,6 +103,8 @@ pub mod spacetime_diagram;
 pub mod relativistic_portfolio;
 pub mod quantum_finance;
 pub mod entropy_finance;
+pub mod curved_spacetime;
+pub mod wormhole;
 
 #[cfg(feature = "viz")]
 pub mod viz;
