@@ -36,6 +36,7 @@
 
 pub mod config;
 pub mod worker;
+pub mod relativistic_options;
 
 #[cfg(feature = "tui")]
 pub mod tui;
@@ -85,6 +86,9 @@ pub mod geodesic_signals;
 pub mod proper_time;
 pub mod gravitational_waves;
 pub mod penrose;
+
+#[cfg(feature = "viz")]
+pub mod viz;
 
 // Re-export the most commonly used types at the crate root.
 pub use worker::{AnthropicWorker, EchoWorker, LlamaCppWorker, ModelWorker, OpenAiWorker, VllmWorker};

@@ -74,6 +74,57 @@ ctest --test-dir build -C Release --output-on-failure
 
 ---
 
+## What's New in v1.2.0
+
+### Multi-Asset Spacetime (`include/srfm/multi_asset.hpp`)
+
+Extends the single-asset framework to handle N correlated financial assets
+simultaneously, using a rolling correlation-based Lorentzian metric.
+
+| Class | Responsibility |
+|-------|----------------|
+| `MultiAssetEvent` | N-asset spacetime event: `symbols`, `prices`, `volumes`, `timestamp` |
+| `MultiAssetInterval` | ds² in (N+1)-dimensional spacetime using the full metric tensor |
+| `CorrelationMetric` | Rolling correlation matrix → Lorentzian (N+1)×(N+1) metric with Cholesky regularisation |
+| `MultiAssetLorentz` | Per-asset and portfolio Lorentz boosts; metric-weighted portfolio β |
+| `PortfolioGeodesic` | Inertial portfolio trajectory; geodesic deviation as trading signals; geodesic weights |
+
+### Python Bindings (`python/srfm/`)
+
+Full Python API via pybind11, with a pure-Python fallback (no build required):
+
+```python
+from srfm import SpacetimeInterval, LorentzTransform, Backtester
+
+# Classify an OHLCV bar
+SpacetimeInterval.classify(dt=1.0, dp=0.5, dv=0.1, dm=0.05)
+# → 'TIMELIKE'
+
+# Lorentz factor
+LorentzTransform.gamma(beta=0.8)
+# → 1.6666666666666667
+
+# Full relativistic backtest
+result = Backtester().run(prices=[100, 101, 99, 102, 103])
+print(result.sharpe)            # relativistic Sharpe ratio
+print(result.relativistic_lift) # IR_γ lift factor
+print(result.to_string())       # formatted comparison table
+```
+
+```bash
+# Install (pure-Python, no build required):
+pip install -e python/
+
+# Or with C++ extension:
+pip install pybind11
+cmake -B build -DSRFM_BUILD_PYTHON=ON && cmake --build build
+pip install -e python/
+```
+
+See [`examples/quickstart.ipynb`](examples/quickstart.ipynb) for a complete walkthrough.
+
+---
+
 ## Architecture
 
 ```
@@ -90,12 +141,22 @@ Special-Relativity-in-Financial-Modeling/
 |   +-- data_loader.hpp        DataLoader, OHLCV
 |   +-- simd/                  CPU feature detection, AVX2/AVX-512 kernels
 |   +-- stream/                Lock-free tick streaming pipeline
+|   +-- multi_asset.hpp        MultiAssetEvent, MultiAssetInterval,
+|                               CorrelationMetric, MultiAssetLorentz, PortfolioGeodesic
 |
 +-- include/                   N-asset portfolio headers
 |   +-- portfolio_manifold.hpp AssetEvent, MinkowskiCovariance, SpacetimeCausalGraph
 |   +-- relativistic_optimizer.hpp RelativisticPortfolio, OptimizationResult
 |
 +-- src/                       C++ implementation files
+|   +-- multi_asset.cpp        Multi-asset spacetime implementation
+|
++-- python/srfm/               Python interface
+|   +-- __init__.py            Pure-Python fallback API (no build required)
+|   +-- bindings.cpp           pybind11 C++ extension (optional)
+|
++-- examples/
+|   +-- quickstart.ipynb       Jupyter notebook: full API walkthrough
 |
 +-- validation/                Python validation and tooling layer
 |   +-- portfolio_optimizer.py  Relativistic portfolio optimizer (NEW v1.2.0)
