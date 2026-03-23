@@ -130,6 +130,8 @@ pub mod spin_foam;
 pub mod quantum_entanglement;
 pub mod cosmological_model;
 pub mod black_hole;
+pub mod loop_quantum_gravity;
+pub mod conformal_field_theory;
 
 #[cfg(feature = "viz")]
 pub mod viz;
