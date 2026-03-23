@@ -122,6 +122,8 @@ pub mod renormalization;
 pub mod causal_structure;
 pub mod quantum_gravity;
 pub mod thermodynamic_market;
+pub mod field_theory;
+pub mod statistical_mechanics;
 
 #[cfg(feature = "viz")]
 pub mod viz;
