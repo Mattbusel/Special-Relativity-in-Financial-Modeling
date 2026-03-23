@@ -93,6 +93,8 @@ pub mod holographic;
 pub mod entanglement;
 pub mod information_geometry;
 pub mod causal_inference;
+pub mod causal_graph;
+pub mod tensor;
 pub mod light_cone;
 pub mod relativistic_momentum_factor;
 pub mod spacetime_diagram;
