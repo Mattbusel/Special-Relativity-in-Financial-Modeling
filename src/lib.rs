@@ -97,6 +97,8 @@ pub mod light_cone;
 pub mod relativistic_momentum_factor;
 pub mod spacetime_diagram;
 pub mod relativistic_portfolio;
+pub mod quantum_finance;
+pub mod entropy_finance;
 
 #[cfg(feature = "viz")]
 pub mod viz;
