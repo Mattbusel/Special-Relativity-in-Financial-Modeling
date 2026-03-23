@@ -1,242 +1,208 @@
-//! Holographic principle analogy: bulk market information encoded on boundary.
+//! Holographic principle and AdS/CFT analogy for financial markets.
 //!
-//! Inspired by the AdS/CFT correspondence: a high-dimensional "bulk" market
-//! state is projected onto a lower-dimensional "boundary" encoding, much as
-//! the holographic principle encodes volumetric information on a bounding surface.
+//! This module provides structs and functions modelling the holographic
+//! principle: bulk market information encoded on a lower-dimensional boundary,
+//! inspired by the AdS/CFT correspondence.
 
-/// High-dimensional market state (the "bulk").
+/// A point in the AdS bulk space (radial coordinate z, time t, spatial x).
+/// z → 0 corresponds to the CFT boundary.
+#[derive(Debug, Clone, Copy)]
+pub struct AdsBulkPoint {
+    /// Radial coordinate (z → 0 is boundary).
+    pub radial: f64,
+    pub time: f64,
+    pub x: f64,
+}
+
+/// A point on the CFT (boundary) side of the duality.
+#[derive(Debug, Clone, Copy)]
+pub struct CftBoundaryPoint {
+    pub time: f64,
+    pub x: f64,
+}
+
+/// A holographic screen described by area, entropy, and temperature.
+#[derive(Debug, Clone, Copy)]
+pub struct HolographicScreen {
+    pub area: f64,
+    pub entropy: f64,
+    pub temperature: f64,
+}
+
+impl HolographicScreen {
+    /// Bekenstein–Hawking entropy: S = A / (4 l_P²).
+    pub fn bekenstein_hawking_entropy(area: f64, planck_area: f64) -> f64 {
+        area / (4.0 * planck_area)
+    }
+
+    /// Unruh temperature (dimensionless): T = a / (2π).
+    pub fn unruh_temperature(acceleration: f64) -> f64 {
+        acceleration / (2.0 * std::f64::consts::PI)
+    }
+
+    /// Hawking temperature in Planck units: T = 1 / (8πM).
+    pub fn hawking_temperature(mass: f64) -> f64 {
+        if mass.abs() < 1e-300 {
+            return f64::INFINITY;
+        }
+        1.0 / (8.0 * std::f64::consts::PI * mass)
+    }
+}
+
+/// A bulk scalar field on a radial × time grid.
 #[derive(Debug, Clone)]
-pub struct BulkMarket {
-    /// Number of dimensions / observables in the bulk.
-    pub dimension: usize,
-    /// The actual market observables (prices, factors, …).
-    pub observables: Vec<f64>,
+pub struct BulkField {
+    /// values[radial_idx][time_idx]
+    pub values: Vec<Vec<f64>>,
+    pub dz: f64,
+    pub dt: f64,
 }
 
-impl BulkMarket {
-    /// Construct a `BulkMarket`, inferring dimension from the observable list.
-    pub fn new(observables: Vec<f64>) -> Self {
-        let dimension = observables.len();
-        BulkMarket { dimension, observables }
-    }
-}
-
-/// Lower-dimensional boundary encoding of a bulk market state.
-#[derive(Debug, Clone)]
-pub struct BoundaryEncoding {
-    /// The encoded surface data (reduced dimensions).
-    pub surface_data: Vec<f64>,
-    /// How much the data was compressed (bulk_dim / boundary_dim).
-    pub compression_ratio: f64,
-    /// Approximate information content in bits (log2 of the encoding size).
-    pub information_bits: f64,
-}
-
-/// Projects market states between bulk and boundary representations.
-#[derive(Debug, Default)]
-pub struct HolographicProjector;
-
-impl HolographicProjector {
-    /// Create a new projector.
-    pub fn new() -> Self {
-        HolographicProjector
-    }
-
-    /// Project a bulk market onto its boundary by retaining the first
-    /// `sqrt(N)` principal components (approximated here as the first
-    /// `floor(sqrt(N))` elements, normalised by their RMS).
-    pub fn project_to_boundary(&self, bulk: &BulkMarket) -> BoundaryEncoding {
-        let n = bulk.observables.len();
-        let boundary_dim = ((n as f64).sqrt().floor() as usize).max(1);
-
-        // "PCA-like": take first boundary_dim elements and normalise.
-        let surface_data: Vec<f64> = bulk.observables[..boundary_dim.min(n)]
-            .iter()
-            .copied()
-            .collect();
-
-        let compression_ratio = if boundary_dim == 0 {
-            1.0
-        } else {
-            n as f64 / boundary_dim as f64
-        };
-
-        let information_bits = if boundary_dim > 0 {
-            (boundary_dim as f64).log2()
-        } else {
-            0.0
-        };
-
-        BoundaryEncoding {
-            surface_data,
-            compression_ratio,
-            information_bits,
+impl BulkField {
+    /// Extrapolate to the boundary (z → 0) using a linear fit of the last two
+    /// radial slices (smallest z values).
+    pub fn propagate_to_boundary(&self) -> Vec<f64> {
+        let nr = self.values.len();
+        if nr == 0 {
+            return vec![];
         }
+        if nr == 1 {
+            return self.values[0].clone();
+        }
+        // Index 0 is smallest z (closest to boundary).
+        let v0 = &self.values[0];
+        let v1 = &self.values[1];
+        v0.iter()
+            .zip(v1.iter())
+            .map(|(&a, &b)| {
+                let slope = (a - b) / self.dz;
+                a + slope * self.dz * 0.5
+            })
+            .collect()
     }
 
-    /// Reconstruct a bulk market from a boundary encoding by tiling the
-    /// boundary data until `target_dim` elements are filled.
-    pub fn reconstruct_from_boundary(
-        &self,
-        encoding: &BoundaryEncoding,
-        target_dim: usize,
-    ) -> BulkMarket {
-        if encoding.surface_data.is_empty() || target_dim == 0 {
-            return BulkMarket {
-                dimension: target_dim,
-                observables: vec![0.0; target_dim],
-            };
-        }
-
-        let mut observables = Vec::with_capacity(target_dim);
-        let src = &encoding.surface_data;
-        for i in 0..target_dim {
-            observables.push(src[i % src.len()]);
-        }
-
-        BulkMarket {
-            dimension: target_dim,
-            observables,
-        }
-    }
-
-    /// Holographic entropy (Bekenstein-Hawking analogy): proportional to the
-    /// boundary area, which here is `sqrt(bulk.dimension)`.
-    pub fn holographic_entropy(&self, bulk: &BulkMarket) -> f64 {
-        (bulk.dimension as f64).sqrt()
-    }
-
-    /// Information paradox score: normalised mean-squared error between the
-    /// original and reconstructed observables.  A score of 0.0 = perfect
-    /// reconstruction; 1.0 = maximum disagreement.
-    pub fn information_paradox_score(
-        &self,
-        original: &BulkMarket,
-        reconstructed: &BulkMarket,
-    ) -> f64 {
-        let len = original.observables.len().min(reconstructed.observables.len());
-        if len == 0 {
+    /// Boundary–boundary two-point function between time indices t1 and t2.
+    pub fn two_point_function(&self, t1: usize, t2: usize) -> f64 {
+        let nr = self.values.len();
+        if nr == 0 {
             return 0.0;
         }
-
-        let mse: f64 = original.observables[..len]
-            .iter()
-            .zip(reconstructed.observables[..len].iter())
-            .map(|(a, b)| (a - b).powi(2))
-            .sum::<f64>()
-            / len as f64;
-
-        // Normalise by the variance of the original to get a relative score.
-        let mean = original.observables[..len].iter().sum::<f64>() / len as f64;
-        let variance = original.observables[..len]
-            .iter()
-            .map(|x| (x - mean).powi(2))
-            .sum::<f64>()
-            / len as f64;
-
-        if variance < 1e-12 {
-            if mse < 1e-12 { 0.0 } else { 1.0 }
-        } else {
-            (mse / variance).min(1.0)
+        let nt = self.values[0].len();
+        if t1 >= nt || t2 >= nt {
+            return 0.0;
         }
-    }
-
-    /// Simplified AdS/CFT coupling: product of bulk and boundary couplings.
-    pub fn ads_cft_coupling(&self, bulk_coupling: f64, boundary_coupling: f64) -> f64 {
-        bulk_coupling * boundary_coupling
+        let col1: Vec<f64> =
+            (0..nr).map(|r| self.values[r].get(t1).copied().unwrap_or(0.0)).collect();
+        let col2: Vec<f64> =
+            (0..nr).map(|r| self.values[r].get(t2).copied().unwrap_or(0.0)).collect();
+        col1.iter().zip(col2.iter()).map(|(a, b)| a * b).sum::<f64>() * self.dz
     }
 }
 
-// ---------------------------------------------------------------------------
-// Unit Tests
-// ---------------------------------------------------------------------------
-#[cfg(test)]
-mod tests {
-    use super::*;
+/// A Ryu–Takayanagi minimal surface (semicircle arc in AdS₂).
+#[derive(Debug, Clone, Copy)]
+pub struct RyuTakayanagiSurface {
+    /// (x_left, x_right) boundary endpoints.
+    pub endpoints: (f64, f64),
+    /// Bulk depth / UV cutoff ε.
+    pub bulk_depth: f64,
+}
 
-    #[test]
-    fn test_project_reduces_dimension() {
-        let proj = HolographicProjector::new();
-        let bulk = BulkMarket::new(vec![1.0; 16]);
-        let enc = proj.project_to_boundary(&bulk);
-        // sqrt(16) = 4 boundary dimensions
-        assert_eq!(enc.surface_data.len(), 4);
+impl RyuTakayanagiSurface {
+    /// Arc length: L = 2 ln(l / ε).
+    pub fn area(&self) -> f64 {
+        let l = (self.endpoints.1 - self.endpoints.0).abs();
+        let eps = self.bulk_depth.max(1e-15);
+        2.0 * (l / eps).max(1.0).ln()
     }
 
-    #[test]
-    fn test_compression_ratio() {
-        let proj = HolographicProjector::new();
-        let bulk = BulkMarket::new(vec![1.0; 9]);
-        let enc = proj.project_to_boundary(&bulk);
-        // boundary_dim = 3, compression = 9/3 = 3
-        assert!((enc.compression_ratio - 3.0).abs() < 1e-9);
+    /// Holographic entanglement entropy: S = (c/3) ln(l / ε).
+    pub fn entanglement_entropy(&self, central_charge: f64) -> f64 {
+        let l = (self.endpoints.1 - self.endpoints.0).abs();
+        let eps = self.bulk_depth.max(1e-15);
+        (central_charge / 3.0) * (l / eps).max(1.0).ln()
+    }
+}
+
+/// Market holography utilities.
+pub struct MarketHolography;
+
+impl MarketHolography {
+    /// Encode a price series into a bulk field by Gaussian smearing at each
+    /// radial depth. Deeper layers receive more smearing.
+    pub fn encode_prices_to_bulk(prices: &[f64], radial_depth: usize) -> BulkField {
+        let nt = prices.len();
+        let nr = radial_depth.max(1);
+        let mut values = vec![vec![0.0f64; nt]; nr];
+        let dz = 1.0 / nr as f64;
+
+        for (r, row) in values.iter_mut().enumerate() {
+            let sigma = (r + 1) as f64 * dz;
+            let sigma2 = 2.0 * sigma * sigma;
+            for t in 0..nt {
+                let mut acc = 0.0f64;
+                let mut norm = 0.0f64;
+                for (s, &p) in prices.iter().enumerate() {
+                    let d = (t as f64 - s as f64).powi(2);
+                    let w = (-d / sigma2).exp();
+                    acc += w * p;
+                    norm += w;
+                }
+                row[t] = if norm > 1e-15 { acc / norm } else { 0.0 };
+            }
+        }
+
+        BulkField { values, dz, dt: 1.0 }
     }
 
-    #[test]
-    fn test_information_bits_positive() {
-        let proj = HolographicProjector::new();
-        let bulk = BulkMarket::new(vec![1.0; 16]);
-        let enc = proj.project_to_boundary(&bulk);
-        assert!(enc.information_bits > 0.0);
+    /// Holographic complexity: L1 norm of all bulk values × dz × dt.
+    pub fn holographic_complexity(bulk: &BulkField) -> f64 {
+        bulk.values
+            .iter()
+            .flat_map(|row| row.iter())
+            .map(|v| v.abs())
+            .sum::<f64>()
+            * bulk.dz
+            * bulk.dt
     }
 
-    #[test]
-    fn test_reconstruct_matches_target_dim() {
-        let proj = HolographicProjector::new();
-        let bulk = BulkMarket::new(vec![2.0, 4.0, 6.0, 8.0]);
-        let enc = proj.project_to_boundary(&bulk);
-        let rec = proj.reconstruct_from_boundary(&enc, 8);
-        assert_eq!(rec.observables.len(), 8);
+    /// Info loss rate: average increase in boundary entropy per time step.
+    pub fn info_loss_rate(bulk: &BulkField, steps: usize) -> f64 {
+        let boundary = bulk.propagate_to_boundary();
+        let nt = boundary.len();
+        if nt < 2 || steps == 0 {
+            return 0.0;
+        }
+        let actual_steps = steps.min(nt - 1);
+        let mut total_increase = 0.0f64;
+        let mut count = 0usize;
+        for t in 0..actual_steps {
+            let s_before = boundary.get(t).copied().unwrap_or(0.0).abs().ln().max(0.0);
+            let s_after = boundary.get(t + 1).copied().unwrap_or(0.0).abs().ln().max(0.0);
+            if s_after > s_before {
+                total_increase += s_after - s_before;
+                count += 1;
+            }
+        }
+        if count == 0 { 0.0 } else { total_increase / count as f64 }
     }
 
-    #[test]
-    fn test_holographic_entropy_sqrt_dimension() {
-        let proj = HolographicProjector::new();
-        let bulk = BulkMarket::new(vec![1.0; 25]);
-        let entropy = proj.holographic_entropy(&bulk);
-        assert!((entropy - 5.0).abs() < 1e-9);
-    }
-
-    #[test]
-    fn test_paradox_score_perfect_reconstruction_is_zero() {
-        let proj = HolographicProjector::new();
-        let bulk = BulkMarket::new(vec![1.0, 2.0, 3.0, 4.0]);
-        let score = proj.information_paradox_score(&bulk, &bulk);
-        assert!(score < 1e-9);
-    }
-
-    #[test]
-    fn test_paradox_score_bounded_zero_to_one() {
-        let proj = HolographicProjector::new();
-        let original = BulkMarket::new(vec![1.0, 2.0, 3.0, 4.0]);
-        let reconstructed = BulkMarket::new(vec![100.0, 200.0, 300.0, 400.0]);
-        let score = proj.information_paradox_score(&original, &reconstructed);
-        assert!(score >= 0.0 && score <= 1.0);
-    }
-
-    #[test]
-    fn test_ads_cft_coupling() {
-        let proj = HolographicProjector::new();
-        let result = proj.ads_cft_coupling(2.0, 3.0);
-        assert!((result - 6.0).abs() < 1e-9);
-    }
-
-    #[test]
-    fn test_empty_bulk_entropy() {
-        let proj = HolographicProjector::new();
-        let bulk = BulkMarket { dimension: 0, observables: vec![] };
-        assert!((proj.holographic_entropy(&bulk) - 0.0).abs() < 1e-9);
-    }
-
-    #[test]
-    fn test_reconstruct_empty_encoding() {
-        let proj = HolographicProjector::new();
-        let enc = BoundaryEncoding {
-            surface_data: vec![],
-            compression_ratio: 1.0,
-            information_bits: 0.0,
-        };
-        let rec = proj.reconstruct_from_boundary(&enc, 4);
-        assert_eq!(rec.observables, vec![0.0; 4]);
+    /// Rolling entanglement entropy of the price series using a sliding window.
+    pub fn entanglement_structure(prices: &[f64], window: usize) -> Vec<f64> {
+        let n = prices.len();
+        if window == 0 || n < window {
+            return vec![];
+        }
+        let eps = 1e-3_f64;
+        let mut result = Vec::with_capacity(n - window + 1);
+        for i in 0..=(n - window) {
+            let slice = &prices[i..i + window];
+            let surf = RyuTakayanagiSurface {
+                endpoints: (slice[0], slice[window - 1]),
+                bulk_depth: eps,
+            };
+            result.push(surf.entanglement_entropy(1.0).max(0.0));
+        }
+        result
     }
 }

@@ -126,6 +126,7 @@ pub mod field_theory;
 pub mod statistical_mechanics;
 pub mod causal_sets;
 pub mod spin_foam;
+pub mod quantum_entanglement;
 
 #[cfg(feature = "viz")]
 pub mod viz;
