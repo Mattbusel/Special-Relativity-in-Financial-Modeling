@@ -44,6 +44,7 @@ pub mod holography;
 pub mod string_theory;
 pub mod superluminal;
 pub mod dark_energy;
+pub mod dark_matter;
 
 #[cfg(feature = "tui")]
 pub mod tui;
