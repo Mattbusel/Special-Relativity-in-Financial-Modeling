@@ -85,6 +85,8 @@ pub enum OrchestratorError {
 
 pub mod metrics;
 pub mod quantum;
+pub mod frame_transformation;
+pub mod hawking_radiation;
 pub mod geodesic_signals;
 pub mod proper_time;
 pub mod gravitational_waves;
