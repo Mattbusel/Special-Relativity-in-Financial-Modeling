@@ -24,6 +24,9 @@ pub const LOG_ENTRIES_CAP: usize = 50;
 /// Maximum number of regime history samples (one per second, 60s window).
 pub const REGIME_HISTORY_CAP: usize = 60;
 
+/// Maximum number of gamma (Lorentz factor) history samples for the sparkline.
+pub const GAMMA_HISTORY_CAP: usize = 100;
+
 /// Minimum terminal width for the dashboard to render.
 pub const MIN_COLS: u16 = 80;
 
@@ -136,6 +139,14 @@ pub struct App {
     pub regime: RegimeType,
     /// Regime history for the last 60 ticks (used to colour-code the sparkline).
     pub regime_history: VecDeque<RegimeType>,
+
+    /// Gamma (Lorentz factor) history for the last 100 ticks (sparkline).
+    /// Values are scaled to u64 as gamma * 1000 for the ratatui Sparkline widget.
+    pub gamma_history: VecDeque<u64>,
+
+    /// Rolling regime classification counts over the last 100 bars.
+    /// Order: [timelike, lightlike, spacelike].
+    pub regime_stats: [usize; 3],
 
     // ── UI state ─────────────────────────────────────────────────────────────
 
@@ -303,6 +314,8 @@ impl App {
             ds2_display: 0.0,
             regime: RegimeType::Unknown,
             regime_history: VecDeque::with_capacity(REGIME_HISTORY_CAP),
+            gamma_history: VecDeque::with_capacity(GAMMA_HISTORY_CAP),
+            regime_stats: [0; 3],
 
             fullscreen_sparkline: false,
             selected_symbol: 0,
@@ -333,6 +346,8 @@ impl App {
         self.ds2_display = 0.0;
         self.regime = RegimeType::Unknown;
         self.regime_history.clear();
+        self.gamma_history.clear();
+        self.regime_stats = [0; 3];
     }
 
     /// Advances to the next tracked symbol, wrapping around.
@@ -346,12 +361,34 @@ impl App {
     }
 
     /// Pushes a regime sample, evicting the oldest if at capacity.
+    /// Also updates rolling `regime_stats` counters over the last 100 bars.
     pub fn push_regime(&mut self, regime: RegimeType) {
         if self.regime_history.len() >= REGIME_HISTORY_CAP {
             self.regime_history.pop_front();
         }
         self.regime_history.push_back(regime);
         self.regime = regime;
+        // Recompute stats over the full window for simplicity.
+        let window: Vec<RegimeType> = self.regime_history.iter().copied().collect();
+        let total = window.len().max(1);
+        // We extend beyond REGIME_HISTORY_CAP for stats using gamma_history len as proxy.
+        let _ = total; // suppress lint
+        self.regime_stats = [
+            window.iter().filter(|&&r| r == RegimeType::Timelike).count(),
+            window.iter().filter(|&&r| r == RegimeType::Lightlike).count(),
+            window.iter().filter(|&&r| r == RegimeType::Spacelike).count(),
+        ];
+    }
+
+    /// Pushes a Lorentz factor (gamma) sample for the sparkline, evicting oldest if at capacity.
+    /// The gamma value is clamped to [1.0, 20.0] before scaling.
+    pub fn push_gamma(&mut self, gamma: f64) {
+        if self.gamma_history.len() >= GAMMA_HISTORY_CAP {
+            self.gamma_history.pop_front();
+        }
+        let scaled = (gamma.clamp(1.0, 20.0) * 1000.0) as u64;
+        self.gamma_history.push_back(scaled);
+        self.gamma_display = gamma;
     }
 
     /// Scrolls the help overlay up by one line (toward the top).

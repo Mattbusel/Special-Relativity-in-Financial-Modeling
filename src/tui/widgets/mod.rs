@@ -16,4 +16,5 @@ pub mod health;
 pub mod log;
 pub mod pipeline;
 pub mod regime;
+pub mod regime_classifier;
 pub mod sparkline;

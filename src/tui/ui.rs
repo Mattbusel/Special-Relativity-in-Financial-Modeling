@@ -93,13 +93,14 @@ pub fn draw(f: &mut Frame, app: &mut App) {
     f.render_widget(outer_block, size);
     f.render_widget(footer_block, size);
 
-    // Main layout: top section, sparkline, regime timeline, log
+    // Main layout: top section, sparkline, regime classifier panel, regime timeline, log
     let main_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Min(14), // Top section (pipeline + health + channels + circuit + dedup)
+            Constraint::Min(14),   // Top section (pipeline + health + channels + circuit + dedup)
             Constraint::Length(8), // Throughput sparkline
-            Constraint::Length(3), // Regime timeline
+            Constraint::Length(6), // Regime classifier panel (current regime + gamma sparkline)
+            Constraint::Length(3), // Regime timeline (last 60 bars colour blocks)
             Constraint::Length(10), // Log tail
         ])
         .split(inner);
@@ -143,8 +144,9 @@ pub fn draw(f: &mut Frame, app: &mut App) {
         widgets::circuit::render(f, right_chunks[1], app);
         widgets::dedup::render(f, right_chunks[2], app);
         widgets::sparkline::render_multi_sparkline(f, main_chunks[1], app);
-        widgets::regime::render(f, main_chunks[2], app);
-        widgets::log::render(f, main_chunks[3], app);
+        widgets::regime_classifier::render(f, main_chunks[2], app);
+        widgets::regime::render(f, main_chunks[3], app);
+        widgets::log::render(f, main_chunks[4], app);
     }
 
     // Loading overlay

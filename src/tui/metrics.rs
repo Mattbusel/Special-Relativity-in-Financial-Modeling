@@ -498,15 +498,20 @@ impl MockMetrics {
         // Clamp beta to (0, 0.9999) to avoid division by zero
         let beta = beta_base.clamp(0.01, 0.9999);
         let gamma = 1.0 / (1.0 - beta * beta).sqrt();
-        let ds2 = match regime {
-            RegimeType::Timelike | RegimeType::Unknown => -0.5,
-            RegimeType::Lightlike => 0.0,
-            RegimeType::Spacelike => 0.5,
+        // ds2 is computed from sign of interval based on regime for mock purposes.
+        let ds2_value = match regime {
+            RegimeType::Timelike | RegimeType::Unknown => {
+                // Timelike: ds² < 0; vary slightly with beta
+                -(gamma * 0.3 + 0.1 * wobble(0.17))
+            }
+            RegimeType::Lightlike => (wobble(0.23) * 0.005).abs(), // near zero
+            RegimeType::Spacelike => gamma * 0.25 + 0.1 * wobble(0.13).abs(),
         };
 
         app.beta_display = beta;
-        app.gamma_display = gamma;
-        app.ds2_display = ds2;
+        app.ds2_display = ds2_value;
+        // push_gamma updates gamma_display and gamma_history.
+        app.push_gamma(gamma);
         app.push_regime(regime);
     }
 
