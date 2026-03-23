@@ -23,6 +23,65 @@ with real-time streaming signal generation.
 
 ---
 
+## Lorentz Portfolio Transformation
+
+### Header: `include/srfm/lorentz_portfolio.hpp`  |  Source: `src/lorentz_portfolio.cpp`
+
+Interprets a portfolio's statistical moments as a 4-vector in financial spacetime and applies a Lorentz boost along the return-volatility plane.
+
+**Portfolio 4-vector:**
+
+```
+p^μ = (ret, vol, skew, kurt)
+```
+
+**Boost transformation (β ∈ (-1, 1), γ = 1/√(1 − β²)):**
+
+```
+ret'  = γ (ret  − β · vol)
+vol'  = γ (vol  − β · ret)
+skew' = skew               (transverse — unchanged)
+kurt' = kurt               (transverse — unchanged)
+```
+
+**Minkowski invariant (conserved under all boosts):**
+
+```
+I = ret² − vol² − skew² − kurt²
+```
+
+| Class | Role |
+|---|---|
+| `PortfolioFourVector` | Portfolio moments `(ret, vol, skew, kurt)` with `sharpe()` helper |
+| `LorentzFactor` | γ = 1/√(1 − β²); throws `std::domain_error` if \|β\| ≥ 1 |
+| `LorentzBoost::transform(pf, β)` | Apply boost, returns boosted `PortfolioFourVector` |
+| `PortfolioInvariant::compute(pf)` | Minkowski norm squared I |
+| `OptimalBoost::find(target_sharpe, pf, step)` | Grid-search β ∈ (−0.99, 0.99) to maximise ret'/vol' |
+
+```cpp
+#include "srfm/lorentz_portfolio.hpp"
+using namespace srfm::portfolio;
+
+PortfolioFourVector pf;
+pf.ret = 0.12; pf.vol = 0.10; pf.skew = 0.3; pf.kurt = 1.5;
+
+// Apply boost
+auto boosted = LorentzBoost::transform(pf, 0.5);
+// boosted.sharpe() >= pf.sharpe() for appropriate beta
+
+// Verify invariance
+double I  = PortfolioInvariant::compute(pf);
+double Ib = PortfolioInvariant::compute(boosted);
+// |I - Ib| < 1e-8
+
+// Find optimal beta
+double beta_opt = OptimalBoost::find(1.5, pf, 0.01);
+```
+
+**Tests:** `tests/lorentz/test_lorentz_portfolio.cpp` (20+ GTest cases)
+
+---
+
 ## Key Empirical Finding
 
 > **TIMELIKE bars exhibit 1.27x lower next-bar absolute return variance than

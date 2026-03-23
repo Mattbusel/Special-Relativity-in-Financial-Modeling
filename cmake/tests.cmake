@@ -121,6 +121,18 @@ target_link_libraries(test_metrics_precision PRIVATE
 )
 add_test(NAME MetricsPrecisionTests COMMAND test_metrics_precision)
 
+# ── Lorentz Portfolio Transformation tests (Round 4) ─────────────────────────
+add_executable(test_lorentz_portfolio
+    tests/lorentz/test_lorentz_portfolio.cpp
+)
+target_include_directories(test_lorentz_portfolio PRIVATE src include)
+target_link_libraries(test_lorentz_portfolio PRIVATE
+    srfm_lorentz_portfolio
+    srfm_lorentz
+    GTest::gtest_main
+)
+add_test(NAME LorentzPortfolioTests COMMAND test_lorentz_portfolio)
+
 # ── Integration tests ─────────────────────────────────────────────────────────
 # NOTE: test_full_pipeline and test_error_handling reference srfm::core::Engine
 # (declared in include/srfm/engine.hpp) which currently has no implementation

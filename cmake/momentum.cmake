@@ -29,3 +29,13 @@ target_link_libraries(srfm_lorentz PUBLIC srfm_momentum)
 if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
     target_link_libraries(srfm_lorentz PUBLIC Eigen3::Eigen)
 endif()
+
+# ── srfm_lorentz_portfolio: Lorentz Portfolio Transformation (Round 4) ────────
+add_library(srfm_lorentz_portfolio STATIC
+    src/lorentz_portfolio.cpp
+)
+target_include_directories(srfm_lorentz_portfolio PUBLIC src include)
+target_link_libraries(srfm_lorentz_portfolio PUBLIC srfm_momentum)
+if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
+    target_link_libraries(srfm_lorentz_portfolio PUBLIC Eigen3::Eigen)
+endif()
