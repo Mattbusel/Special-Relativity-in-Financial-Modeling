@@ -38,6 +38,8 @@ pub mod config;
 pub mod workers;
 pub mod worker;
 pub mod relativistic_options;
+pub mod twin_paradox;
+pub mod doppler_effect;
 
 #[cfg(feature = "tui")]
 pub mod tui;
