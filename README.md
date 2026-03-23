@@ -260,6 +260,62 @@ curvature information.
 
 ---
 
+## What's New in v1.2.0
+
+### Multi-Asset Spacetime (`include/srfm/multi_asset.hpp`)
+
+Extends the single-asset framework to handle N correlated financial assets
+simultaneously with a rolling correlation-based Lorentzian metric.
+
+| Class | Responsibility |
+|-------|----------------|
+| `MultiAssetEvent` | N-asset spacetime event: `symbols`, `prices`, `volumes`, `timestamp` |
+| `MultiAssetInterval` | ds² in (N+1)-dimensional spacetime using the full metric tensor |
+| `CorrelationMetric` | Rolling correlation matrix → Lorentzian (N+1)×(N+1) metric with Cholesky regularisation |
+| `MultiAssetLorentz` | Per-asset and portfolio Lorentz boosts; metric-weighted portfolio β |
+| `PortfolioGeodesic` | Inertial portfolio trajectory; geodesic deviation as trading signals; geodesic weights |
+
+### Python Bindings (`python/srfm/`)
+
+Full Python API via pybind11, with a pure-Python fallback (no build required):
+
+```python
+from srfm import SpacetimeInterval, LorentzTransform, Backtester
+from srfm import MultiAssetEvent, CorrelationMetric, PortfolioGeodesic
+
+# Interval classification
+SpacetimeInterval.classify(dt=1.0, dp=0.5, dv=0.1, dm=0.05)
+# → 'TIMELIKE'
+
+# Lorentz factor
+LorentzTransform.gamma(beta=0.8)
+# → 1.6666666666666667
+
+# Full backtest
+bt = Backtester()
+result = bt.run(prices=[100, 101, 99, 102, 103, 100, 104])
+print(result.sharpe)           # relativistic Sharpe ratio
+print(result.relativistic_lift)# IR_γ lift factor
+print(result.to_string())      # formatted comparison table
+```
+
+**Install (no build required):**
+```bash
+pip install -e python/
+```
+
+**Install with C++ extension:**
+```bash
+pip install pybind11
+cmake -B build -DSRFM_BUILD_PYTHON=ON
+cmake --build build
+pip install -e python/
+```
+
+See [`examples/quickstart.ipynb`](examples/quickstart.ipynb) for a complete walkthrough.
+
+---
+
 ## Architecture
 
 ```
@@ -276,12 +332,22 @@ include/srfm/
   normalizer.hpp     — CoordinateNormalizer
   geodesic_signal.hpp    — GeodesicSignal
   geodesic_strategy.hpp  — GeodesicStrategy
+  multi_asset.hpp    — MultiAssetEvent, MultiAssetInterval,
+                       CorrelationMetric, MultiAssetLorentz, PortfolioGeodesic
 
 include/
   portfolio_manifold.hpp      — AssetEvent, MinkowskiCovariance,
                                 SpacetimeCausalGraph (N-asset portfolio layer)
   relativistic_optimizer.hpp  — RelativisticPortfolio, OptimizerConfig,
                                 OptimizationResult
+
+python/srfm/
+  __init__.py        — Pure-Python fallback API (NumPy-backed)
+  bindings.cpp       — pybind11 C++ extension (optional, for performance)
+
+examples/
+  quickstart.ipynb   — Jupyter notebook: interval classification, backtest,
+                       multi-asset spacetime, portfolio geodesics
 
   simd/
     cpu_features.hpp     — detect_simd_level(), SimdLevel enum
