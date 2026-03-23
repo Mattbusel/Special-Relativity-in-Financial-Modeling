@@ -109,6 +109,8 @@ pub mod uncertainty_principle;
 pub mod decoherence;
 pub mod many_worlds;
 pub mod quantum_tunneling;
+pub mod path_integral;
+pub mod spin_network;
 
 #[cfg(feature = "viz")]
 pub mod viz;
