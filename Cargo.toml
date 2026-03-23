@@ -33,6 +33,7 @@ default = []
 web-api = ["axum", "tower", "tower-http", "dashmap", "futures", "subtle"]
 mcp = []
 tui = ["ratatui", "crossterm"]
+viz = ["egui", "eframe"]
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
@@ -61,6 +62,10 @@ subtle = { version = "2", optional = true }
 # TUI dependencies (optional)
 ratatui = { version = "0.26", optional = true }
 crossterm = { version = "0.27", optional = true }
+
+# Visualization dependencies (optional)
+egui = { version = "0.27", optional = true }
+eframe = { version = "0.27", optional = true }
 
 [dev-dependencies]
 tokio-test = "0.4"
