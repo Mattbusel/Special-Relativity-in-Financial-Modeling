@@ -128,6 +128,8 @@ pub mod statistical_mechanics;
 pub mod causal_sets;
 pub mod spin_foam;
 pub mod quantum_entanglement;
+pub mod cosmological_model;
+pub mod black_hole;
 
 #[cfg(feature = "viz")]
 pub mod viz;
