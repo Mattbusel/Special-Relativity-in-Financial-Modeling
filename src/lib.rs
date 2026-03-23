@@ -40,6 +40,8 @@ pub mod worker;
 pub mod relativistic_options;
 pub mod twin_paradox;
 pub mod doppler_effect;
+pub mod holography;
+pub mod string_theory;
 
 #[cfg(feature = "tui")]
 pub mod tui;
