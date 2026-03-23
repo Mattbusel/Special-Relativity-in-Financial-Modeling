@@ -421,3 +421,14 @@ target_link_libraries(test_minkowski_momentum PRIVATE
     GTest::gtest_main
 )
 add_test(NAME MinkowskiMomentumTests COMMAND test_minkowski_momentum)
+
+# ── Proper Time Portfolio tests (Round 7) ────────────────────────────────────
+add_executable(test_proper_time
+    tests/portfolio/test_proper_time.cpp
+)
+target_include_directories(test_proper_time PRIVATE src include)
+target_link_libraries(test_proper_time PRIVATE
+    srfm_proper_time
+    GTest::gtest_main
+)
+add_test(NAME ProperTimeTests COMMAND test_proper_time)

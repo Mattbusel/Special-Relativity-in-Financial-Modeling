@@ -49,3 +49,13 @@ target_link_libraries(srfm_minkowski_momentum PUBLIC srfm_momentum)
 if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
     target_link_libraries(srfm_minkowski_momentum PUBLIC Eigen3::Eigen)
 endif()
+
+# ── srfm_proper_time: Proper Time Portfolio (Round 7) ─────────────────────────
+add_library(srfm_proper_time STATIC
+    src/proper_time.cpp
+)
+target_include_directories(srfm_proper_time PUBLIC src include)
+target_link_libraries(srfm_proper_time PUBLIC srfm_momentum)
+if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
+    target_link_libraries(srfm_proper_time PUBLIC Eigen3::Eigen)
+endif()

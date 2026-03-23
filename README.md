@@ -23,6 +23,23 @@ with real-time streaming signal generation.
 
 ---
 
+## Round 7: Proper Time Portfolio
+
+### Header: `include/srfm/proper_time.hpp`  |  Source: `src/proper_time.cpp`
+
+Models portfolio dynamics using the proper time formalism from Special Relativity.  A high-volatility ("fast-moving") portfolio is analogous to a relativistic observer: it experiences less proper time per calendar day, effectively taking longer to reach the same information state.
+
+| Class | Role |
+|---|---|
+| `ProperTime` | Static helpers: `compute(t, v)`, `gamma_factor(v)`, `to_velocity(vol, max_vol)` |
+| `ProperTimeClock` | Integrates `dτ = dt / γ(v)` over streaming volatility observations |
+| `PortfolioAgingModel` | Computes `effective_age = t * γ` and `adj_sharpe = sharpe / √(effective_age)` |
+| `RelativisticRebalanceTimer` | Fires rebalance events when accumulated proper time `Δτ > threshold` — reduces turnover in high-vol regimes |
+
+**Tests:** `tests/portfolio/test_proper_time.cpp` — 25 GTest cases covering all classes and edge conditions.
+
+---
+
 ## Round 6: Minkowski Momentum
 
 ### Header: `include/srfm/minkowski_momentum.hpp`  |  Source: `src/minkowski_momentum.cpp`
