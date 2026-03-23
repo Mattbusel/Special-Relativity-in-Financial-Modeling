@@ -117,6 +117,8 @@ pub mod path_integral;
 pub mod spin_network;
 pub mod quantum_field;
 pub mod entropy_dynamics;
+pub mod gauge_field;
+pub mod renormalization;
 
 #[cfg(feature = "viz")]
 pub mod viz;
