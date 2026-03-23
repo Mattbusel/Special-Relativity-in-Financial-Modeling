@@ -86,6 +86,10 @@ pub mod geodesic_signals;
 pub mod proper_time;
 pub mod gravitational_waves;
 pub mod penrose;
+pub mod holographic;
+pub mod entanglement;
+pub mod information_geometry;
+pub mod causal_inference;
 
 #[cfg(feature = "viz")]
 pub mod viz;
