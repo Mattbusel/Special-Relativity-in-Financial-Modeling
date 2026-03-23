@@ -125,6 +125,236 @@ See [`examples/quickstart.ipynb`](examples/quickstart.ipynb) for a complete walk
 
 ---
 
+## What's New in v2.0.0
+
+### Relativistic Options Pricing (`src/relativistic_options.rs`)
+
+Full options pricing framework extending the financial manifold to derivative
+instruments.  Replaces Black-Scholes constant-vol assumption with the
+Minkowski spacetime interval derived from the underlying's price trajectory.
+
+| Type | Description |
+|------|-------------|
+| `RelativisticBlackScholes` | B-S where σ is replaced by the spacetime metric |
+| `LightconeOptionPricing` | Two-regime vol surface: TIMELIKE < σ_base < SPACELIKE |
+| `SpacetimeDelta` | Relativistic hedge ratio Δ_rel = γ(β) · Δ_BS |
+| `RelOrbitArbitrage` | Flags options mispriced relative to spacetime regime |
+
+Key derivations:
+
+- **Effective volatility**: `σ_eff = σ_base · √(1 − β²)` for TIMELIKE, enhanced
+  for SPACELIKE by `σ_base / γ`.
+- **Proper-time discounting**: expiry discounted at `e^{−rτ}` where
+  `τ = T · √(1 − β²) < T` for TIMELIKE trajectories.
+- **Relativistic delta**: `Δ_rel = γ(β) · N(d₁)` — larger hedge in fast-moving
+  regimes because a unit price move covers more proper distance.
+- **Arbitrage signal**: contradiction between TIMELIKE/SPACELIKE label and
+  market implied vol direction generates a signed mispricing score.
+
+```rust
+use tokio_prompt_orchestrator::relativistic_options::{
+    RelativisticBlackScholes, LightconeOptionPricing,
+    SpacetimeDelta, RelOrbitArbitrage, OptionsConfig,
+};
+
+let cfg = OptionsConfig::default();
+let model = RelativisticBlackScholes::new(cfg.clone());
+
+// Price a call: S=100, K=105, T=0.25yr, dt=1, dp=2.0
+let result = model.price_call(100.0, 105.0, 0.25, 1.0, 2.0).unwrap();
+println!("Call price: {:.4}", result.price);
+println!("σ_eff:      {:.4}", result.sigma_effective);
+println!("Regime:     {}", result.interval_class);   // TIMELIKE / SPACELIKE
+println!("γ:          {:.4}", result.gamma);
+
+// Light-cone vol surface
+let pricer = LightconeOptionPricing::new(cfg.clone());
+let lc = pricer.price(100.0, 100.0, 1.0, 0.3, true).unwrap();
+println!("σ_TL={:.4}  σ_SL={:.4}", lc.sigma_timelike, lc.sigma_spacelike);
+
+// Relativistic delta
+let sd = SpacetimeDelta::new(cfg.clone());
+let dr = sd.compute(100.0, 100.0, 1.0, 0.20, 1.0, 1.0, true).unwrap();
+println!("Δ_classical={:.4}  Δ_rel={:.4}", dr.delta_classical, dr.delta_relativistic);
+
+// Arbitrage scan (provide market price to detect mispricing)
+let arb = RelOrbitArbitrage::new(cfg, 0.05);
+let sig = arb.scan(100.0, 100.0, 1.0, 1.0, 0.5, Some(12.0), true).unwrap();
+println!("Arb type: {}  score: {:.4}", sig.arb_type, sig.score);
+```
+
+---
+
+### Extended Crypto Empirical Validation (`validation/empirical_extended.py`)
+
+Extends the Q1 2025 equity validation to cryptocurrency markets (BTC, ETH,
+and configurable altcoins) via the public Binance REST API.
+
+**Statistical tests:**
+- Bootstrap resampling (default 10,000 replications) for mean next-bar vol CI.
+- Permutation test (default 10,000 shuffles) for TIMELIKE vs SPACELIKE vol equality.
+- Bartlett test for variance equality.
+- Bonferroni correction across all assets.
+
+**Benchmarks:**
+- RSI overbought/oversold (Mann-Whitney U) vs SRFM classification.
+- MACD histogram direction (Mann-Whitney U) vs SRFM classification.
+
+**Output:** LaTeX + Markdown reports with confidence intervals.
+
+```bash
+# Quick run (BTC + ETH, 1h bars, 1000 bars each)
+python validation/empirical_extended.py
+
+# Custom symbols and interval
+python validation/empirical_extended.py \
+    --symbols BTCUSDT ETHUSDT SOLUSDT \
+    --interval 4h \
+    --limit 1000 \
+    --n-boot 10000 \
+    --n-perm 10000 \
+    --format both
+
+# Offline (uses cached CSV data)
+python validation/empirical_extended.py --no-download
+```
+
+```python
+from validation.empirical_extended import CryptoValidation, ValidationReport
+
+validator = CryptoValidation(
+    symbols=["BTCUSDT", "ETHUSDT"],
+    interval="1h",
+    limit=500,
+    c_scale=0.05,
+    n_boot=1000,
+    n_perm=1000,
+)
+results = validator.run()
+
+# Print vol ratio for each asset
+for sym, r in results.items():
+    print(f"{sym}: TL/SL vol ratio = {r.vol_ratio_tl_sl:.4f}")
+
+# Generate LaTeX + Markdown reports
+report = ValidationReport(results, output_dir="validation")
+report.generate_all(fmt="both")
+```
+
+---
+
+### Interactive Spacetime Visualization (`src/viz.rs`, `viz` feature)
+
+Interactive egui-based visualizations for the SRFM financial manifold.
+
+```bash
+# Build with viz feature
+cargo build --features viz
+
+# Run the plotter
+cargo run --features viz -- --viz
+```
+
+**`SpacetimePlotter`** — 2D Minkowski diagram:
+- Light cone lines at slope ±1/c from the most recent event.
+- Price worldline rendered as a colored polyline.
+- Per-event color coding: blue (β ≈ 0) → red (|β| → 1).
+- Geodesic best-fit path (OLS constant-velocity trajectory).
+- Interactive zoom (scroll) and inspect panel (hover).
+
+**`PortfolioManifoldViewer`** — 3D scatter plot:
+- TIMELIKE dots in green, SPACELIKE in red, LIGHTLIKE in yellow.
+- Drag to rotate (azimuth + elevation camera).
+- Scroll to zoom.
+- Click a dot to inspect full event details in the side panel.
+
+```rust
+use tokio_prompt_orchestrator::viz::{
+    SpacetimePlotter, SpacetimePlotterConfig,
+    PortfolioManifoldViewer, ManifoldViewerConfig, AssetPoint,
+};
+
+let mut plotter = SpacetimePlotter::new(SpacetimePlotterConfig::default());
+plotter.push_raw(0.0, 4.605, 0.12);  // (coord_time, log_price, beta)
+plotter.push_raw(1.0, 4.612, 0.08);
+println!("TIMELIKE fraction: {:.1}%", plotter.timelike_fraction() * 100.0);
+if let Some((slope, intercept)) = plotter.geodesic_fit() {
+    println!("Geodesic: x = {:.4}·t + {:.4}", slope, intercept);
+}
+
+let mut viewer = PortfolioManifoldViewer::new(ManifoldViewerConfig::default());
+viewer.upsert_point(AssetPoint::new("BTC", 65000.0, 5e9, -0.3, 0.15));
+viewer.upsert_point(AssetPoint::new("ETH",  3500.0, 2e9,  0.1, 0.25));
+println!("Assets: {}", viewer.asset_count());
+```
+
+---
+
+### Python API Wrapper (`python/relfinance.py`)
+
+Simplified, pip-installable Python interface for the research community.
+Wraps the existing `srfm` package and exposes a dataclass-based API for
+options pricing, delta hedging, and portfolio manifold computation.
+
+```bash
+# Install (no build required)
+pip install -e python/
+```
+
+```python
+from relfinance import (
+    SpacetimeEvent,
+    classify_events,
+    compute_lorentz_factor,
+    portfolio_manifold,
+    relativistic_options_price,
+    lightcone_implied_vol,
+    compute_spacetime_delta,
+    OptionsConfig,
+)
+
+# ── Spacetime event classification ─────────────────────────────────────────
+events = [SpacetimeEvent(t=i, P=100 + i * 0.5, V=1e6, M=1e9) for i in range(5)]
+labels = classify_events(events)
+# → ['TIMELIKE', 'TIMELIKE', 'TIMELIKE', 'TIMELIKE']
+
+# ── Lorentz factor ──────────────────────────────────────────────────────────
+gamma = compute_lorentz_factor(beta=0.8)
+# → 1.6666666666666667
+
+# ── Portfolio manifold (covariance matrix via spacetime interval) ───────────
+asset_events = {
+    "BTC": SpacetimeEvent(t=1.0, P=65000.0, V=5e9, M=3e12),
+    "ETH": SpacetimeEvent(t=1.0, P= 3500.0, V=2e9, M=5e11),
+    "SOL": SpacetimeEvent(t=1.0, P=  150.0, V=1e8, M=2e10),
+}
+C = portfolio_manifold(asset_events)
+# C is a 3×3 NumPy array; C[i,j] = exp(-|ds²(i,j)|)
+
+# ── Relativistic options pricing ────────────────────────────────────────────
+cfg = OptionsConfig(c_scale=0.05, sigma_base=0.80, risk_free_rate=0.05)
+result = relativistic_options_price(
+    spot=65000.0, strike=68000.0, expiry=0.083,  # ~1 month
+    dt=1.0, dp=500.0, is_call=True, cfg=cfg,
+)
+print(f"Price:    {result.price:.2f}")
+print(f"σ_eff:    {result.sigma_effective:.4f}")
+print(f"Regime:   {result.interval_class}")
+
+# ── Light-cone vol surface ──────────────────────────────────────────────────
+vols = lightcone_implied_vol(65000.0, 68000.0, 0.083, beta=0.3, cfg=cfg)
+print(f"σ_TL={vols['sigma_timelike']:.4f}  σ_SL={vols['sigma_spacelike']:.4f}")
+
+# ── Relativistic delta ──────────────────────────────────────────────────────
+dr = compute_spacetime_delta(
+    spot=65000.0, strike=68000.0, expiry=0.083,
+    sigma=0.80, dt=1.0, dp=500.0, is_call=True, cfg=cfg,
+)
+print(f"Δ_classical={dr.delta_classical:.4f}  Δ_rel={dr.delta_relativistic:.4f}")
+```
+
+---
+
 ## Architecture
 
 ```
@@ -151,9 +381,14 @@ Special-Relativity-in-Financial-Modeling/
 +-- src/                       C++ implementation files
 |   +-- multi_asset.cpp        Multi-asset spacetime implementation
 |
-+-- python/srfm/               Python interface
++-- python/srfm/               Python interface (pybind11 / pure-Python fallback)
 |   +-- __init__.py            Pure-Python fallback API (no build required)
 |   +-- bindings.cpp           pybind11 C++ extension (optional)
+|
++-- python/
+|   +-- relfinance.py          Simplified pip-installable API (v2.0) —
+|                              SpacetimeEvent, classify_events,
+|                              portfolio_manifold, relativistic options
 |
 +-- examples/
 |   +-- quickstart.ipynb       Jupyter notebook: full API walkthrough
@@ -163,6 +398,7 @@ Special-Relativity-in-Financial-Modeling/
 |   +-- tick_streamer.py        Real-time tick streaming + SRFM signals (NEW v1.2.0)
 |   +-- signal_dashboard.py     ANSI terminal real-time dashboard (NEW v1.2.0)
 |   +-- analyze_q1.py           TIMELIKE vs SPACELIKE variance statistical tests
+|   +-- empirical_extended.py  Extended crypto validation + LaTeX/Markdown report (NEW v2.0)
 |   +-- backtest_comparison.py  Strategy comparison (RAW/RELATIVISTIC/GEODESIC)
 |   +-- fetch_data.py           Yahoo Finance data downloader
 |   +-- run_validation.py       Full validation pipeline runner
