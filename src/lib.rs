@@ -80,6 +80,11 @@ pub enum OrchestratorError {
 }
 
 pub mod metrics;
+pub mod quantum;
+pub mod geodesic_signals;
+pub mod proper_time;
+pub mod gravitational_waves;
+pub mod penrose;
 
 // Re-export the most commonly used types at the crate root.
 pub use worker::{AnthropicWorker, EchoWorker, LlamaCppWorker, ModelWorker, OpenAiWorker, VllmWorker};

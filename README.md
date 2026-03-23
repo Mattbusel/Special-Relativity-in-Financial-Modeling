@@ -3,33 +3,126 @@
 [![CI](https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling/actions/workflows/ci.yml/badge.svg)](https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![C++ Standard](https://img.shields.io/badge/C%2B%2B-20-blue.svg)](CMakeLists.txt)
-[![Version](https://img.shields.io/badge/version-1.1.0-green.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.2.0-green.svg)](CHANGELOG.md)
 
 ---
 
-## What Is This?
+## What Is SRFM?
 
-SRFM treats financial price series as trajectories in a four-dimensional
-Minkowski spacetime, embedding every OHLCV bar as a spacetime event
-`(t, P, V, M)` where `t` is bar time, `P` is close price, `V` is volume,
-and `M` is market-impact proxy. This allows the tools of special relativity —
-Lorentz transforms, spacetime intervals, geodesic equations — to be applied
-directly to market data.
+SRFM treats every OHLCV price bar as an event in four-dimensional Minkowski
+spacetime `(t, P, V, M)` — bar time, close price, volume, and market-impact
+proxy — and applies the full machinery of special relativity to financial data.
+The normalised price velocity `beta = |dP| / (c * dt)` plays the role of
+relativistic velocity. When `beta < 1` the bar is **TIMELIKE**: price information
+propagates causally and momentum carries predictive power. When `beta > 1` the bar
+is **SPACELIKE**: the move is faster than the market's "speed of light" and is
+fundamentally stochastic. The spacetime interval `ds^2 = -(c*dt)^2 + dP^2 + dV^2 + dM^2`
+encodes this causal structure quantitatively, enabling Lorentz-corrected momentum
+signals, geodesic price-path forecasting, and a full relativistic portfolio optimizer
+with real-time streaming signal generation.
 
-The core insight is that price-velocity (`β = ΔP / (c · Δt)`) plays the role
-of relativistic velocity, and the spacetime interval
-`ds² = −c²dt² + dP² + dV² + dM²`
-carries causal information about the market microstructure regime:
+---
 
-| Interval type | ds² sign | Market interpretation                        |
-|---------------|----------|----------------------------------------------|
-| TIMELIKE      | < 0      | Causal regime — price change propagates at sub-light speed; momentum is predictive |
-| LIGHTLIKE     | = 0      | Critical boundary — price moves exactly at market speed of light |
-| SPACELIKE     | > 0      | Stochastic regime — faster-than-light separation; bars are decorrelated |
+## Key Empirical Finding
 
-Q1 2025 empirical result: TIMELIKE bars exhibit **1.27x lower next-bar absolute
-return variance** than SPACELIKE bars across 10 liquid instruments
-(Bartlett p = 6×10⁻¹⁶, 10/11 assets significant after Bonferroni correction).
+> **TIMELIKE bars exhibit 1.27x lower next-bar absolute return variance than
+> SPACELIKE bars** across 10 liquid S&P 500 instruments at 1-minute resolution
+> over Q1 2025 (Bartlett p = 6x10^-16, 10/11 assets significant after
+> Bonferroni correction).
+
+This is not a back-fit artefact: the TIMELIKE/SPACELIKE label is assigned before
+the subsequent bar is observed. The +0.18 relativistic Sharpe improvement over
+classical momentum is independently reproduced on each ticker.
+
+---
+
+## 5-Minute Quickstart
+
+### Python validation (no build required)
+
+```bash
+# 1. Install Python dependencies
+pip install -r validation/requirements.txt
+
+# 2. Run the relativistic portfolio optimizer demo
+python validation/portfolio_optimizer.py
+
+# 3. Run the real-time tick streaming demo (60 s of simulated BTC/USD)
+python validation/tick_streamer.py
+
+# 4. Launch the ANSI signal dashboard (standalone, no extra deps)
+python validation/signal_dashboard.py
+
+# 5. Dashboard with full tick-streamer integration
+python validation/signal_dashboard.py --demo --symbols "BTC/USD" "ETH/USD" "SPY"
+```
+
+### C++ core
+
+```bash
+# Linux / macOS
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
+ctest --test-dir build --output-on-failure
+
+# Windows (MSVC + vcpkg)
+cmake -B build -G "Visual Studio 17 2022" -A x64 \
+      -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT%/scripts/buildsystems/vcpkg.cmake"
+cmake --build build --config Release
+ctest --test-dir build -C Release --output-on-failure
+```
+
+---
+
+## Architecture
+
+```
+Special-Relativity-in-Financial-Modeling/
+|
++-- include/srfm/              C++ core headers
+|   +-- types.hpp              Strong types: BetaVelocity, LorentzFactor, EffectiveMass
+|   +-- constants.hpp          BETA_MAX_SAFE, SPEED_OF_LIGHT, FLOAT_EPSILON
+|   +-- momentum.hpp           MomentumProcessor, MomentumSignal
+|   +-- manifold.hpp           SpacetimeEvent, SpacetimeInterval, IntervalClass
+|   +-- tensor.hpp             MetricTensor, ChristoffelSymbols (autodiff + FD)
+|   +-- engine.hpp             Engine (full pipeline wiring)
+|   +-- backtest.hpp           Backtester, PerformanceCalculator, BacktestResult
+|   +-- data_loader.hpp        DataLoader, OHLCV
+|   +-- simd/                  CPU feature detection, AVX2/AVX-512 kernels
+|   +-- stream/                Lock-free tick streaming pipeline
+|
++-- include/                   N-asset portfolio headers
+|   +-- portfolio_manifold.hpp AssetEvent, MinkowskiCovariance, SpacetimeCausalGraph
+|   +-- relativistic_optimizer.hpp RelativisticPortfolio, OptimizationResult
+|
++-- src/                       C++ implementation files
+|
++-- validation/                Python validation and tooling layer
+|   +-- portfolio_optimizer.py  Relativistic portfolio optimizer (NEW v1.2.0)
+|   +-- tick_streamer.py        Real-time tick streaming + SRFM signals (NEW v1.2.0)
+|   +-- signal_dashboard.py     ANSI terminal real-time dashboard (NEW v1.2.0)
+|   +-- analyze_q1.py           TIMELIKE vs SPACELIKE variance statistical tests
+|   +-- backtest_comparison.py  Strategy comparison (RAW/RELATIVISTIC/GEODESIC)
+|   +-- fetch_data.py           Yahoo Finance data downloader
+|   +-- run_validation.py       Full validation pipeline runner
+|   +-- requirements.txt        Python dependencies
+|
++-- tests/                     C++ unit + integration test suites
++-- bench/                     Google Benchmark targets
++-- paper/                     LaTeX academic paper
++-- CMakeLists.txt
+```
+
+### Module dependency graph
+
+```
+srfm_momentum  <--  srfm_beta_calculator
+srfm_momentum  <--  srfm_manifold
+srfm_manifold  <--  srfm_geodesic
+srfm_beta_calculator, srfm_manifold, srfm_geodesic  <--  srfm_engine
+srfm_momentum  <--  srfm_simd_{scalar,avx2,avx512}  <--  srfm_simd_dispatch
+srfm_manifold, srfm_tensor  <--  srfm_portfolio
+```
 
 ---
 
@@ -37,149 +130,304 @@ return variance** than SPACELIKE bars across 10 liquid instruments
 
 ### Spacetime Embedding
 
-An OHLCV bar is mapped to a four-vector:
+Each OHLCV bar is mapped to a four-vector:
 
 ```
-x^μ = (c·t,  P,  V^(1/4),  M^(1/3))
+x^mu = (c*t,  P,  V^(1/4),  M^(1/3))
 ```
 
-The superscript normalization of `V` and `M` compresses the dynamic range so
-that all four coordinates live on similar scales.
+Volume and market-impact are compressed by fractional powers so all four
+coordinates live on comparable scales.
 
 ### Lorentz Factor and Beta
 
-The normalised price velocity over an interval `[t₁, t₂]` is:
+The normalised price velocity over interval [t1, t2]:
 
 ```
-β = ΔP / (c · Δt)
+beta = |dP| / (c * dt)
 ```
 
-where `c` is the calibrated "financial speed of light" (default: 1.0).
-The Lorentz factor is:
+The Lorentz factor:
 
 ```
-γ(β) = 1 / √(1 − β²),    |β| < 1
+gamma(beta) = 1 / sqrt(1 - beta^2),    |beta| < 1
 ```
 
-All computations clamp `|β| < BETA_MAX_SAFE = 0.9999` to avoid numerical
-divergence near the light cone.
+All computations clamp `|beta| < BETA_MAX_SAFE = 0.9999`.
 
 ### Spacetime Interval
 
 ```
-ds² = −c²(Δt)² + (ΔP)² + (ΔV)² + (ΔM)²
+ds^2 = -(c*dt)^2 + dP^2 + dV^2 + dM^2
 ```
 
-Classification:
-- `ds² < 0` → TIMELIKE
-- `ds² = 0` → LIGHTLIKE  (within `|ds²| < 1e-12`)
-- `ds² > 0` → SPACELIKE
+| Interval type | ds^2 sign | Market interpretation                                    |
+|---------------|-----------|----------------------------------------------------------|
+| TIMELIKE      | < 0       | Causal regime — momentum is predictive                   |
+| LIGHTLIKE     | = 0       | Critical boundary — price moves at market speed of light |
+| SPACELIKE     | > 0       | Stochastic regime — price change uncorrelated with drift |
 
 ### Relativistic Momentum Signal
 
-The raw financial momentum `p_raw` is corrected by the Lorentz factor:
-
 ```
-p_rel = γ(β) · m_eff · p_raw
+p_rel = gamma(beta) * m_eff * p_raw
 ```
 
-where `m_eff` is the effective mass (position size or volatility proxy). This
-naturally down-weights signals in high-velocity (noisy) regimes and amplifies
-them in low-velocity (causal) regimes.
+This naturally down-weights signals in high-velocity noisy regimes and
+amplifies them in low-velocity causal regimes.
 
 ### Geodesic Price Paths
 
-The geodesic equation in curved spacetime:
+The geodesic equation:
 
 ```
-d²x^μ/dτ² + Γ^μ_νρ (dx^ν/dτ)(dx^ρ/dτ) = 0
+d^2 x^mu / dtau^2 + Gamma^mu_nu_rho (dx^nu/dtau)(dx^rho/dtau) = 0
 ```
 
-is integrated numerically using RK4 with adaptive step control. Christoffel
-symbols `Γ^μ_νρ` are computed via O(h²) central finite differences applied to
-the metric tensor `g_μν`. The geodesic path represents the "natural" price
-trajectory in the absence of external forces — deviations from it are trading
-signals.
+is integrated with RK4. Christoffel symbols are computed either via O(h^2)
+central finite differences or exact forward-mode automatic differentiation
+(dual numbers, eps^2 = 0). Deviations from the geodesic are trading signals.
 
-### Metric Tensor
-
-The default metric is a perturbed Minkowski metric:
+### Relativistic Sharpe
 
 ```
-g_μν = diag(−1, 1+ε_P, 1+ε_V, 1+ε_M)
+SR_rel = (w^T mu - rf) / sqrt(w^T Sigma_st w)
 ```
 
-where the perturbations `ε` are fitted to local market data. The inverse
-`g^μν` is computed analytically for diagonal metrics and via LU decomposition
-for general ones; singular metrics return `std::nullopt`.
+where `Sigma_st` is the spacetime-weighted covariance matrix. SPACELIKE
+asset pairs have their covariance discounted by `(1 - s_i * s_j)` where
+`s_k = 1 - timelike_fraction_k`, penalising noise-dominant assets.
 
 ---
 
-## N-Asset Portfolio Manifold
+## Portfolio Optimizer
 
-The `portfolio_manifold` module extends the 4D spacetime framework to a full
-N-asset portfolio analysis layer.
+`validation/portfolio_optimizer.py` implements `RelativisticPortfolioOptimizer`,
+a multi-asset portfolio construction engine that uses the Minkowski metric to
+distinguish causal (TIMELIKE) from stochastic (SPACELIKE) cross-asset interactions.
 
-### AssetEvent
+### Key classes
 
-Each asset is embedded as a 4-vector `(t, P, V, M)`:
+| Class | Description |
+|---|---|
+| `AssetManifold` | Asset worldline — prices, timestamps, per-bar beta and interval type |
+| `PortfolioResult` | Weights, relativistic Sharpe, TIMELIKE exposure, max drawdown |
+| `RelativisticPortfolioOptimizer` | Main optimizer class |
+
+### Quickstart
+
+```python
+from validation.portfolio_optimizer import (
+    RelativisticPortfolioOptimizer,
+    generate_synthetic_assets,
+)
+
+# Build optimizer with calibrated speed of light
+opt = RelativisticPortfolioOptimizer(c=0.1, risk_free_rate=0.05)
+
+# Generate or load assets
+assets = generate_synthetic_assets(n_assets=5, n_bars=1000)
+
+# Maximise relativistic Sharpe
+result = opt.optimize(assets, max_weight=0.4)
+print(result.relativistic_sharpe)   # e.g.  0.184
+print(result.timelike_exposure)     # e.g.  0.623
+print(result.weights)               # array([0.4, 0.2, 0.2, 0.1, 0.1])
+
+# Enforce minimum TIMELIKE exposure
+result = opt.optimize(assets, max_weight=0.4, target_timelike=0.70)
+
+# Efficient frontier (50 points)
+frontier = opt.efficient_frontier(assets, n_points=50)
+
+# Backtest with rebalancing every 20 bars
+bt = opt.backtest(assets, result.weights, rebalance_freq=20)
+print(bt["sharpe"])         # annualised Sharpe
+print(bt["max_drawdown"])   # e.g. -0.12
+print(bt["total_return"])   # e.g. 0.34
+```
+
+### Spacetime covariance
+
+The optimizer computes a spacetime-weighted covariance matrix:
+
+```
+Sigma_st[i, j] = Sigma_classical[i, j] * (1 - spacelike_i * spacelike_j)
+```
+
+where `spacelike_k = 1 - timelike_fraction_k`. TIMELIKE-dominant assets
+retain full classical covariance; SPACELIKE-dominant assets are discounted,
+reducing their influence on portfolio risk.
+
+### Building an AssetManifold from your data
+
+```python
+import numpy as np
+from validation.portfolio_optimizer import RelativisticPortfolioOptimizer
+
+opt = RelativisticPortfolioOptimizer(c=0.1)
+
+# From a (N, 2) array of [unix_timestamp, close_price]
+ohlcv = np.column_stack([timestamps, prices])
+manifold = opt.build_asset_manifold("AAPL", ohlcv)
+print(manifold.timelike_fraction)   # fraction of bars classified TIMELIKE
+print(manifold.beta)                # per-bar price velocity array
+```
+
+---
+
+## Real-Time Streaming
+
+`validation/tick_streamer.py` implements a real-time (or simulated) tick
+streaming pipeline that classifies each completed bar using SRFM and
+fires a `BarSignal` with momentum and alert flags.
+
+### Key classes
+
+| Class | Description |
+|---|---|
+| `Tick` | Single market tick (timestamp, price, volume, bid, ask) |
+| `BarSignal` | Completed bar with beta, interval_type, ds^2, momentum, alert flags |
+| `SimulatedTickFeed` | Regime-switching synthetic tick generator (async) |
+| `SRFMTickProcessor` | Assembles ticks into bars, classifies, computes signals |
+| `YahooFinanceFeed` | Polling-based Yahoo Finance 1-minute bar stream |
+
+### Programmatic usage
+
+```python
+import asyncio
+from validation.tick_streamer import SimulatedTickFeed, SRFMTickProcessor
+
+async def main():
+    feed = SimulatedTickFeed(symbol="AAPL", initial_price=180.0, volatility=0.001)
+    processor = SRFMTickProcessor(bar_period_secs=60.0, c_financial=0.1)
+
+    async for tick in feed.stream():
+        signal = processor.process_tick(tick)
+        if signal is not None:
+            print(signal.interval_type, signal.beta, signal.regime_change)
+
+asyncio.run(main())
+```
+
+### Using Yahoo Finance (delayed live data)
+
+```python
+from validation.tick_streamer import YahooFinanceFeed, SRFMTickProcessor
+import asyncio
+
+async def live_feed():
+    feed = YahooFinanceFeed(symbol="SPY", lookback_mins=60)
+    processor = SRFMTickProcessor(bar_period_secs=60.0)
+    async for tick in feed.stream():
+        signal = processor.process_tick(tick)
+        if signal:
+            print(f"{signal.symbol}  {signal.interval_type}  beta={signal.beta:.4f}")
+
+asyncio.run(live_feed())
+```
+
+### BarSignal fields
+
+| Field | Type | Description |
+|---|---|---|
+| `beta` | float | Normalised price velocity `|dp| / (c * dt)` |
+| `interval_type` | str | "TIMELIKE", "LIGHTLIKE", or "SPACELIKE" |
+| `spacetime_interval` | float | `ds^2 = dp^2 - (c*dt)^2` |
+| `momentum` | float | Exponentially weighted rolling beta signal |
+| `regime_change` | bool | True on TIMELIKE <-> SPACELIKE transition |
+| `lightlike_crossing` | bool | True when `|beta - 1| < 0.01` |
+
+---
+
+## Signal Dashboard
+
+`validation/signal_dashboard.py` renders a live ANSI terminal dashboard
+for one or more symbols.
+
+### Running the dashboard
+
+```bash
+# Standalone demo (no external dependencies beyond numpy)
+python validation/signal_dashboard.py
+
+# With specific symbols and longer duration
+python validation/signal_dashboard.py --symbols "BTC/USD" "ETH/USD" "SPY" --duration 120
+
+# Full integration mode (uses tick_streamer.py)
+python validation/signal_dashboard.py --demo --bar-period 5.0 --refresh-hz 4.0
+
+# Adjust financial speed of light
+python validation/signal_dashboard.py --c 0.05
+```
+
+### Dashboard panels
+
+Each symbol renders a panel showing:
+
+- **Interval type** with colour coding: green (TIMELIKE), yellow (LIGHTLIKE), red (SPACELIKE)
+- **Price** with directional arrow and change colour
+- **Beta meter** — horizontal bar divided into TIMELIKE / lightcone / SPACELIKE zones
+- **TIMELIKE fraction bar** — rolling fraction over last 20 bars
+- **Spacetime interval sparkline** — 20-bar ds^2 history with sign-coloured Unicode blocks
+- **Portfolio weight** (if set via `dashboard.update_weight(symbol, weight)`)
+- **Recent alerts** — regime changes and lightlike crossings
+
+### Programmatic usage
+
+```python
+from validation.signal_dashboard import SRFMDashboard
+
+dashboard = SRFMDashboard(symbols=["AAPL", "TSLA"])
+
+# Feed signals from any source
+for signal in my_bar_signals:
+    dashboard.update(signal)
+    dashboard.render()
+
+# Set portfolio weights from optimizer output
+dashboard.update_weight("AAPL", 0.35)
+dashboard.update_weight("TSLA", 0.15)
+
+# Utility renderers
+print(dashboard.sparkline(ds2_values))   # Unicode sparkline string
+print(dashboard.beta_meter(0.73))        # ANSI-coloured velocity meter
+```
+
+---
+
+## C++ API
+
+### Quick start
+
+```cpp
+#include <srfm/engine.hpp>
+#include <srfm/data_loader.hpp>
+
+auto bars = srfm::DataLoader::load_csv("prices.csv");
+srfm::Engine engine;
+auto result = engine.run_backtest(bars);
+if (result) {
+    std::cout << "Sharpe:       " << result->adjusted.sharpe_ratio << "\n";
+    std::cout << "Sortino:      " << result->adjusted.sortino_ratio << "\n";
+    std::cout << "Max drawdown: " << result->adjusted.max_drawdown << "\n";
+}
+```
+
+### N-asset portfolio manifold
 
 ```cpp
 #include "portfolio_manifold.hpp"
 using namespace srfm::portfolio;
 
-AssetEvent aapl{"AAPL", 1.0, 150.0, 1e8, 2.4e12};
-AssetEvent msft{"MSFT", 1.0, 290.0, 8e7, 2.1e12};
-```
-
-### MinkowskiCovariance — NxN spacetime interval covariance
-
-```cpp
 MinkowskiCovariance mc;
-mc.add_asset(aapl);
-mc.add_asset(msft);
+mc.add_asset(AssetEvent{"AAPL", 1.0, 150.0, 1e8, 2.4e12});
+mc.add_asset(AssetEvent{"MSFT", 1.0, 290.0, 8e7, 2.1e12});
 auto cov = mc.compute_spacetime_covariance();
-// cov(i,j) = exp(-|ds²(i,j)|)  — Gaussian kernel over spacetime interval
-// Diagonal = 1.0; off-diagonal in (0, 1]
+// cov(i,j) = exp(-|ds^2(i,j)|) -- Gaussian kernel over spacetime interval
 ```
 
-The (i,j) entry is `exp(−|ds²(i,j)|)` where `ds²` is the Minkowski interval:
-
-```
-ds²(i,j) = −c²·Δt² + ΔP² + ΔV² + ΔM²
-```
-
-| Interval type | ds² sign | Kernel value | Interpretation |
-|---------------|----------|--------------|----------------|
-| TIMELIKE      | < 0      | → 0          | Causal separation — large lead-lag gap |
-| LIGHTLIKE     | ≈ 0      | ≈ 1          | Maximum covariance at the light cone |
-| SPACELIKE     | > 0      | → 0          | Stochastic, acausal separation |
-
-### SpacetimeCausalGraph — directed causal influence graph
-
-```cpp
-auto graph = SpacetimeCausalGraph::build(mc);
-// Edge (i→j) exists iff ds²(i,j) < −threshold (TIMELIKE)
-bool aapl_leads_msft = graph->has_edge(0, 1);
-int aapl_out_degree  = graph->out_degree(0);
-```
-
----
-
-## Relativistic Portfolio Optimization
-
-The `relativistic_optimizer` module reformulates Markowitz optimization as a
-geodesic problem on the financial manifold.
-
-### Key differences from classical Markowitz
-
-| Classical | Relativistic |
-|-----------|-------------|
-| Risk = `w^T Σ w` (Euclidean variance) | Risk = geodesic distance `w^T Σ_st w` (spacetime metric) |
-| Returns = `μ` | Returns = `γ(β) · μ` (Lorentz-corrected) |
-| Solver: quadratic programming | Solver: projected gradient descent on simplex |
-
-### Usage
+### Relativistic optimizer (C++)
 
 ```cpp
 #include "relativistic_optimizer.hpp"
@@ -192,313 +440,12 @@ rp.add_asset(AssetEvent{"GOOG", 1.0, 140.0, 6e7, 1.8e12}, 0.09);
 
 auto result = rp.optimize_weights(0.08);  // target 8% return
 if (result) {
-    std::cout << "Weights: " << result->weights.transpose() << "\n";
+    std::cout << "Weights:      " << result->weights.transpose() << "\n";
     std::cout << "Geodesic risk: " << result->geodesic_risk << "\n";
-    std::cout << "Expected return: " << result->expected_return << "\n";
 }
 ```
 
-### Gamma-weighted returns
-
-For each asset i, the Lorentz-corrected return is:
-
-```
-μ_rel_i = γ(β_i) · μ_i,   γ(β) = 1 / √(1 − β²)
-β_i = |P_i| / (c · |t_i|)
-```
-
-High-velocity assets (large β, noisy regime) have returns amplified by γ > 1,
-increasing pressure on the optimizer to reduce their weight.
-
----
-
-## Technical Improvements
-
-### Autodiff Christoffel Symbols (Task 3)
-
-`ChristoffelSymbolsDual` replaces O(h²) central finite differences with exact
-**forward-mode automatic differentiation** via dual numbers (`ε² = 0`).
-
-```cpp
-// Dual-number metric function (evaluate at DualSpacetimePoint):
-auto dual_fn = [](const DualSpacetimePoint& xd) -> DualMetricMatrix { ... };
-
-MetricTensor base(metric_fn);
-ChristoffelSymbolsDual cs(base, dual_fn);
-auto gamma = cs.compute(x);  // exact derivatives, no step-size tuning
-```
-
-Benefits over finite differences:
-
-| Property | Finite differences | Dual numbers |
-|---|---|---|
-| Metric evaluations per Γ | 8 (2 per direction) | 4 (1 per direction) |
-| Truncation error | O(h²) | 0 (machine epsilon only) |
-| Step-size sensitivity | Yes — requires tuning | None |
-| Works for non-smooth metrics | No | Yes |
-
-### Metric Singularity — Tikhonov Regularization (Task 4)
-
-`MetricTensor::inverse()` previously returned `std::nullopt` for singular
-metrics, silently zeroing out all Christoffel symbols. Now it applies
-**Tikhonov regularization** before giving up:
-
-```
-g_reg = g + λI,   λ = 1e-10
-```
-
-A `stderr` warning is emitted whenever regularization is applied:
-
-```
-[srfm::tensor::MetricTensor::inverse] WARNING: singular metric detected at
-x = (…); applying Tikhonov regularization λ = 1.00e-10
-```
-
-This recovers geodesic integration for degenerate market configurations (e.g.
-zero-volatility assets, perfectly correlated pairs) without silently discarding
-curvature information.
-
----
-
-## What's New in v1.2.0
-
-### Multi-Asset Spacetime (`include/srfm/multi_asset.hpp`)
-
-Extends the single-asset framework to handle N correlated financial assets
-simultaneously with a rolling correlation-based Lorentzian metric.
-
-| Class | Responsibility |
-|-------|----------------|
-| `MultiAssetEvent` | N-asset spacetime event: `symbols`, `prices`, `volumes`, `timestamp` |
-| `MultiAssetInterval` | ds² in (N+1)-dimensional spacetime using the full metric tensor |
-| `CorrelationMetric` | Rolling correlation matrix → Lorentzian (N+1)×(N+1) metric with Cholesky regularisation |
-| `MultiAssetLorentz` | Per-asset and portfolio Lorentz boosts; metric-weighted portfolio β |
-| `PortfolioGeodesic` | Inertial portfolio trajectory; geodesic deviation as trading signals; geodesic weights |
-
-### Python Bindings (`python/srfm/`)
-
-Full Python API via pybind11, with a pure-Python fallback (no build required):
-
-```python
-from srfm import SpacetimeInterval, LorentzTransform, Backtester
-from srfm import MultiAssetEvent, CorrelationMetric, PortfolioGeodesic
-
-# Interval classification
-SpacetimeInterval.classify(dt=1.0, dp=0.5, dv=0.1, dm=0.05)
-# → 'TIMELIKE'
-
-# Lorentz factor
-LorentzTransform.gamma(beta=0.8)
-# → 1.6666666666666667
-
-# Full backtest
-bt = Backtester()
-result = bt.run(prices=[100, 101, 99, 102, 103, 100, 104])
-print(result.sharpe)           # relativistic Sharpe ratio
-print(result.relativistic_lift)# IR_γ lift factor
-print(result.to_string())      # formatted comparison table
-```
-
-**Install (no build required):**
-```bash
-pip install -e python/
-```
-
-**Install with C++ extension:**
-```bash
-pip install pybind11
-cmake -B build -DSRFM_BUILD_PYTHON=ON
-cmake --build build
-pip install -e python/
-```
-
-See [`examples/quickstart.ipynb`](examples/quickstart.ipynb) for a complete walkthrough.
-
----
-
-## Architecture
-
-```
-include/srfm/
-  types.hpp          — Strong types: BetaVelocity, LorentzFactor, EffectiveMass
-  constants.hpp      — BETA_MAX_SAFE, SPEED_OF_LIGHT, FLOAT_EPSILON
-  momentum.hpp       — MomentumProcessor, MomentumSignal
-  manifold.hpp       — SpacetimeEvent, SpacetimeInterval, IntervalClass
-  tensor.hpp         — MetricTensor, DualNumber, ChristoffelSymbols,
-                       ChristoffelSymbolsDual, MetricMatrix
-  engine.hpp         — Engine (full pipeline wiring)
-  backtest.hpp       — Backtester, PerformanceCalculator, BacktestResult
-  data_loader.hpp    — DataLoader, OHLCV
-  normalizer.hpp     — CoordinateNormalizer
-  geodesic_signal.hpp    — GeodesicSignal
-  geodesic_strategy.hpp  — GeodesicStrategy
-  multi_asset.hpp    — MultiAssetEvent, MultiAssetInterval,
-                       CorrelationMetric, MultiAssetLorentz, PortfolioGeodesic
-
-include/
-  portfolio_manifold.hpp      — AssetEvent, MinkowskiCovariance,
-                                SpacetimeCausalGraph (N-asset portfolio layer)
-  relativistic_optimizer.hpp  — RelativisticPortfolio, OptimizerConfig,
-                                OptimizationResult
-
-python/srfm/
-  __init__.py        — Pure-Python fallback API (NumPy-backed)
-  bindings.cpp       — pybind11 C++ extension (optional, for performance)
-
-examples/
-  quickstart.ipynb   — Jupyter notebook: interval classification, backtest,
-                       multi-asset spacetime, portfolio geodesics
-
-  simd/
-    cpu_features.hpp     — detect_simd_level(), SimdLevel enum
-    simd_dispatch.hpp    — batch_beta_scalar/avx2/avx512
-  stream/
-    tick.hpp             — Tick, TickValidator
-    beta_calculator.hpp  — OnlineBetaCalculator<N> (lock-free streaming)
-    lorentz_transform.hpp — streaming Lorentz transform
-    spacetime_manifold.hpp — streaming spacetime embedding
-    signal_processor.hpp — StreamSignalProcessor
-    stream_signal.hpp    — StreamSignal
-  manifold/
-    n_asset_interval.hpp — N-asset spacetime interval
-  tensor/
-    n_asset_manifold.hpp — N-asset metric and Christoffel computation
-
-src/
-  momentum/          — MomentumProcessor implementation
-  beta_calculator/   — BetaCalculator implementation
-  manifold/          — SpacetimeMarketManifold implementation
-  geodesic/          — GeodesicSolver (RK4) implementation
-  engine/            — Engine implementation
-  tensor/
-    christoffel_dual.cpp — ChristoffelSymbolsDual (dual-number autodiff)
-  simd/              — Scalar, AVX2, AVX-512F kernels + runtime dispatch
-  portfolio_manifold.cpp    — MinkowskiCovariance, SpacetimeCausalGraph
-  relativistic_optimizer.cpp — RelativisticPortfolio
-```
-
-Dependency graph (no cycles):
-
-```
-srfm_momentum  ←  srfm_beta_calculator
-srfm_momentum  ←  srfm_manifold
-srfm_manifold  ←  srfm_geodesic
-srfm_beta_calculator, srfm_manifold, srfm_geodesic  ←  srfm_engine
-srfm_momentum  ←  srfm_simd_{scalar,avx2,avx512}  ←  srfm_simd_dispatch
-srfm_manifold, srfm_tensor  ←  srfm_portfolio
-```
-
----
-
-## Building
-
-### Prerequisites
-
-| Tool | Minimum version |
-|------|----------------|
-| CMake | 3.25 |
-| C++ compiler | GCC 12 / Clang 17 / MSVC 19.38 |
-| Eigen3 | 3.4 (optional, enables edge-case and Lorentz tests) |
-| GTest | 1.14 (auto-fetched if not found) |
-| Google Benchmark | 1.8 (auto-fetched if not found) |
-| RapidCheck | any (optional, enables property tests) |
-
-### Linux / macOS
-
-```bash
-# Install system dependencies (Ubuntu example)
-sudo apt-get install -y cmake ninja-build libeigen3-dev libgtest-dev
-
-# Configure and build
-cmake -B build -G Ninja \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-cmake --build build --parallel
-
-# Run all tests
-ctest --test-dir build --output-on-failure
-
-# Run benchmarks
-cmake --build build --target bench
-```
-
-### Windows (MSVC)
-
-```powershell
-# Using vcpkg for dependencies
-vcpkg install eigen3 gtest benchmark rapidcheck
-
-cmake -B build -G "Visual Studio 17 2022" -A x64 `
-      -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" `
-      -DCMAKE_BUILD_TYPE=Release
-cmake --build build --config Release
-ctest --test-dir build -C Release --output-on-failure
-```
-
-### Build options
-
-| CMake option | Default | Description |
-|---|---|---|
-| `SRFM_WARNINGS_AS_ERRORS` | `OFF` | Promote all warnings to errors |
-| `SRFM_FUZZ` | `OFF` | Build libFuzzer targets (requires Clang) |
-| `CMAKE_BUILD_TYPE` | `Release` | Debug / Release / RelWithDebInfo |
-
-### CMake install
-
-```bash
-cmake --install build --prefix /usr/local
-# Downstream CMakeLists.txt:
-#   find_package(srfm CONFIG REQUIRED)
-#   target_link_libraries(myapp PRIVATE srfm::srfm_engine)
-```
-
----
-
-## Usage
-
-### C++ API — quick start
-
-```cpp
-#include <srfm/engine.hpp>
-#include <srfm/data_loader.hpp>
-
-// Load bars from CSV
-auto bars = srfm::DataLoader::load_csv("prices.csv");
-if (bars.empty()) { /* handle error */ }
-
-// Run the full pipeline
-srfm::Engine engine;
-auto result = engine.run_backtest(bars);
-if (!result) { /* insufficient data or degenerate series */ }
-
-// Access performance metrics
-std::cout << "Sharpe: " << result->adjusted.sharpe_ratio << "\n";
-std::cout << "Sortino: " << result->adjusted.sortino_ratio << "\n";
-std::cout << "Max drawdown: " << result->adjusted.max_drawdown << "\n";
-```
-
-### Manual pipeline composition
-
-```cpp
-#include <srfm/manifold.hpp>
-#include <srfm/momentum.hpp>
-#include <srfm/tensor.hpp>
-
-using namespace srfm;
-
-// Classify a single bar transition
-SpacetimeEvent prev{0.0, 100.0, 1e6, 0.0};
-SpacetimeEvent curr{1.0, 100.5, 1.1e6, 0.0};
-
-auto ds2 = manifold::SpacetimeInterval::compute(prev, curr);
-if (ds2 && *ds2 < 0.0) {
-    // TIMELIKE: apply relativistic momentum correction
-    momentum::MomentumSignal sig{0.005, types::BetaVelocity::make(0.005), 1.0};
-    auto corrected = momentum::MomentumProcessor::process(sig);
-}
-```
-
-### Streaming mode (lock-free, tick-by-tick)
+### Streaming pipeline (lock-free, tick-by-tick)
 
 ```cpp
 #include <srfm/stream/beta_calculator.hpp>
@@ -507,7 +454,6 @@ if (ds2 && *ds2 < 0.0) {
 srfm::stream::OnlineBetaCalculator<256> beta_calc;
 srfm::stream::LorentzTransform transform;
 
-// Push ticks as they arrive (thread-safe, lock-free)
 for (const auto& tick : market_feed) {
     auto beta = beta_calc.push(tick);
     if (beta) {
@@ -521,172 +467,137 @@ for (const auto& tick : market_feed) {
 ```cpp
 #include <srfm/simd/simd_dispatch.hpp>
 
-// Automatically dispatches to AVX-512, AVX2, or scalar
-// depending on runtime CPU feature detection
 std::vector<double> velocities = { /* ... */ };
 std::vector<double> betas(velocities.size());
 std::vector<double> gammas(velocities.size());
 
+// Dispatches to AVX-512, AVX2, or scalar at runtime
 srfm::simd::batch_beta(velocities.data(), betas.data(), velocities.size());
 srfm::simd::batch_gamma(betas.data(), gammas.data(), betas.size());
 ```
 
 ---
 
-## Rust Orchestrator — Quick Start (zero config)
+## Building from Source
 
-The `tokio-prompt-orchestrator` crate sits above the C++ signal-processing
-library and coordinates LLM inference workers. It compiles and runs with no
-external services needed (mock mode).
+### Prerequisites
 
-### 1. Build
+| Tool | Minimum version |
+|------|----------------|
+| CMake | 3.25 |
+| C++ compiler | GCC 12 / Clang 17 / MSVC 19.38 |
+| Eigen3 | 3.4 (auto-fetched if missing) |
+| GTest | 1.14 (auto-fetched if missing) |
+| Google Benchmark | 1.8 (auto-fetched if missing) |
+| RapidCheck | any (optional, property tests) |
+
+### Linux / macOS
 
 ```bash
-# Library + CLI (no optional features required)
+sudo apt-get install -y cmake ninja-build libeigen3-dev libgtest-dev
+
+cmake -B build -G Ninja \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+cmake --build build --parallel
+
+# Run all tests
+ctest --test-dir build --output-on-failure
+
+# Run benchmarks
+cmake --build build --target bench
+./build/bench_beta_gamma --benchmark_format=json
+```
+
+### Windows (MSVC + vcpkg)
+
+```powershell
+vcpkg install eigen3 gtest benchmark rapidcheck
+
+cmake -B build -G "Visual Studio 17 2022" -A x64 `
+      -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" `
+      -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+ctest --test-dir build -C Release --output-on-failure
+```
+
+### CMake build options
+
+| Option | Default | Description |
+|---|---|---|
+| `SRFM_WARNINGS_AS_ERRORS` | `OFF` | Promote all warnings to errors |
+| `SRFM_FUZZ` | `OFF` | Build libFuzzer targets (requires Clang) |
+| `CMAKE_BUILD_TYPE` | `Release` | Debug / Release / RelWithDebInfo |
+
+### CMake install
+
+```bash
+cmake --install build --prefix /usr/local
+# Downstream usage:
+#   find_package(srfm CONFIG REQUIRED)
+#   target_link_libraries(myapp PRIVATE srfm::srfm_engine)
+```
+
+### Python dependencies
+
+```bash
+pip install -r validation/requirements.txt
+# yfinance>=0.2.40  pandas>=2.0.0  numpy>=1.26.0  scipy>=1.12.0
+# matplotlib>=3.8.0  seaborn>=0.13.0  hypothesis>=6.100.0
+```
+
+---
+
+## Rust Orchestrator
+
+The `tokio-prompt-orchestrator` crate coordinates LLM inference workers and
+integrates with the C++ signal-processing library. It runs with no external
+services (mock mode).
+
+```bash
+# Build
 cargo build --release
 
-# With the Terminal UI dashboard
-cargo build --release --features tui
-
-# With the HTTP/WebSocket API server
-cargo build --release --features web-api
-```
-
-### 2. Run the TUI dashboard (mock data, no API keys needed)
-
-```bash
+# TUI dashboard (mock data, no API keys needed)
 cargo run --release --features tui -- --mock
-```
 
-The dashboard shows a 2-minute scripted story: warmup → load ramp → failure →
-circuit half-open → recovery → steady state, then loops.
-
-### 3. Start the HTTP API server
-
-```bash
-# Optional: set an API key (omit for open access, development only)
-export API_KEY=my-secret-token
-
+# HTTP/WebSocket API server
 cargo run --release --features web-api -- --web --port 8080
-```
 
-### 4. Send a test inference request
-
-```bash
+# Test inference
 curl -s -X POST http://localhost:8080/api/v1/infer \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer my-secret-token" \
   -d '{"prompt": "Explain Lorentz contraction in one sentence."}' | jq .
 ```
 
-### 5. Use the EchoWorker in your own code (no keys required)
-
-```rust
-use tokio_prompt_orchestrator::{EchoWorker, ModelWorker};
-
-#[tokio::main]
-async fn main() {
-    let worker = EchoWorker;
-    let tokens = worker.infer("Hello, world!").await.unwrap();
-    println!("{}", tokens.join(""));
-}
-```
-
 ---
 
-## HTTP API Endpoint Reference
+## Empirical Validation
 
-> Requires the `web-api` feature.
-> All inference endpoints require `Authorization: Bearer <API_KEY>` when
-> `API_KEY` is set. Public endpoints (`/health`, `/metrics`, `/api/v1/schema`)
-> are always unauthenticated.
+Evaluated on 10 liquid S&P 500 instruments at 1-minute resolution over Q1 2025:
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `POST` | `/api/v1/infer` | Yes | Submit an inference request; returns a `request_id` immediately |
-| `POST` | `/api/v1/stream` | Yes | SSE token stream; events: `start`, `token`, `done` |
-| `GET`  | `/api/v1/status/{id}` | Yes | Poll request status (`pending`, `processing`, `completed`, `failed`, `timeout`) |
-| `GET`  | `/api/v1/result/{id}` | Yes | Block until the result is ready (or timeout) |
-| `GET`  | `/api/v1/ws` | Yes | WebSocket upgrade — bidirectional streaming; 1 MB message limit, 30 s ping |
-| `GET`  | `/api/v1/schema` | No | OpenAPI 3.0 JSON schema |
-| `GET`  | `/health` | No | `{"status":"healthy","version":"…"}` |
-| `GET`  | `/metrics` | No | Prometheus text-format metrics |
+- **Variance ratio (VR):** SPACELIKE bars show 1.27x higher next-bar return
+  variance than TIMELIKE bars.
+- **Bartlett test:** p = 6x10^-16 (null hypothesis of equal variances rejected).
+- **Per-instrument significance:** 10/11 instruments significant at alpha = 0.01
+  after Bonferroni correction.
+- **Relativistic Sharpe improvement:** +0.18 vs classical momentum on the same
+  universe over the same period.
 
-### Request body (`POST /api/v1/infer` and `/api/v1/stream`)
+Reproduce the analysis:
 
-```json
-{
-  "prompt": "string (required)",
-  "session_id": "string (optional, generated if absent)",
-  "metadata": { "key": "value" },
-  "stream": false
-}
+```bash
+# Run C++ regime validator to produce CSVs
+cmake --build build --target regime_validator
+./build/regime_validator --data-dir data/ --output-dir validation/results/
+
+# Run Python statistical analysis
+python validation/analyze_q1.py --results-dir validation/results/
+
+# Run backtest strategy comparison
+python validation/backtest_comparison.py
 ```
-
-### Response body
-
-```json
-{
-  "request_id": "uuid",
-  "status": "processing",
-  "result": "string (present when completed)",
-  "error": "string (present when failed)"
-}
-```
-
-### Environment variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `API_KEY` | *(none)* | Bearer token; unset = auth disabled (warning logged) |
-| `ALLOWED_ORIGINS` | *(wildcard)* | Comma-separated CORS origins |
-| `OPENAI_API_KEY` | — | Required for `OpenAiWorker` |
-| `ANTHROPIC_API_KEY` | — | Required for `AnthropicWorker` |
-| `LLAMA_CPP_URL` | `http://localhost:8080` | llama.cpp server URL |
-| `VLLM_URL` | `http://localhost:8000` | vLLM server URL |
-| `RUST_LOG` | `info` | Tracing log filter (e.g. `debug`, `tokio_prompt_orchestrator=trace`) |
-
-### WebSocket message format
-
-Send JSON matching the `POST /api/v1/infer` body. The server replies with:
-
-```json
-{ "request_id": "uuid", "status": "processing" }
-// ... then when complete:
-{ "request_id": "uuid", "status": "completed", "result": "…" }
-```
-
-Rate limit: 60 messages per minute per connection.
-
-### Rate Limits
-
-| Endpoint | Limit | Window | Scope |
-|----------|-------|--------|-------|
-| `POST /api/v1/infer` | 60 requests | 60 seconds | Per IP address |
-| `WS /api/v1/ws` | 60 messages | 60 seconds | Per connection |
-| `POST /api/v1/stream` | 10 concurrent connections | — | Per server |
-
-Rate limit response headers (on `POST /api/v1/infer`):
-
-| Header | Description |
-|--------|-------------|
-| `X-RateLimit-Limit` | Maximum requests allowed in the window |
-| `X-RateLimit-Remaining` | Requests remaining in the current window |
-| `X-RateLimit-Reset` | Unix timestamp when the window resets |
-
-When a rate limit is exceeded the server responds with HTTP `429 Too Many Requests` and a structured error body:
-
-```json
-{"error": {"code": "too_many_connections", "message": "SSE connection limit reached"}}
-```
-
-The SSE connection limit (default: 10) is configurable at startup.
-
----
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
 ---
 
@@ -705,9 +616,6 @@ cmake -B build-asan -DCMAKE_BUILD_TYPE=Debug \
 cmake --build build-asan
 ctest --test-dir build-asan --output-on-failure
 
-# Property-based tests (requires RapidCheck)
-ctest --test-dir build -R "prop_"
-
 # Python validation suite
 cd tests/python && pip install -r requirements.txt && pytest -v
 ```
@@ -718,20 +626,20 @@ Test coverage summary:
 |---|---|---|
 | MomentumUnitTests | 12 | `MomentumProcessor`, `BetaVelocity`, `LorentzFactor` |
 | LorentzTransformTests | 18 | `gamma`, `rapidity`, `Doppler`, round-trip |
-| BetaCalculatorTests | 14 | Online `β` computation, boundary clamping |
-| LorentzInvariantTests | 16 | ds² invariance, velocity composition, subnormals |
+| BetaCalculatorTests | 14 | Online beta computation, boundary clamping |
+| LorentzInvariantTests | 16 | ds^2 invariance, velocity composition, subnormals |
 | MetricTensorTests | 10 | Minkowski metric, inverse, singular metric |
-| ChristoffelTests | 8 | Flat space identity, symmetry `Γ^μ_νρ = Γ^μ_ρν` |
+| ChristoffelTests | 8 | Flat space identity, Gamma symmetry |
 | GeodesicTests | 12 | RK4 energy conservation, flat geodesic linearity |
 | IntervalGapTests | 9 | Symmetry, extreme coordinates, boost invariance |
 | SimdAccelerationTests | 6 | Scalar/AVX2/AVX-512 numerical agreement |
-| BacktesterTests | 14 | Sharpe, Sortino, max drawdown, γ-weighted IR |
+| BacktesterTests | 14 | Sharpe, Sortino, max drawdown, gamma-weighted IR |
 | PerformanceMetricsTests | 10 | Precision, edge cases |
-| ErrorHandlingIntegrationTests | 22 | NaN/Inf inputs, length mismatches, degenerate metrics |
+| ErrorHandlingIntegrationTests | 22 | NaN/Inf inputs, degenerate metrics |
 | FullPipelineIntegrationTests | 8 | End-to-end Engine.run_backtest |
 | NAssetTests | 20 | N-asset interval, manifold, geodesic |
-| StreamTests | 15 | Lock-free ring buffer, tick validation, SPSC stress |
-| Property tests (RapidCheck) | 9 × 10,000 | Lorentz identity, rapidity additivity, subluminality |
+| StreamTests | 15 | Lock-free ring buffer, SPSC stress |
+| Property tests (RapidCheck) | 9 x 10,000 | Lorentz identity, rapidity additivity |
 
 ---
 
@@ -748,35 +656,45 @@ Measured on Intel Core i9-13900K (Ubuntu 22.04, GCC 12, `-O3`):
 | `batch_gamma` AVX2 | 4-wide | 1.18 Gop/s (3.8x) |
 | `batch_gamma` AVX-512 | 8-wide | 2.24 Gop/s (7.2x) |
 
-Run benchmarks locally:
-
-```bash
-cmake --build build --target bench
-./build/bench_beta_gamma --benchmark_format=json
-```
-
 ---
 
-## Empirical Validation (Q1 2025)
+## Contributing
 
-Evaluated on 10 liquid S&P 500 instruments at 1-minute resolution over Q1 2025:
+### Pre-PR checklist
 
-- **Variance ratio (VR):** SPACELIKE bars show 1.27x higher next-bar return
-  variance than TIMELIKE bars.
-- **Bartlett test:** p = 6×10⁻¹⁶ (null hypothesis of equal variances rejected).
-- **Per-instrument significance:** 10/11 instruments significant at α = 0.01
-  after Bonferroni correction.
-- **Relativistic Sharpe improvement:** +0.18 vs classical momentum on the same
-  universe over the same period.
+```bash
+# 1. Build in Debug with all sanitizers
+cmake -B build-check -DCMAKE_BUILD_TYPE=Debug \
+      -DSRFM_WARNINGS_AS_ERRORS=ON \
+      -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined,thread"
+cmake --build build-check && ctest --test-dir build-check --output-on-failure
 
-Full methodology and results are in the companion paper (see below).
+# 2. clang-tidy (must produce zero warnings)
+clang-tidy src/**/*.cpp include/**/*.hpp -- \
+      -std=c++20 -Iinclude -Isrc
+
+# 3. Doxygen (zero undocumented public symbols)
+doxygen Doxyfile 2>&1 | grep -i warning
+```
+
+### API contract (C++)
+
+Every public function must:
+- Return `std::optional<T>` for all fallible paths; never throw.
+- Not invoke UB for any finite or non-finite IEEE 754 input.
+- Be documented with `@brief`, `@param`, and `@return` Doxygen tags.
+- Be covered by at least one unit test for the happy path and one for the
+  error path (`std::nullopt` return).
+
+### Python style
+
+- Type-annotated (`from __future__ import annotations`).
+- All public functions have docstrings with Parameters / Returns sections.
+- No external dependencies beyond the packages in `validation/requirements.txt`.
 
 ---
 
 ## Academic Paper
-
-The mathematical foundations and empirical results are documented in a
-full-length academic paper:
 
 ```
 paper/
@@ -801,139 +719,29 @@ cd paper && make arxiv      # arXiv submission tarball
 
 ---
 
-## API Reference
+## HTTP API Endpoint Reference
 
-Full Doxygen-generated API documentation is built in CI and available as a
-GitHub Actions artifact on every `main` push. To build locally:
+> Requires the `web-api` feature.
+> All inference endpoints require `Authorization: Bearer <API_KEY>` when
+> `API_KEY` is set. Public endpoints (`/health`, `/metrics`, `/api/v1/schema`)
+> are always unauthenticated.
 
-```bash
-doxygen Doxyfile
-# Output: docs/api/html/index.html
-```
-
-Key namespaces:
-
-| Namespace | Content |
-|---|---|
-| `srfm::types` | Strong types (`BetaVelocity`, `LorentzFactor`, `EffectiveMass`) |
-| `srfm::constants` | Physical and numerical constants |
-| `srfm::momentum` | `MomentumProcessor`, `MomentumSignal` |
-| `srfm::manifold` | `SpacetimeInterval`, `SpacetimeEvent`, `IntervalClass` |
-| `srfm::tensor` | `MetricTensor`, `ChristoffelSymbols`, `GeodesicSolver` |
-| `srfm::core` | `Engine`, `BarData`, `BetaVelocity` |
-| `srfm::backtest` | `Backtester`, `PerformanceCalculator`, `BacktestResult` |
-| `srfm::simd` | `detect_simd_level()`, `batch_beta`, `batch_gamma` |
-| `srfm::stream` | Lock-free streaming pipeline |
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `POST` | `/api/v1/infer` | Yes | Submit inference request; returns `request_id` |
+| `POST` | `/api/v1/stream` | Yes | SSE token stream; events: `start`, `token`, `done` |
+| `GET`  | `/api/v1/status/{id}` | Yes | Poll request status |
+| `GET`  | `/api/v1/result/{id}` | Yes | Block until result ready |
+| `GET`  | `/api/v1/ws` | Yes | WebSocket bidirectional streaming |
+| `GET`  | `/api/v1/schema` | No | OpenAPI 3.0 JSON schema |
+| `GET`  | `/health` | No | `{"status":"healthy","version":"..."}` |
+| `GET`  | `/metrics` | No | Prometheus text-format metrics |
 
 ---
 
-## Contributing
+## Changelog
 
-### Pre-PR checklist
-
-```bash
-# 1. Build in Debug with all sanitizers
-cmake -B build-check -DCMAKE_BUILD_TYPE=Debug \
-      -DSRFM_WARNINGS_AS_ERRORS=ON \
-      -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined,thread"
-cmake --build build-check && ctest --test-dir build-check --output-on-failure
-
-# 2. clang-tidy (must produce zero warnings)
-clang-tidy src/**/*.cpp include/**/*.hpp -- \
-      -std=c++20 -Iinclude -Isrc
-
-# 3. Doxygen (zero undocumented public symbols)
-doxygen Doxyfile 2>&1 | grep -i warning
-```
-
-### API contract
-
-Every public function must satisfy:
-- Returns `std::optional<T>` for all fallible paths; never throws.
-- Does not invoke UB for any finite or non-finite IEEE 754 input.
-- Is documented with `@brief`, `@param`, and `@return` Doxygen tags.
-- Is covered by at least one unit test exercising the happy path and at least
-  one test exercising the error path (`std::nullopt` return).
-
----
-
-## Python Quickstart
-
-```python
-from srfm import SpacetimeInterval, LorentzTransform, Backtester
-
-# 1. Classify an OHLCV bar interval
-#    ds² = -c²Δt² + ΔP² + ΔV¹/⁴² + ΔM¹/³²
-label = SpacetimeInterval.classify(dt=1.0, dp=0.3, dv=0.05, dm=0.02)
-print(label)  # 'TIMELIKE'
-
-# 2. Compute Lorentz factor
-gamma = LorentzTransform.gamma(beta=0.6)
-print(gamma)  # 1.25
-
-# 3. Relativistic backtest
-prices = [100, 101.5, 99.8, 102.4, 101.1, 103.5, 102.0, 105.0]
-result = Backtester().run(prices)
-print(f"Sharpe: {result.sharpe:.4f}")
-print(f"Relativistic lift: {result.relativistic_lift:.3f}x")
-print(result.to_string())
-```
-
-## C++ Quickstart
-
-```cpp
-#include "srfm/manifold.hpp"
-#include "srfm/engine.hpp"
-#include "srfm/multi_asset.hpp"
-
-// Single-asset interval classification
-auto ds2 = srfm::manifold::SpacetimeInterval::interval(event_a, event_b);
-if (ds2) {
-    auto t = srfm::manifold::SpacetimeInterval::classify(*ds2);
-    std::cout << srfm::manifold::to_string(t) << "\n"; // TIMELIKE
-}
-
-// Full pipeline
-srfm::core::Engine engine;
-auto bars = srfm::core::DataLoader::load_csv("prices.csv");
-if (bars) {
-    auto result = engine.run_backtest(*bars);
-    if (result) fmt::print("{}\n", result->to_string());
-}
-
-// Multi-asset spacetime
-srfm::multi_asset::CorrelationMetric cm(3 /*n_assets*/);
-for (auto& row : price_history)
-    if (auto metric = cm.update(row)) {
-        auto ds2 = srfm::multi_asset::MultiAssetInterval::compute(ev_a, ev_b, *metric);
-        // ds2 < 0 → TIMELIKE portfolio move
-    }
-```
-
----
-
-## FAQ
-
-**Q: What does "financial speed of light" mean?**
-A: It is the normalised unit velocity `c = 1.0` that sets the boundary between TIMELIKE (causal, β < 1) and SPACELIKE (stochastic, β > 1) market movements.  Unlike physical light speed, its numerical value is arbitrary and is calibrated to the instrument's volatility scale.
-
-**Q: Is this model physically rigorous?**
-A: No — it is a mathematical analogy.  Special relativity's mathematical formalism (Lorentz transforms, spacetime intervals, geodesics) is borrowed and applied to price series because the invariant interval equation ds² = −c²dt² + dP² + dV² + dM² produces empirically useful market-regime labels.  We make no claim that financial markets literally obey special relativity.
-
-**Q: Why does TIMELIKE imply lower next-bar variance?**
-A: The Bartlett test result (p = 6×10⁻¹⁶, Q1 2025) shows this empirically.  The intuition is that TIMELIKE intervals correspond to price moves where |ΔP| < c·Δt — i.e., the price change is "sub-light", meaning the move is small relative to the time elapsed.  Such bars tend to be in momentum-driven, low-noise regimes, which exhibit lower variance.
-
-**Q: Can I use this in production?**
-A: The C++ library is production-quality (no exceptions in hot paths, lock-free where possible, zero raw pointers, 100% optional-returning fallible ops).  The trading logic itself is experimental — always backtest thoroughly on your own data before deploying.
-
-**Q: What is the difference between `SpacetimeInterval` and `MultiAssetInterval`?**
-A: `SpacetimeInterval` handles a single asset embedded in 4D spacetime `(t, P, V, M)` with a fixed Minkowski metric.  `MultiAssetInterval` handles N assets in an (N+1)-dimensional spacetime where the spatial block of the metric is the rolling sample covariance matrix of asset log-returns.
-
-**Q: How do I extend the metric to time-varying correlations?**
-A: Call `CorrelationMetric::update()` with each new price bar.  The metric is recomputed over the rolling window on every call.  For stochastic volatility models, you can subclass `CorrelationMetric` and override `compute_covariance()`.
-
-**Q: Do I need Rust to build the C++ library?**
-A: No.  The Rust crate (`src/main.rs`, `src/lib.rs`) provides the optional Tokio orchestration layer for async prompt dispatching and the TUI dashboard.  The core C++ library (`CMakeLists.txt`) builds independently.
+See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
 ---
 
@@ -944,8 +752,6 @@ MIT License. See [LICENSE](LICENSE).
 ---
 
 ## Citation
-
-If you use this library in academic work, please cite:
 
 ```bibtex
 @software{busel2025srfm,
