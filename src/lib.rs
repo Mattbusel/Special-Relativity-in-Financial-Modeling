@@ -42,6 +42,8 @@ pub mod twin_paradox;
 pub mod doppler_effect;
 pub mod holography;
 pub mod string_theory;
+pub mod superluminal;
+pub mod dark_energy;
 
 #[cfg(feature = "tui")]
 pub mod tui;
