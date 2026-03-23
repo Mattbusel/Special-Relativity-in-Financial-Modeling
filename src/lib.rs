@@ -107,6 +107,8 @@ pub mod curved_spacetime;
 pub mod wormhole;
 pub mod uncertainty_principle;
 pub mod decoherence;
+pub mod many_worlds;
+pub mod quantum_tunneling;
 
 #[cfg(feature = "viz")]
 pub mod viz;
