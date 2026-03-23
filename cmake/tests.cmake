@@ -330,3 +330,49 @@ target_include_directories(test_simd PRIVATE
 )
 target_link_libraries(test_simd PRIVATE srfm_simd_dispatch)
 add_test(NAME SimdAccelerationTests COMMAND test_simd)
+
+# ── Dual-number Christoffel symbols (Task 3) ──────────────────────────────────
+
+add_executable(test_christoffel_dual
+    tests/tensor/test_christoffel_dual.cpp
+)
+target_include_directories(test_christoffel_dual PRIVATE src include)
+target_link_libraries(test_christoffel_dual PRIVATE
+    srfm_tensor
+    GTest::gtest_main
+)
+add_test(NAME ChristoffelDualTests COMMAND test_christoffel_dual)
+
+# ── Metric singularity / Tikhonov regularization (Task 4) ────────────────────
+
+add_executable(test_metric_singularity
+    tests/tensor/test_metric_singularity.cpp
+)
+target_include_directories(test_metric_singularity PRIVATE src include)
+target_link_libraries(test_metric_singularity PRIVATE
+    srfm_tensor
+    GTest::gtest_main
+)
+add_test(NAME MetricSingularityTests COMMAND test_metric_singularity)
+
+# ── Portfolio Manifold & Relativistic Optimizer (Task 1 + Task 2) ────────────
+
+add_executable(test_portfolio_manifold
+    tests/portfolio/test_portfolio_manifold.cpp
+)
+target_include_directories(test_portfolio_manifold PRIVATE src include)
+target_link_libraries(test_portfolio_manifold PRIVATE
+    srfm_portfolio
+    GTest::gtest_main
+)
+add_test(NAME PortfolioManifoldTests COMMAND test_portfolio_manifold)
+
+add_executable(test_relativistic_optimizer
+    tests/portfolio/test_relativistic_optimizer.cpp
+)
+target_include_directories(test_relativistic_optimizer PRIVATE src include)
+target_link_libraries(test_relativistic_optimizer PRIVATE
+    srfm_portfolio
+    GTest::gtest_main
+)
+add_test(NAME RelativisticOptimizerTests COMMAND test_relativistic_optimizer)

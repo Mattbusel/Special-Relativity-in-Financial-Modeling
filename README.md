@@ -115,6 +115,151 @@ for general ones; singular metrics return `std::nullopt`.
 
 ---
 
+## N-Asset Portfolio Manifold
+
+The `portfolio_manifold` module extends the 4D spacetime framework to a full
+N-asset portfolio analysis layer.
+
+### AssetEvent
+
+Each asset is embedded as a 4-vector `(t, P, V, M)`:
+
+```cpp
+#include "portfolio_manifold.hpp"
+using namespace srfm::portfolio;
+
+AssetEvent aapl{"AAPL", 1.0, 150.0, 1e8, 2.4e12};
+AssetEvent msft{"MSFT", 1.0, 290.0, 8e7, 2.1e12};
+```
+
+### MinkowskiCovariance — NxN spacetime interval covariance
+
+```cpp
+MinkowskiCovariance mc;
+mc.add_asset(aapl);
+mc.add_asset(msft);
+auto cov = mc.compute_spacetime_covariance();
+// cov(i,j) = exp(-|ds²(i,j)|)  — Gaussian kernel over spacetime interval
+// Diagonal = 1.0; off-diagonal in (0, 1]
+```
+
+The (i,j) entry is `exp(−|ds²(i,j)|)` where `ds²` is the Minkowski interval:
+
+```
+ds²(i,j) = −c²·Δt² + ΔP² + ΔV² + ΔM²
+```
+
+| Interval type | ds² sign | Kernel value | Interpretation |
+|---------------|----------|--------------|----------------|
+| TIMELIKE      | < 0      | → 0          | Causal separation — large lead-lag gap |
+| LIGHTLIKE     | ≈ 0      | ≈ 1          | Maximum covariance at the light cone |
+| SPACELIKE     | > 0      | → 0          | Stochastic, acausal separation |
+
+### SpacetimeCausalGraph — directed causal influence graph
+
+```cpp
+auto graph = SpacetimeCausalGraph::build(mc);
+// Edge (i→j) exists iff ds²(i,j) < −threshold (TIMELIKE)
+bool aapl_leads_msft = graph->has_edge(0, 1);
+int aapl_out_degree  = graph->out_degree(0);
+```
+
+---
+
+## Relativistic Portfolio Optimization
+
+The `relativistic_optimizer` module reformulates Markowitz optimization as a
+geodesic problem on the financial manifold.
+
+### Key differences from classical Markowitz
+
+| Classical | Relativistic |
+|-----------|-------------|
+| Risk = `w^T Σ w` (Euclidean variance) | Risk = geodesic distance `w^T Σ_st w` (spacetime metric) |
+| Returns = `μ` | Returns = `γ(β) · μ` (Lorentz-corrected) |
+| Solver: quadratic programming | Solver: projected gradient descent on simplex |
+
+### Usage
+
+```cpp
+#include "relativistic_optimizer.hpp"
+using namespace srfm::portfolio;
+
+RelativisticPortfolio rp;
+rp.add_asset(AssetEvent{"AAPL", 1.0, 150.0, 1e8, 2.4e12}, 0.12);
+rp.add_asset(AssetEvent{"MSFT", 1.0, 290.0, 8e7, 2.1e12}, 0.10);
+rp.add_asset(AssetEvent{"GOOG", 1.0, 140.0, 6e7, 1.8e12}, 0.09);
+
+auto result = rp.optimize_weights(0.08);  // target 8% return
+if (result) {
+    std::cout << "Weights: " << result->weights.transpose() << "\n";
+    std::cout << "Geodesic risk: " << result->geodesic_risk << "\n";
+    std::cout << "Expected return: " << result->expected_return << "\n";
+}
+```
+
+### Gamma-weighted returns
+
+For each asset i, the Lorentz-corrected return is:
+
+```
+μ_rel_i = γ(β_i) · μ_i,   γ(β) = 1 / √(1 − β²)
+β_i = |P_i| / (c · |t_i|)
+```
+
+High-velocity assets (large β, noisy regime) have returns amplified by γ > 1,
+increasing pressure on the optimizer to reduce their weight.
+
+---
+
+## Technical Improvements
+
+### Autodiff Christoffel Symbols (Task 3)
+
+`ChristoffelSymbolsDual` replaces O(h²) central finite differences with exact
+**forward-mode automatic differentiation** via dual numbers (`ε² = 0`).
+
+```cpp
+// Dual-number metric function (evaluate at DualSpacetimePoint):
+auto dual_fn = [](const DualSpacetimePoint& xd) -> DualMetricMatrix { ... };
+
+MetricTensor base(metric_fn);
+ChristoffelSymbolsDual cs(base, dual_fn);
+auto gamma = cs.compute(x);  // exact derivatives, no step-size tuning
+```
+
+Benefits over finite differences:
+
+| Property | Finite differences | Dual numbers |
+|---|---|---|
+| Metric evaluations per Γ | 8 (2 per direction) | 4 (1 per direction) |
+| Truncation error | O(h²) | 0 (machine epsilon only) |
+| Step-size sensitivity | Yes — requires tuning | None |
+| Works for non-smooth metrics | No | Yes |
+
+### Metric Singularity — Tikhonov Regularization (Task 4)
+
+`MetricTensor::inverse()` previously returned `std::nullopt` for singular
+metrics, silently zeroing out all Christoffel symbols. Now it applies
+**Tikhonov regularization** before giving up:
+
+```
+g_reg = g + λI,   λ = 1e-10
+```
+
+A `stderr` warning is emitted whenever regularization is applied:
+
+```
+[srfm::tensor::MetricTensor::inverse] WARNING: singular metric detected at
+x = (…); applying Tikhonov regularization λ = 1.00e-10
+```
+
+This recovers geodesic integration for degenerate market configurations (e.g.
+zero-volatility assets, perfectly correlated pairs) without silently discarding
+curvature information.
+
+---
+
 ## Architecture
 
 ```
@@ -123,13 +268,21 @@ include/srfm/
   constants.hpp      — BETA_MAX_SAFE, SPEED_OF_LIGHT, FLOAT_EPSILON
   momentum.hpp       — MomentumProcessor, MomentumSignal
   manifold.hpp       — SpacetimeEvent, SpacetimeInterval, IntervalClass
-  tensor.hpp         — MetricTensor, ChristoffelSymbols, MetricMatrix
+  tensor.hpp         — MetricTensor, DualNumber, ChristoffelSymbols,
+                       ChristoffelSymbolsDual, MetricMatrix
   engine.hpp         — Engine (full pipeline wiring)
   backtest.hpp       — Backtester, PerformanceCalculator, BacktestResult
   data_loader.hpp    — DataLoader, OHLCV
   normalizer.hpp     — CoordinateNormalizer
   geodesic_signal.hpp    — GeodesicSignal
   geodesic_strategy.hpp  — GeodesicStrategy
+
+include/
+  portfolio_manifold.hpp      — AssetEvent, MinkowskiCovariance,
+                                SpacetimeCausalGraph (N-asset portfolio layer)
+  relativistic_optimizer.hpp  — RelativisticPortfolio, OptimizerConfig,
+                                OptimizationResult
+
   simd/
     cpu_features.hpp     — detect_simd_level(), SimdLevel enum
     simd_dispatch.hpp    — batch_beta_scalar/avx2/avx512
@@ -151,7 +304,11 @@ src/
   manifold/          — SpacetimeMarketManifold implementation
   geodesic/          — GeodesicSolver (RK4) implementation
   engine/            — Engine implementation
+  tensor/
+    christoffel_dual.cpp — ChristoffelSymbolsDual (dual-number autodiff)
   simd/              — Scalar, AVX2, AVX-512F kernels + runtime dispatch
+  portfolio_manifold.cpp    — MinkowskiCovariance, SpacetimeCausalGraph
+  relativistic_optimizer.cpp — RelativisticPortfolio
 ```
 
 Dependency graph (no cycles):
@@ -162,6 +319,7 @@ srfm_momentum  ←  srfm_manifold
 srfm_manifold  ←  srfm_geodesic
 srfm_beta_calculator, srfm_manifold, srfm_geodesic  ←  srfm_engine
 srfm_momentum  ←  srfm_simd_{scalar,avx2,avx512}  ←  srfm_simd_dispatch
+srfm_manifold, srfm_tensor  ←  srfm_portfolio
 ```
 
 ---

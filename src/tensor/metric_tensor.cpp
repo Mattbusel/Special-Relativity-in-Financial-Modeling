@@ -5,8 +5,16 @@
 #include "srfm/constants.hpp"
 
 #include <Eigen/Eigenvalues>
+#include <cstdio>   // std::fprintf for regularization warning
 
 namespace srfm::tensor {
+
+// ─── Tikhonov regularization constant ────────────────────────────────────────
+// When the metric matrix is near-singular, we add λI to stabilise the
+// LU decomposition before inverting.  The value λ = 1e-10 is small enough
+// to preserve the geometry to full double precision for well-conditioned
+// metrics while rescuing degenerate (zero-volatility) configurations.
+static constexpr double TIKHONOV_LAMBDA = 1e-10;
 
 // ─── Construction ─────────────────────────────────────────────────────────────
 
@@ -27,7 +35,31 @@ std::optional<MetricMatrix> MetricTensor::inverse(const SpacetimePoint& x) const
     Eigen::FullPivLU<MetricMatrix> lu(g);
 
     if (!lu.isInvertible()) {
-        return std::nullopt;
+        // FIX (Task 4): Replace hard nullopt on singular metric with Tikhonov
+        // regularization.  Adding λI to a singular matrix shifts all eigenvalues
+        // by λ, making the matrix invertible while introducing only O(λ) error
+        // in the geometry.  This prevents geodesic integrations from silently
+        // returning zero Christoffel symbols when the covariance matrix has a
+        // zero-volatility direction (e.g. a perfectly correlated asset pair).
+        //
+        // λ = TIKHONOV_LAMBDA = 1e-10 is chosen to be:
+        //   - Large enough to regularise numerically zero eigenvalues
+        //   - Small enough to be negligible for well-conditioned markets (σ ~ 0.01)
+        std::fprintf(stderr,
+            "[srfm::tensor::MetricTensor::inverse] WARNING: singular metric "
+            "detected at x = (%.4g, %.4g, %.4g, %.4g); applying Tikhonov "
+            "regularization λ = %.2e\n",
+            x(0), x(1), x(2), x(3), TIKHONOV_LAMBDA);
+
+        MetricMatrix g_reg = g;
+        g_reg += TIKHONOV_LAMBDA * MetricMatrix::Identity();
+
+        Eigen::FullPivLU<MetricMatrix> lu_reg(g_reg);
+        if (!lu_reg.isInvertible()) {
+            // Even after regularization the matrix is degenerate — return nullopt.
+            return std::nullopt;
+        }
+        return lu_reg.inverse();
     }
 
     return lu.inverse();

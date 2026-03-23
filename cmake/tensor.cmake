@@ -4,6 +4,7 @@
 add_library(srfm_tensor STATIC
     src/tensor/metric_tensor.cpp
     src/tensor/christoffel.cpp
+    src/tensor/christoffel_dual.cpp
     src/tensor/christoffel_n.cpp
     src/tensor/geodesic.cpp
     src/tensor/geodesic_n.cpp

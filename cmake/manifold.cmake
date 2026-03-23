@@ -57,3 +57,20 @@ add_library(srfm_stream STATIC
 )
 target_include_directories(srfm_stream PUBLIC src include)
 target_link_libraries(srfm_stream PUBLIC srfm_engine)
+
+# ── Portfolio Manifold & Relativistic Optimizer ───────────────────────────────
+# New modules: N-asset Minkowski covariance matrix, causal graph, and
+# relativistic Markowitz portfolio optimization (Task 1 + Task 2).
+
+add_library(srfm_portfolio STATIC
+    src/portfolio_manifold.cpp
+    src/relativistic_optimizer.cpp
+)
+target_include_directories(srfm_portfolio PUBLIC
+    include   # for include/portfolio_manifold.hpp and include/relativistic_optimizer.hpp
+    src       # for srfm/* internal headers
+)
+target_link_libraries(srfm_portfolio PUBLIC srfm_manifold srfm_tensor)
+if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
+    target_link_libraries(srfm_portfolio PUBLIC Eigen3::Eigen)
+endif()

@@ -8,6 +8,7 @@
 /// ## Responsibility
 /// Implements the differential geometry machinery for the financial spacetime
 /// manifold. Provides:
+///   - `DualNumber`       — Scalar dual number for forward-mode autodiff
 ///   - `MetricTensor`     — 4×4 position-dependent g_μν encoding covariance
 ///   - `ChristoffelSymbols` — Γ^λ_μν = ½ g^λσ(∂_μg_νσ + ∂_νg_μσ − ∂_σg_μν)
 ///   - `GeodesicSolver`   — integrates d²x^λ/dτ² + Γ^λ_μν ẋ^μ ẋ^ν = 0
@@ -19,6 +20,15 @@
 /// matrix. Christoffel symbols Γ^λ_μν therefore measure the *rate of change
 /// of correlations* through market space. The geodesic equation describes the
 /// natural, force-free price path through this curved geometry.
+///
+/// ## Autodifferentiation (Dual Numbers)
+/// ChristoffelSymbolsDual replaces the O(h²) central finite-difference
+/// metric derivative with exact forward-mode automatic differentiation via
+/// dual numbers:
+///   x = a + b·ε,  ε² = 0
+/// Evaluating g_μν at x = (x₀ + ε·ê_σ) propagates the partial derivative
+/// ∂g_μν/∂x^σ exactly through any polynomial or rational metric function,
+/// with zero truncation error and no step-size tuning.
 ///
 /// ## Guarantees
 /// - No undefined behaviour: all fallible operations return std::optional
@@ -44,6 +54,88 @@
 #include <vector>
 
 namespace srfm::tensor {
+
+// ─── DualNumber ───────────────────────────────────────────────────────────────
+
+/// Forward-mode automatic differentiation scalar: x = value + deriv·ε, ε² = 0.
+///
+/// A dual number carries a real value and its directional derivative
+/// simultaneously. Arithmetic operations propagate both components according
+/// to the standard rules of dual-number algebra:
+///   (a+bε) + (c+dε) = (a+c) + (b+d)ε
+///   (a+bε) × (c+dε) = ac + (ad+bc)ε     [ε² = 0]
+///   (a+bε) / (c+dε) = a/c + (bc−ad)/c²ε  [c≠0]
+///
+/// ## Usage for metric derivatives
+/// To compute ∂g_μν/∂x^σ exactly (without finite-difference truncation error):
+/// ```cpp
+/// // Seed coordinate σ with derivative 1; all others with derivative 0.
+/// DualSpacetimePoint xd;
+/// for (int k = 0; k < 4; ++k)
+///     xd[k] = DualNumber{x(k), k == sigma ? 1.0 : 0.0};
+/// // Evaluate the dual-number metric; extract the .deriv component.
+/// auto gd_mu_nu = dual_metric_fn(xd);
+/// // gd_mu_nu(mu, nu).deriv == ∂g_μν/∂x^σ  (exact, no rounding)
+/// ```
+struct DualNumber {
+    double value;  ///< Real part
+    double deriv;  ///< Infinitesimal (ε) part: the directional derivative
+
+    // ── Arithmetic operators ───────────────────────────────────────────────
+
+    constexpr DualNumber operator+(const DualNumber& o) const noexcept {
+        return {value + o.value, deriv + o.deriv};
+    }
+    constexpr DualNumber operator-(const DualNumber& o) const noexcept {
+        return {value - o.value, deriv - o.deriv};
+    }
+    constexpr DualNumber operator*(const DualNumber& o) const noexcept {
+        // (a+bε)(c+dε) = ac + (ad+bc)ε
+        return {value * o.value, value * o.deriv + deriv * o.value};
+    }
+    constexpr DualNumber operator/(const DualNumber& o) const noexcept {
+        // (a+bε)/(c+dε) = a/c + (bc−ad)/c²·ε
+        const double inv_c = 1.0 / o.value;
+        return {value * inv_c,
+                (deriv * o.value - value * o.deriv) * inv_c * inv_c};
+    }
+
+    // ── Mixed real/dual arithmetic ─────────────────────────────────────────
+
+    constexpr DualNumber operator+(double s) const noexcept {
+        return {value + s, deriv};
+    }
+    constexpr DualNumber operator-(double s) const noexcept {
+        return {value - s, deriv};
+    }
+    constexpr DualNumber operator*(double s) const noexcept {
+        return {value * s, deriv * s};
+    }
+    constexpr DualNumber operator/(double s) const noexcept {
+        return {value / s, deriv / s};
+    }
+    constexpr DualNumber operator-() const noexcept {
+        return {-value, -deriv};
+    }
+
+    friend constexpr DualNumber operator+(double s, const DualNumber& d) noexcept {
+        return {s + d.value, d.deriv};
+    }
+    friend constexpr DualNumber operator*(double s, const DualNumber& d) noexcept {
+        return {s * d.value, s * d.deriv};
+    }
+};
+
+/// A 4-vector of dual numbers — one per spacetime coordinate.
+/// Used to seed the autodiff direction when computing metric derivatives.
+using DualSpacetimePoint = Eigen::Matrix<DualNumber, SPACETIME_DIM, 1>;
+
+/// A 4×4 matrix of dual numbers — the metric evaluated at a dual-number point.
+using DualMetricMatrix = Eigen::Matrix<DualNumber, SPACETIME_DIM, SPACETIME_DIM>;
+
+/// A callable mapping a dual-number spacetime point to a dual-number metric.
+/// Implement this alongside MetricFunction to enable exact autodiff derivatives.
+using DualMetricFunction = std::function<DualMetricMatrix(const DualSpacetimePoint&)>;
 
 // ─── Type Aliases ─────────────────────────────────────────────────────────────
 
@@ -342,6 +434,80 @@ private:
     mutable bool              cache_valid_{false};
     mutable SpacetimePoint    cached_point_{SpacetimePoint::Zero()};
     mutable ChristoffelArray  cached_result_{};
+};
+
+// ─── ChristoffelSymbolsDual ───────────────────────────────────────────────────
+
+/// Christoffel symbols computed via dual-number forward-mode autodiff.
+///
+/// Replaces the O(h²) central finite-difference approximation in
+/// ChristoffelSymbols with an exact computation. The metric function is
+/// re-evaluated at a dual-number point xd = x + ε·ê_σ; the ε-component of
+/// the result is the exact partial derivative ∂g_μν/∂x^σ, with zero
+/// truncation error and no step-size sensitivity.
+///
+/// ## Requirements
+/// The caller must supply a `DualMetricFunction` in addition to the standard
+/// `MetricFunction`. This is the same mathematical object as the metric, but
+/// templated over DualNumber arithmetic instead of double arithmetic.
+///
+/// ## Performance vs. ChristoffelSymbols
+/// Each of the 4 derivative directions requires one call to the dual metric
+/// function (vs. 2 calls each for central differences). Total cost: 4 calls
+/// vs. 8 calls per Christoffel evaluation, and no step-size h to tune.
+///
+/// ## Example
+/// ```cpp
+/// // Build a flat Minkowski dual metric function for a flat (constant) metric.
+/// auto dual_fn = [](const DualSpacetimePoint& /*xd*/) -> DualMetricMatrix {
+///     DualMetricMatrix gd = DualMetricMatrix::Zero();
+///     gd(0,0) = DualNumber{-1.0, 0.0};
+///     gd(1,1) = DualNumber{ 1.0, 0.0};
+///     gd(2,2) = DualNumber{ 1.0, 0.0};
+///     gd(3,3) = DualNumber{ 1.0, 0.0};
+///     return gd;
+/// };
+/// MetricTensor base_metric = MetricTensor::make_minkowski(1.0, 1.0);
+/// ChristoffelSymbolsDual cs(base_metric, dual_fn);
+/// auto gamma = cs.compute(SpacetimePoint::Zero());
+/// // All gamma[l](mu,nu) == 0 for flat Minkowski — exact with no FD error.
+/// ```
+class ChristoffelSymbolsDual {
+public:
+    /// Construct from a base MetricTensor and a dual-number metric function.
+    ///
+    /// @param metric    Base metric tensor (used for inverse metric g^λσ).
+    /// @param dual_fn   Dual-number analogue of the metric function, used for
+    ///                  exact derivative extraction via autodiff.
+    ChristoffelSymbolsDual(const MetricTensor&  metric,
+                            DualMetricFunction   dual_fn);
+
+    /// Compute all Γ^λ_μν at point x using dual-number autodiff.
+    ///
+    /// For each coordinate σ ∈ {0,1,2,3}:
+    ///   1. Build dual point xd: xd[k] = {x(k), k==σ ? 1.0 : 0.0}
+    ///   2. Evaluate dual_fn(xd) → DualMetricMatrix gd
+    ///   3. dg[σ](μ,ν) = gd(μ,ν).deriv   (exact ∂g_μν/∂x^σ)
+    ///
+    /// Then assemble Γ^λ_μν using the standard formula with g^λσ from the
+    /// base metric inverse.
+    ///
+    /// @param x  Spacetime point at which to evaluate Γ^λ_μν.
+    /// @return   ChristoffelArray, or all-zero if the metric is singular at x.
+    ChristoffelArray compute(const SpacetimePoint& x) const;
+
+    /// Contract Christoffel symbols with a four-velocity (identical to
+    /// ChristoffelSymbols::contract).
+    FourVelocity contract(const ChristoffelArray& gamma,
+                          const FourVelocity& u) const;
+
+private:
+    /// Extract ∂g_μν/∂x^σ at point x via a single dual metric evaluation.
+    MetricMatrix dual_metric_derivative(const SpacetimePoint& x,
+                                         int sigma) const;
+
+    const MetricTensor& metric_;
+    DualMetricFunction  dual_fn_;
 };
 
 // ─── GeodesicSolver ───────────────────────────────────────────────────────────
