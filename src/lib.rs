@@ -95,6 +95,8 @@ pub mod information_geometry;
 pub mod causal_inference;
 pub mod light_cone;
 pub mod relativistic_momentum_factor;
+pub mod spacetime_diagram;
+pub mod relativistic_portfolio;
 
 #[cfg(feature = "viz")]
 pub mod viz;
