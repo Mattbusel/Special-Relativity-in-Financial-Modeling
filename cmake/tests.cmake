@@ -69,6 +69,17 @@ target_link_libraries(test_online_beta PRIVATE
 )
 add_test(NAME OnlineBetaTests COMMAND test_online_beta)
 
+# ── Event-Driven Backtester unit tests (Round 3) ──────────────────────────────
+add_executable(test_event_backtester
+    tests/backtest/test_event_backtester.cpp
+)
+target_include_directories(test_event_backtester PRIVATE src include)
+target_link_libraries(test_event_backtester PRIVATE
+    srfm_event_backtest
+    GTest::gtest_main
+)
+add_test(NAME EventBacktesterTests COMMAND test_event_backtester)
+
 # ── Backtest unit tests ───────────────────────────────────────────────────────
 add_executable(test_backtester
     tests/backtest/test_backtester.cpp

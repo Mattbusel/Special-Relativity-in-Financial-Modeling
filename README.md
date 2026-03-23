@@ -74,6 +74,61 @@ ctest --test-dir build -C Release --output-on-failure
 
 ---
 
+## Round 3: Event-Driven Backtester
+
+### Event-Driven Backtester (`include/srfm/event_backtester.hpp` + `src/event_backtester.cpp`)
+
+A lightweight priority-queue event simulation engine that replays market events in strict timestamp order and dispatches them to a pluggable `Strategy`.
+
+| Type | Role |
+|---|---|
+| `BacktestEvent` | Market event: timestamp_ms, price, volume, EventType (Trade/Quote/Bar), symbol |
+| `BacktestEngine` | Priority-queue event loop; `add_event()`, `run()` → `BacktestResult` |
+| `Strategy` | Abstract base: `on_trade()`, `on_bar()`, `on_start()`, `on_end()` |
+| `Order` | Symbol, Buy/Sell side, quantity, Market/Limit type, limit_price |
+| `Fill` | Confirmed execution: fill_price, fill_qty, commission |
+| `Portfolio` | cash, positions map, equity_curve vector |
+| `BacktestResult` | total_return, sharpe_ratio, max_drawdown, num_trades, win_rate, profit_factor |
+| `RelativisticStrategy` | Concrete strategy: rejects spacelike events via `SpacetimeInterval::classify()` |
+
+```cpp
+#include "srfm/event_backtester.hpp"
+using namespace srfm::event_bt;
+
+// Use the built-in relativistic strategy (filters spacelike events)
+BacktestEngine engine(100'000.0, 0.001);
+engine.set_strategy(std::make_unique<RelativisticStrategy>(1.0, 0.001));
+
+// Feed events (price bars at 1-minute intervals)
+for (int i = 0; i < 100; ++i) {
+    engine.add_event({
+        .timestamp_ms = static_cast<long long>(i) * 60'000LL,
+        .price        = 100.0 + i * 0.1,
+        .volume       = 1000.0,
+        .type         = EventType::Bar,
+        .symbol       = "BTC",
+    });
+}
+
+BacktestResult r = engine.run();
+std::cout << "Total return: " << r.total_return * 100 << "%\n";
+std::cout << "Sharpe ratio: " << r.sharpe_ratio << "\n";
+std::cout << "Max drawdown: " << r.max_drawdown * 100 << "%\n";
+```
+
+#### RelativisticStrategy — The Core Idea
+
+`RelativisticStrategy` converts each pair of consecutive market events into `SpacetimeEvent` structs and calls `SpacetimeInterval::classify()`:
+
+- `ds² < 0` (TIMELIKE): the price move is causally connected to the previous event — the strategy generates a momentum order.
+- `ds² > 0` (SPACELIKE): the move is faster than the market's "speed of information" — the event is rejected as stochastic noise.
+
+This means only trades that respect the relativistic causal structure of financial spacetime are acted upon. `spacelike_rejections()` and `timelike_accepts()` counters are exposed for post-run analysis.
+
+The CMake library target is `srfm_event_backtest`; link it with `-lsrfm_event_backtest -lsrfm_manifold -lsrfm_backtest`.
+
+---
+
 ## What's New in v1.2.0
 
 ### Multi-Asset Spacetime (`include/srfm/multi_asset.hpp`)

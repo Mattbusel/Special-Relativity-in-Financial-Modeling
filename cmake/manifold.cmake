@@ -45,6 +45,16 @@ add_library(srfm_backtest STATIC
 )
 target_include_directories(srfm_backtest PUBLIC src include)
 target_link_libraries(srfm_backtest PUBLIC srfm_engine srfm_lorentz)
+
+# ── Event-Driven Backtester (Round 3) ─────────────────────────────────────────
+# Provides BacktestEngine (priority-queue event loop), Strategy (abstract base),
+# Fill / Portfolio / BacktestResult types, and RelativisticStrategy which uses
+# SpacetimeInterval::classify() to filter spacelike market events.
+add_library(srfm_event_backtest STATIC
+    src/event_backtester.cpp
+)
+target_include_directories(srfm_event_backtest PUBLIC src include)
+target_link_libraries(srfm_event_backtest PUBLIC srfm_manifold srfm_backtest)
 if(fmt_FOUND OR TARGET fmt::fmt)
     target_link_libraries(srfm_backtest PUBLIC fmt::fmt)
 endif()
