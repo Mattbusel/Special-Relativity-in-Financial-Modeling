@@ -105,6 +105,8 @@ pub mod quantum_finance;
 pub mod entropy_finance;
 pub mod curved_spacetime;
 pub mod wormhole;
+pub mod uncertainty_principle;
+pub mod decoherence;
 
 #[cfg(feature = "viz")]
 pub mod viz;
