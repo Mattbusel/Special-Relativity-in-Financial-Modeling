@@ -410,3 +410,14 @@ target_link_libraries(test_geodesic_path PRIVATE
     GTest::gtest_main
 )
 add_test(NAME GeodesicPathTests COMMAND test_geodesic_path)
+
+# ── Minkowski Momentum tests (Round 6) ───────────────────────────────────────
+add_executable(test_minkowski_momentum
+    tests/portfolio/test_minkowski_momentum.cpp
+)
+target_include_directories(test_minkowski_momentum PRIVATE src include)
+target_link_libraries(test_minkowski_momentum PRIVATE
+    srfm_minkowski_momentum
+    GTest::gtest_main
+)
+add_test(NAME MinkowskiMomentumTests COMMAND test_minkowski_momentum)

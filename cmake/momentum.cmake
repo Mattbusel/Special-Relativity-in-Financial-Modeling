@@ -39,3 +39,13 @@ target_link_libraries(srfm_lorentz_portfolio PUBLIC srfm_momentum)
 if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
     target_link_libraries(srfm_lorentz_portfolio PUBLIC Eigen3::Eigen)
 endif()
+
+# ── srfm_minkowski_momentum: Minkowski Four-Momentum (Round 6) ────────────────
+add_library(srfm_minkowski_momentum STATIC
+    src/minkowski_momentum.cpp
+)
+target_include_directories(srfm_minkowski_momentum PUBLIC src include)
+target_link_libraries(srfm_minkowski_momentum PUBLIC srfm_momentum)
+if(Eigen3_FOUND OR TARGET Eigen3::Eigen)
+    target_link_libraries(srfm_minkowski_momentum PUBLIC Eigen3::Eigen)
+endif()

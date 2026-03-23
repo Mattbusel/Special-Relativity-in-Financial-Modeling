@@ -23,6 +23,73 @@ with real-time streaming signal generation.
 
 ---
 
+## Round 6: Minkowski Momentum
+
+### Header: `include/srfm/minkowski_momentum.hpp`  |  Source: `src/minkowski_momentum.cpp`
+
+Extends classical momentum to financial spacetime by representing a portfolio's
+exposure profile as a **four-momentum vector** `p^μ = (E, p_x, p_y, p_z)`:
+
+| Component | Physics | Finance |
+|-----------|---------|---------|
+| `E`   | Energy (time-like) | Portfolio return |
+| `p_x` | x-momentum | Equity exposure |
+| `p_y` | y-momentum | Bond exposure |
+| `p_z` | z-momentum | Commodity exposure |
+
+#### Invariant Mass (Diversification Measure)
+
+```
+m² = E² - p_x² - p_y² - p_z²
+```
+
+A portfolio with `m² > 0` (time-like) has total return exceeding its combined
+directional exposures — the financial analogue of a well-diversified, non-tachyonic
+portfolio.  The signed square root `m = sign(m²) * sqrt(|m²|)` is the
+**Minkowski invariant mass** and is preserved under all Lorentz boosts (regime
+transformations).
+
+#### Rapidity (Financial Velocity in Equity Space)
+
+```
+y = 0.5 * ln((E + p_x) / (E - p_x))
+```
+
+Rapidity is additive under successive equity-space boosts, making it a natural
+measure of compounded equity momentum that avoids the non-additivity of ordinary
+velocity.
+
+#### API
+
+| Class | Key Methods |
+|-------|-------------|
+| `FourMomentum` | Data struct: `energy`, `px`, `py`, `pz` |
+| `MinkowskiMomentum` | `invariant_mass_sq(p)`, `invariant_mass(p)`, `rapidity(p)`, `transverse_momentum(p)`, `spatial_magnitude(p)` |
+| `FourMomentumConservation` | `sum(trades)`, `conserves(trades, reference, tol)` |
+| `MomentumPortfolioOptimizer` | `optimize(returns, exposures, config)` — gradient-ascent maximises `m²` |
+
+#### Build
+
+```cmake
+# Automatically built via cmake/momentum.cmake
+target_link_libraries(my_target PRIVATE srfm_minkowski_momentum)
+```
+
+```cpp
+#include "srfm/minkowski_momentum.hpp"
+using namespace srfm::minkowski_momentum;
+
+FourMomentum p{0.12, 0.08, 0.03, 0.01};
+auto m = MinkowskiMomentum::invariant_mass(p);   // diversification score
+auto y = MinkowskiMomentum::rapidity(p);          // equity-space rapidity
+```
+
+**Tests:** `tests/portfolio/test_minkowski_momentum.cpp` — 20+ GTest cases covering
+invariant mass algebra, Lorentz invariance, rapidity edge cases, conservation checks,
+and the gradient-ascent portfolio optimiser.
+
+---
+
 ## Round 5: Geodesic Portfolio Path
 
 ### Header: `include/srfm/geodesic_path.hpp`  |  Source: `src/geodesic_path.cpp`
