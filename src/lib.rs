@@ -119,6 +119,8 @@ pub mod quantum_field;
 pub mod entropy_dynamics;
 pub mod gauge_field;
 pub mod renormalization;
+pub mod causal_structure;
+pub mod quantum_gravity;
 
 #[cfg(feature = "viz")]
 pub mod viz;
