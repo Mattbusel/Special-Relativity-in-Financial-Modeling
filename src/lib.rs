@@ -132,6 +132,8 @@ pub mod cosmological_model;
 pub mod black_hole;
 pub mod loop_quantum_gravity;
 pub mod conformal_field_theory;
+pub mod quantum_chromodynamics;
+pub mod inflation_theory;
 
 #[cfg(feature = "viz")]
 pub mod viz;
