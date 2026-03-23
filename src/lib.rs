@@ -115,6 +115,8 @@ pub mod many_worlds;
 pub mod quantum_tunneling;
 pub mod path_integral;
 pub mod spin_network;
+pub mod quantum_field;
+pub mod entropy_dynamics;
 
 #[cfg(feature = "viz")]
 pub mod viz;
