@@ -175,8 +175,10 @@ TEST(ErrorHandling_SpacetimeInterval, BothSamePoint_ZeroInterval) {
 
 // ─── MetricTensor: singular metric handling ───────────────────────────────────
 
-TEST(ErrorHandling_MetricTensor, SingularMetric_InverseNullopt) {
-    // A metric with a zero diagonal entry is singular.
+TEST(ErrorHandling_MetricTensor, SingularMetric_InverseRegularized) {
+    // A metric with a zero diagonal entry is singular. Since the Tikhonov fix
+    // (see tests/tensor/test_metric_singularity.cpp) inverse() returns the
+    // inverse of g + lambda*I instead of nullopt; it must be finite.
     auto g = MetricTensor([](const SpacetimePoint&) {
         MetricMatrix m = MetricMatrix::Zero();
         m(0, 0) = -1.0;
@@ -185,7 +187,9 @@ TEST(ErrorHandling_MetricTensor, SingularMetric_InverseNullopt) {
         m(3, 3) = 1.0;
         return m;
     });
-    EXPECT_FALSE(g.inverse(SpacetimePoint::Zero()).has_value());
+    auto inv = g.inverse(SpacetimePoint::Zero());
+    ASSERT_TRUE(inv.has_value());
+    EXPECT_TRUE(inv->allFinite());
 }
 
 TEST(ErrorHandling_MetricTensor, WellConditionedMinkowski_InverseExists) {

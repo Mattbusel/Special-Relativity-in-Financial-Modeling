@@ -100,8 +100,9 @@ public:
     /// 5. Feed BarData + returns into Backtester::run().
     ///
     /// # Returns
-    /// `nullopt` if fewer than `config.min_bars` bars provided, or any
-    /// downstream computation is numerically degenerate.
+    /// `nullopt` if fewer than `config.min_bars` bars provided, fewer than
+    /// MIN_RETURN_SERIES_LENGTH returns result (N bars give N - 1 returns), or
+    /// any downstream computation is numerically degenerate.
     [[nodiscard]] std::optional<backtest::BacktestComparison>
     run_backtest(std::span<const OHLCV> bars) const noexcept;
 

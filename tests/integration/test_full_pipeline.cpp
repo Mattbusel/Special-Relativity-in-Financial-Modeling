@@ -31,8 +31,10 @@ using namespace srfm::constants;
 
 namespace {
 
-/// Generate a simple trending price series with optional noise.
-/// Returns N bars with close prices starting at 100, drifting by drift_per_bar.
+/// Generate a trending price series with small deterministic noise.
+/// Returns N bars with close prices starting at 100, drifting by `drift` per
+/// bar plus a +/-2*drift wobble, so some bars close lower. (A noiseless trend
+/// has constant returns, which leaves Sharpe and Sortino undefined.)
 std::vector<OHLCV> make_trending_bars(std::size_t n,
                                        double start_price = 100.0,
                                        double drift       = 0.001) {
@@ -40,7 +42,7 @@ std::vector<OHLCV> make_trending_bars(std::size_t n,
     bars.reserve(n);
     double price = start_price;
     for (std::size_t i = 0; i < n; ++i) {
-        price *= (1.0 + drift);
+        price *= (1.0 + drift + 2.0 * drift * std::sin(0.9 * static_cast<double>(i)));
         const double spread = price * 0.001;
         bars.push_back(OHLCV{
             .timestamp = static_cast<double>(i + 1),
@@ -103,8 +105,11 @@ TEST(EngineRunBacktest, TooFewBarsReturnsNullopt) {
 }
 
 TEST(EngineRunBacktest, ExactlyMinBarsSucceeds) {
+    // N bars yield N - 1 close-to-close returns, and the Backtester needs
+    // MIN_RETURN_SERIES_LENGTH returns, so the smallest workable input is
+    // MIN_RETURN_SERIES_LENGTH + 1 bars.
     Engine engine;
-    auto bars = make_trending_bars(MIN_RETURN_SERIES_LENGTH);
+    auto bars = make_trending_bars(MIN_RETURN_SERIES_LENGTH + 1);
     auto result = engine.run_backtest(bars);
     EXPECT_TRUE(result.has_value());
 }

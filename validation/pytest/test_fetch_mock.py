@@ -127,10 +127,12 @@ def test_fetch_chunk_timestamps_are_strings(mock_yf_download: pd.DataFrame) -> N
         result = fetch_data.fetch_chunk("AAPL", start, end, max_retries=1)
 
     assert result is not None
-    assert result["timestamp"].dtype == object, (
-        "timestamp column should be dtype=object (string), "
-        f"got {result['timestamp'].dtype}"
+    # pandas < 3 stores strings as dtype=object; pandas 3 uses a string dtype.
+    ts = result["timestamp"]
+    assert ts.dtype == object or pd.api.types.is_string_dtype(ts), (
+        f"timestamp column should hold strings, got {ts.dtype}"
     )
+    assert all(isinstance(v, str) for v in ts)
 
 
 def test_fetch_chunk_drops_all_nan_price_rows(mock_yf_download: pd.DataFrame) -> None:

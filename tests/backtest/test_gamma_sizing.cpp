@@ -37,11 +37,16 @@ static std::vector<BarData> make_bars(std::size_t n,
     return bars;
 }
 
-/// Perfectly aligned returns: sign matches signal exactly, so strategy always wins.
+/// Returns that mostly follow the signal: magnitudes vary and every fifth bar
+/// moves against it, so the strategy wins on balance while its P&L still has
+/// variance and downside (a constant P&L leaves Sharpe/Sortino undefined).
 static std::vector<double> aligned_returns(std::size_t n, double per_bar = 0.005) {
     std::vector<double> r(n);
     for (std::size_t i = 0; i < n; ++i) {
-        r[i] = (i % 2 == 0) ? per_bar : -per_bar;
+        const double mag  = per_bar * (1.0 + 0.5 * std::sin(0.37 * static_cast<double>(i)));
+        const double sign = (i % 2 == 0) ? 1.0 : -1.0;
+        const double hit  = (i % 5 == 4) ? -1.0 : 1.0;
+        r[i] = sign * hit * mag;
     }
     return r;
 }
@@ -97,9 +102,13 @@ TEST(GammaSizing, RelativisticRegime_PositionScalesWithGamma) {
     auto result = bt.run(bars, rets);
     ASSERT_TRUE(result.has_value());
 
-    // Relativistic strategy returns are 1.25× larger → higher Sharpe
-    EXPECT_GT(result->relativistic.sharpe_ratio, result->raw.sharpe_ratio)
-        << "Relativistic Sharpe should exceed raw when γ > 1 and signals win";
+    // Relativistic strategy returns are exactly 1.25x the raw ones. Sharpe is
+    // scale invariant, so it must be unchanged; the gamma-weighted IR carries
+    // the mean gamma factor and must rise; drawdowns grow with position size.
+    EXPECT_NEAR(result->relativistic.sharpe_ratio, result->raw.sharpe_ratio, 1e-9);
+    EXPECT_GT(result->relativistic.gamma_weighted_ir, result->raw.gamma_weighted_ir)
+        << "gamma-weighted IR should exceed raw when gamma > 1 and signals win";
+    EXPECT_GT(result->relativistic.max_drawdown, result->raw.max_drawdown);
 }
 
 // ─── Test 4: max_gamma cap is respected — γ never exceeds max_gamma ───────────
@@ -202,19 +211,20 @@ TEST(GammaSizing, LosingSignal_RelativisticAmplifies) {
     const std::size_t N = 200;
     auto bars = make_bars(N, 0.6, 1.0, 0.0);
     // Counter-aligned returns (strategy always wrong → loses 0.003/bar)
-    std::vector<double> rets(N);
-    for (std::size_t i = 0; i < N; ++i) {
-        // Signal at bar i is +1 (even) or -1 (odd); asset moves opposite
-        rets[i] = (i % 2 == 0) ? -0.003 : 0.003;
-    }
+    // Mirror image of aligned_returns: the strategy loses on balance.
+    std::vector<double> rets = aligned_returns(N, 0.003);
+    for (double& r : rets) r = -r;
 
     Backtester bt;
     auto result = bt.run(bars, rets);
     ASSERT_TRUE(result.has_value());
 
-    // Relativistic strategy loses more (larger negative Sharpe)
-    EXPECT_LT(result->relativistic.sharpe_ratio, result->raw.sharpe_ratio)
-        << "Relativistic should amplify losses when γ > 1 and signals are wrong";
+    // Relativistic P&L is 1.25x the raw P&L: Sharpe (scale invariant) is
+    // unchanged, but the losses themselves, and so the drawdown, are larger.
+    EXPECT_LT(result->raw.sharpe_ratio, 0.0);
+    EXPECT_NEAR(result->relativistic.sharpe_ratio, result->raw.sharpe_ratio, 1e-9);
+    EXPECT_GT(result->relativistic.max_drawdown, result->raw.max_drawdown)
+        << "Relativistic should amplify losses when gamma > 1 and signals are wrong";
 }
 
 // ─── Test 10: new fields are finite ──────────────────────────────────────────

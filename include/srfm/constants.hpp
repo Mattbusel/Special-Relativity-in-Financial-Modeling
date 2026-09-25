@@ -44,8 +44,8 @@ static constexpr double DEFAULT_FD_STEP = 1e-5;
 
 // ─── Backtester Defaults ──────────────────────────────────────────────────────
 
-/// Minimum number of bars required for a valid backtest run.
-/// Below this threshold all metric computations return nullopt.
+/// Minimum number of return observations required for a Backtester run.
+/// (The standalone PerformanceCalculator metrics only need two samples.)
 static constexpr std::size_t MIN_RETURN_SERIES_LENGTH = 30;
 
 /// Default annualised risk-free rate (zero — excess-return framing by default).

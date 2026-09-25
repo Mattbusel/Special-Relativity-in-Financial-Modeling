@@ -1,0 +1,48 @@
+name: Pages
+
+# Publishes site/ (the project page) with the Doxygen API reference under /api/.
+on:
+  push:
+    branches: [main]
+    paths: ['site/**', 'include/**', 'src/**', 'Doxyfile', 'README.md', '.github/workflows/pages.yml']
+  pull_request:
+    paths: ['site/**', 'Doxyfile', '.github/workflows/pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Doxygen
+        run: sudo apt-get update -qq && sudo apt-get install -y doxygen
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp -r site/. _site/
+          doxygen Doxyfile > doxygen.log 2>&1 || { tail -20 doxygen.log; exit 1; }
+          cp -r docs/api/html _site/api
+          touch _site/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -134,13 +134,9 @@ target_link_libraries(test_lorentz_portfolio PRIVATE
 add_test(NAME LorentzPortfolioTests COMMAND test_lorentz_portfolio)
 
 # ── Integration tests ─────────────────────────────────────────────────────────
-# NOTE: test_full_pipeline and test_error_handling reference srfm::core::Engine
-# (declared in include/srfm/engine.hpp) which currently has no implementation
-# .cpp file. These tests are excluded from the default build until the core
-# engine implementation is provided in src/core/engine.cpp.
-# To include them: cmake -DSRFM_BUILD_INTEGRATION_TESTS=ON ...
+# End-to-end tests of srfm::core::Engine and DataLoader (src/core/).
 option(SRFM_BUILD_INTEGRATION_TESTS
-    "Build integration tests that require srfm::core::Engine implementation" ON)
+    "Build the srfm::core::Engine integration tests" ON)
 
 if(SRFM_BUILD_INTEGRATION_TESTS)
     add_executable(test_full_pipeline
@@ -148,8 +144,7 @@ if(SRFM_BUILD_INTEGRATION_TESTS)
     )
     target_include_directories(test_full_pipeline PRIVATE src include)
     target_link_libraries(test_full_pipeline PRIVATE
-        srfm_backtest
-        srfm_lorentz
+        srfm_core
         srfm_tensor
         GTest::gtest_main
     )
@@ -160,8 +155,7 @@ if(SRFM_BUILD_INTEGRATION_TESTS)
     )
     target_include_directories(test_error_handling PRIVATE src include)
     target_link_libraries(test_error_handling PRIVATE
-        srfm_backtest
-        srfm_lorentz
+        srfm_core
         srfm_tensor
         GTest::gtest_main
     )
@@ -244,11 +238,16 @@ foreach(_st IN LISTS _STREAM_TESTS)
     target_link_libraries(stream_${_st} PRIVATE srfm_stream)
     # Enable QueueTickSource (test-only class guarded by SRFM_TESTING).
     target_compile_definitions(stream_${_st} PRIVATE SRFM_TESTING=1)
+    # The tests build ring buffers and StreamEngine instances on the stack;
+    # Windows' default 1 MB main-thread stack overflows, Linux' 8 MB does not.
+    if(MSVC)
+        target_link_options(stream_${_st} PRIVATE /STACK:16777216)
+    endif()
     add_test(NAME stream_${_st} COMMAND stream_${_st})
 endforeach()
 
 # ── Interval gap tests (symmetry, numerical stability, Lorentz invariance) ───
-if(GTest_FOUND)
+if(TARGET GTest::gtest_main)
     add_executable(test_interval_gaps
         tests/manifold/test_interval_gaps.cpp
     )

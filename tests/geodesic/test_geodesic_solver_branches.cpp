@@ -339,6 +339,7 @@ TEST(BacktestRunnerBranches, MissingRequiredColumns_ErrorStringSet) {
         err = "CSV missing required columns interval_type / next_bar_abs_return";
     }
     EXPECT_FALSE(err.empty());
+    f.close();  // Windows cannot delete a file that is still open
     fs::remove(tmp);
 }
 
@@ -376,6 +377,7 @@ TEST(RegimeValidatorBranches, MissingCloseOrVolumeColumns_ErrorStringSet) {
         err = "CSV missing required columns 'close' or 'volume'";
     }
     EXPECT_FALSE(err.empty());
+    f.close();  // Windows cannot delete a file that is still open
     fs::remove(tmp);
 }
 
@@ -417,6 +419,7 @@ TEST(BacktestRunnerBranches, ValidCSV_NoError) {
     bool has_return   = (hdr.find("next_bar_abs_return") != std::string::npos);
     EXPECT_TRUE(has_interval);
     EXPECT_TRUE(has_return);
+    f.close();  // Windows cannot delete a file that is still open
     fs::remove(tmp);
 }
 
@@ -436,5 +439,6 @@ TEST(RegimeValidatorBranches, ValidOHLCV_NoError) {
     bool has_volume = (hdr.find("volume") != std::string::npos);
     EXPECT_TRUE(has_close);
     EXPECT_TRUE(has_volume);
+    f.close();  // Windows cannot delete a file that is still open
     fs::remove(tmp);
 }

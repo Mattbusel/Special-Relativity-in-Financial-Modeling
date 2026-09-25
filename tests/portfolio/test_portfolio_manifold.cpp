@@ -70,13 +70,18 @@ TEST(MinkowskiCovariance, TwoAssetsCovarianceDiagonalIsOne) {
 
 TEST(MinkowskiCovariance, OffDiagonalIsBetweenZeroAndOne) {
     MinkowskiCovariance mc;
-    mc.add_asset(AssetEvent{"A", 0.0, 100.0, 1e4, 1e6});
-    mc.add_asset(AssetEvent{"B", 0.5, 101.0, 1.1e4, 1.05e6});
+    // Coordinates enter ds2 unscaled, so the events must be close for the
+    // kernel exp(-|ds2|) to be representable: the previous inputs differed by
+    // 5e4 in M, giving exp(-2.5e9), which underflows to exactly 0.0.
+    // Here ds2 = -0.25 + 1 + 0.25 + 0.25 = 1.25, so C = exp(-1.25).
+    mc.add_asset(AssetEvent{"A", 0.0, 100.0, 1e4,       1e6});
+    mc.add_asset(AssetEvent{"B", 0.5, 101.0, 1e4 + 0.5, 1e6 + 0.5});
 
     auto cov_opt = mc.compute_spacetime_covariance();
     ASSERT_TRUE(cov_opt.has_value());
 
     const double off_diag = (*cov_opt)(0, 1);
+    EXPECT_NEAR(off_diag, std::exp(-1.25), 1e-12);
     EXPECT_GT(off_diag, 0.0);
     EXPECT_LE(off_diag, 1.0);
 }

@@ -155,16 +155,21 @@ public:
 /// The optimisation is performed by a simple gradient-ascent procedure:
 /// at each step the weight vector is nudged in the direction of increasing m²,
 /// then re-normalised to sum to 1 and clamped to [min_weight, max_weight].
+/// Configuration for the gradient-ascent optimiser. Defined at namespace scope
+/// (and aliased as MomentumPortfolioOptimizer::Config) because GCC rejects a
+/// `= {}` default argument of a nested class with default member initialisers.
+struct MomentumOptimizerConfig {
+    double learning_rate  = 0.01;   ///< Step size per iteration
+    int    max_iterations = 1000;   ///< Maximum number of ascent steps
+    double tolerance      = 1e-8;   ///< Convergence criterion on m²
+    double min_weight     = 0.0;    ///< Lower bound on each weight
+    double max_weight     = 1.0;    ///< Upper bound on each weight
+};
+
 class MomentumPortfolioOptimizer {
 public:
     /// Configuration for the gradient-ascent optimiser.
-    struct Config {
-        double learning_rate  = 0.01;   ///< Step size per iteration
-        int    max_iterations = 1000;   ///< Maximum number of ascent steps
-        double tolerance      = 1e-8;   ///< Convergence criterion on m²
-        double min_weight     = 0.0;    ///< Lower bound on each weight
-        double max_weight     = 1.0;    ///< Upper bound on each weight
-    };
+    using Config = MomentumOptimizerConfig;
 
     /// Result of a single optimisation run.
     struct Result {

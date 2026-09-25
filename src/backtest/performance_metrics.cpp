@@ -27,6 +27,15 @@ namespace {
     return true;
 }
 
+/// Sample statistics need at least two observations (n - 1 denominator).
+constexpr std::size_t MIN_METRIC_SAMPLES = 2;
+
+/// True when a dispersion estimate is zero up to floating-point rounding of
+/// the mean. A constant series of 0.01 yields sigma of about 1e-18, not 0.
+[[nodiscard]] bool is_degenerate_dispersion(double sd, double mu) noexcept {
+    return sd <= 1e-12 * std::abs(mu);
+}
+
 }  // namespace
 
 // ─── PerformanceCalculator — private statics ──────────────────────────────────
@@ -51,19 +60,19 @@ double PerformanceCalculator::stddev(std::span<const double> v,
 
 double PerformanceCalculator::downside_stddev(std::span<const double> v,
                                                double threshold) noexcept {
-    // Downside deviation: RMS of returns below `threshold` (Bessel-corrected).
-    // If fewer than 2 negative deviations exist, returns 0.0.
+    // Target downside deviation (Sortino and Price, 1994):
+    //   sigma_down = sqrt( sum_i min(0, x_i - T)^2 / n )
+    // The sum runs over all n observations, so bars above the target count
+    // as zero shortfall. Returns 0.0 when no observation is below `threshold`.
+    if (v.empty()) return 0.0;
     double sq_sum = 0.0;
-    std::size_t count = 0;
     for (double x : v) {
         if (x < threshold) {
             const double d = x - threshold;
             sq_sum += d * d;
-            ++count;
         }
     }
-    if (count < 2) return 0.0;
-    return std::sqrt(sq_sum / static_cast<double>(count - 1));
+    return std::sqrt(sq_sum / static_cast<double>(v.size()));
 }
 
 // ─── PerformanceCalculator — Sharpe ──────────────────────────────────────────
@@ -72,7 +81,7 @@ std::optional<double>
 PerformanceCalculator::sharpe(std::span<const double> returns,
                                double risk_free_rate,
                                double annualisation) noexcept {
-    if (returns.size() < constants::MIN_RETURN_SERIES_LENGTH) return std::nullopt;
+    if (returns.size() < MIN_METRIC_SAMPLES)                   return std::nullopt;
     if (!all_finite(returns))                                  return std::nullopt;
     if (!std::isfinite(risk_free_rate))                        return std::nullopt;
     if (annualisation <= 0.0)                                  return std::nullopt;
@@ -80,7 +89,9 @@ PerformanceCalculator::sharpe(std::span<const double> returns,
     const double mu = mean(returns);
     const double sd = stddev(returns, mu);
 
-    if (sd <= 0.0) return std::nullopt;  // zero variance — ratio undefined
+    // Zero variance: ratio undefined. Rounding leaves a constant series with a
+    // sigma of a few ulps of the mean, so compare against the mean's scale.
+    if (is_degenerate_dispersion(sd, mu)) return std::nullopt;
 
     // Annualised Sharpe: (μ − r_f) / σ × √ann
     return (mu - risk_free_rate) / sd * std::sqrt(annualisation);
@@ -92,7 +103,7 @@ std::optional<double>
 PerformanceCalculator::sortino(std::span<const double> returns,
                                 double risk_free_rate,
                                 double annualisation) noexcept {
-    if (returns.size() < constants::MIN_RETURN_SERIES_LENGTH) return std::nullopt;
+    if (returns.size() < MIN_METRIC_SAMPLES)                   return std::nullopt;
     if (!all_finite(returns))                                  return std::nullopt;
     if (!std::isfinite(risk_free_rate))                        return std::nullopt;
     if (annualisation <= 0.0)                                  return std::nullopt;
@@ -140,7 +151,7 @@ PerformanceCalculator::gamma_weighted_ir(
         std::span<const double> gamma_factors) noexcept {
 
     const std::size_t n = strategy_returns.size();
-    if (n < constants::MIN_RETURN_SERIES_LENGTH)  return std::nullopt;
+    if (n < MIN_METRIC_SAMPLES)                    return std::nullopt;
     if (benchmark_returns.size() != n)             return std::nullopt;
     if (gamma_factors.size()     != n)             return std::nullopt;
     if (!all_finite(strategy_returns))             return std::nullopt;
@@ -155,7 +166,7 @@ PerformanceCalculator::gamma_weighted_ir(
 
     const double mu_active = mean(active);
     const double sd_active = stddev(active, mu_active);
-    if (sd_active <= 0.0) return std::nullopt;  // degenerate
+    if (is_degenerate_dispersion(sd_active, mu_active)) return std::nullopt;
 
     // Mean Lorentz factor over the window
     const double mu_gamma = mean(gamma_factors);

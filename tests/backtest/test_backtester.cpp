@@ -28,16 +28,21 @@ static std::vector<BarData> make_bars(std::size_t n,
     return bars;
 }
 
-/// Asset returns that follow the sign of the alternating signal pattern above.
-/// sign(signal_t) × asset_ret = predictable P&L
+/// Asset returns that mostly follow the sign of the alternating signal above.
+/// Magnitudes vary bar to bar and every fifth bar moves against the signal,
+/// so the strategy return series (sign(signal) x asset_ret) is winning on
+/// balance but has non-zero variance and non-zero downside. A perfectly
+/// constant P&L would make Sharpe and Sortino undefined, which the Backtester
+/// correctly reports as nullopt.
 static std::vector<double> make_aligned_returns(std::size_t n,
                                                   double per_bar_ret = 0.005) {
     std::vector<double> r(n);
     for (std::size_t i = 0; i < n; ++i) {
-        // Signal at bar i is positive when i is even, so return also positive
-        r[i] = (i % 2 == 0) ? per_bar_ret : -per_bar_ret;
+        const double mag  = per_bar_ret * (1.0 + 0.5 * std::sin(0.37 * static_cast<double>(i)));
+        const double sign = (i % 2 == 0) ? 1.0 : -1.0;   // follows the signal
+        const double hit  = (i % 5 == 4) ? -1.0 : 1.0;   // occasional loss
+        r[i] = sign * hit * mag;
     }
-    // Strategy return = sign(signal) × asset_return = always positive
     return r;
 }
 

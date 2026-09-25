@@ -91,11 +91,12 @@ static void test_normalizer_known_mean() {
 static void test_normalizer_known_sigma() {
     CoordinateNormalizer norm{4};
 
-    // Values: -3, -1, 1, 3 → mean = 0, population var = (9+1+1+9)/4 = 5, sigma = √5
+    // Values: -3, -1, 1, 3 → mean = 0, sample var = (9+1+1+9)/3 = 20/3
+    // (sigma() is the Bessel-corrected sample std-dev since commit 95c6908e).
     for (double v : {-3.0, -1.0, 1.0, 3.0}) norm.update(v);
 
-    STREAM_CHECK_NEAR(norm.mean(),  0.0,            EPS_LOOSE);
-    STREAM_CHECK_NEAR(norm.sigma(), std::sqrt(5.0), EPS_LOOSE);
+    STREAM_CHECK_NEAR(norm.mean(),  0.0,                   EPS_LOOSE);
+    STREAM_CHECK_NEAR(norm.sigma(), std::sqrt(20.0 / 3.0), EPS_LOOSE);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -286,16 +287,18 @@ static void test_normalizer_window_accessor() {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// sigma^2 = population variance (Bessel-uncorrected)
+// sigma^2 = sample variance (Bessel-corrected, n - 1 denominator)
 // ═════════════════════════════════════════════════════════════════════════════
 
 static void test_normalizer_sigma_squared_is_population_variance() {
     CoordinateNormalizer norm{4};
-    // Values: 1, 2, 3, 4 → mean = 2.5, pop variance = 1.25
+    // Values: 1, 2, 3, 4 → mean = 2.5, sum of squares 5, sample variance 5/3.
+    // (Function name kept; the estimator was switched to the unbiased sample
+    // variance in commit 95c6908e and documented as such in the header.)
     for (double v : {1.0, 2.0, 3.0, 4.0}) norm.update(v);
 
     double s = norm.sigma();
-    STREAM_CHECK_NEAR(s * s, 1.25, EPS_LOOSE);
+    STREAM_CHECK_NEAR(s * s, 5.0 / 3.0, EPS_LOOSE);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
