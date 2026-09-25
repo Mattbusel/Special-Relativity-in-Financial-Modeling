@@ -2,12 +2,10 @@
 # They built but were never green on main; remove a line once its suite passes.
 EdgeCaseBoundaryTests
 LorentzTransformTests
-ErrorHandlingIntegrationTests
 GeodesicSolverBranchTests
 test_geodesic_n
 stream_test_coordinate_normalizer
 stream_test_signal_chain
 IntervalGapTests
-MetricSingularityTests
 PortfolioManifoldTests
 GeodesicPathTests
