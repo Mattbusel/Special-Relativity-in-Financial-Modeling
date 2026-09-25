@@ -38,7 +38,7 @@ jobs:
         run: |
           # Suites listed in ci/known-failing-tests.txt fail on main today and
           # are tracked there; everything else must pass.
-          skip=$(tr -d '\r' < ci/known-failing-tests.txt | grep -v '^#' | grep -v '^\s*$' | paste -sd'|' -)
+          skip=$(tr -d '\r' < ci/known-failing-tests.txt | { grep -v -e '^#' -e '^\s*$' || true; } | paste -sd'|' -)
           if [ -n "$skip" ]; then
             ${{ matrix.test }} -E "^(${skip})$"
           else

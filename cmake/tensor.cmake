@@ -10,6 +10,7 @@ add_library(srfm_tensor STATIC
     src/tensor/geodesic_n.cpp
     src/tensor/geodesic_signal.cpp
     src/tensor/n_asset_manifold.cpp
+    src/manifold/n_asset_interval.cpp   # uses NAssetManifold, so it lives here
 )
 # Note: ${CMAKE_SOURCE_DIR} is NOT added here to avoid a bare 'version' file
 # in the project root shadowing <version> from C++20 standard library on MSVC.

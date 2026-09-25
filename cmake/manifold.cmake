@@ -5,7 +5,6 @@ add_library(srfm_manifold STATIC
     src/manifold/spacetime_manifold.cpp
     src/manifold/spacetime_interval.cpp
     src/manifold/market_manifold.cpp
-    src/manifold/n_asset_interval.cpp
     src/manifold/normalizer.cpp
 )
 target_include_directories(srfm_manifold PUBLIC src include)
