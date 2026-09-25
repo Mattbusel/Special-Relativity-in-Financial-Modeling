@@ -274,9 +274,21 @@ TEST(GeodesicSolver, IdenticalStartAndEnd) {
     auto e = make_state({0.4, 0.6}, 1000);  // Same weights
     auto geo = GeodesicSolver::solve(s, e, 5, 0.2);
 
+    // The concentration-penalty geodesic is the unconstrained oscillator
+    // w(t) = A cos(wt) + B sin(wt); it has no budget constraint, so interior
+    // weights need not sum to 1. With equal endpoints the path must return
+    // to them and be symmetric in time.
     EXPECT_EQ(geo.size(), 6);
-    for (const auto& state : geo.states) {
-        EXPECT_NEAR(state.weights[0] + state.weights[1], 1.0, 1e-9);
+    const std::size_t n = geo.states.size();
+    for (int i = 0; i < 2; ++i) {
+        EXPECT_NEAR(geo.start().weights[i], s.weights[i], 1e-12);
+        EXPECT_NEAR(geo.end().weights[i],   e.weights[i], 1e-12);
+    }
+    for (std::size_t k = 0; k < n; ++k) {
+        for (int i = 0; i < 2; ++i) {
+            EXPECT_NEAR(geo.states[k].weights[i],
+                        geo.states[n - 1 - k].weights[i], 1e-9);
+        }
     }
 }
 

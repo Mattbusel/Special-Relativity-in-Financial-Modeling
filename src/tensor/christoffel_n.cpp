@@ -112,12 +112,24 @@ ChristoffelN::all_symbols(const Eigen::VectorXd& x) const noexcept {
     std::vector<std::vector<std::vector<double>>> dg(
         D, std::vector<std::vector<double>>(D, std::vector<double>(D, 0.0)));
 
+    // Same central difference as metric_deriv(), but the two perturbed
+    // metrics are evaluated once per alpha instead of once per (alpha, mu, nu):
+    // 2*D metric evaluations rather than 2*D^3, which made D = 51 unusable.
     for (int alpha = 0; alpha < D; ++alpha) {
+        Eigen::VectorXd xp = x;
+        xp(alpha) += FD_STEP;
+        auto gp = manifold_.metric_at(xp);
+        if (!gp) { return std::nullopt; }
+
+        Eigen::VectorXd xm = x;
+        xm(alpha) -= FD_STEP;
+        auto gm = manifold_.metric_at(xm);
+        if (!gm) { return std::nullopt; }
+
         for (int mu = 0; mu < D; ++mu) {
             for (int nu = 0; nu < D; ++nu) {
-                auto val = metric_deriv(alpha, mu, nu, x);
-                if (!val) { return std::nullopt; }
-                dg[alpha][mu][nu] = *val;
+                dg[alpha][mu][nu] =
+                    ((*gp)(mu, nu) - (*gm)(mu, nu)) / (2.0 * FD_STEP);
             }
         }
     }

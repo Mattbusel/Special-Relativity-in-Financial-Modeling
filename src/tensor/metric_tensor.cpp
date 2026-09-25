@@ -15,6 +15,8 @@ namespace srfm::tensor {
 // to preserve the geometry to full double precision for well-conditioned
 // metrics while rescuing degenerate (zero-volatility) configurations.
 static constexpr double TIKHONOV_LAMBDA = 1e-10;
+/// Relative pivot threshold below which inverse() regularizes the metric.
+static constexpr double TIKHONOV_CONDITION = 1e-10;
 
 // ─── Construction ─────────────────────────────────────────────────────────────
 
@@ -33,6 +35,11 @@ std::optional<MetricMatrix> MetricTensor::inverse(const SpacetimePoint& x) const
     // Use full-pivoting LU decomposition for numerical robustness.
     // Full-pivoting is slower than partial but detects near-singularity reliably.
     Eigen::FullPivLU<MetricMatrix> lu(g);
+    // Treat the metric as singular when its pivots span more than
+    // 1 / TIKHONOV_CONDITION orders of magnitude, not only when a pivot is
+    // exactly zero: a 1e-12 spatial scale next to a unit time scale inverts to
+    // 1e12 entries that swamp every Christoffel symbol computed from it.
+    lu.setThreshold(TIKHONOV_CONDITION);
 
     if (!lu.isInvertible()) {
         // FIX (Task 4): Replace hard nullopt on singular metric with Tikhonov

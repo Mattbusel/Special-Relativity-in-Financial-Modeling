@@ -81,7 +81,8 @@ static void test_normalizer_window_size_2_basic() {
     n.update(20.0);
     STREAM_CHECK(n.warmed_up());
     STREAM_CHECK_NEAR(n.mean(), 15.0, 1e-9);
-    STREAM_CHECK_NEAR(n.sigma(), 5.0, 1e-6);
+    // Sample std-dev of {10, 20}: sqrt(((-5)^2 + 5^2) / (2 - 1)) = sqrt(50).
+    STREAM_CHECK_NEAR(n.sigma(), std::sqrt(50.0), 1e-6);
 }
 
 static void test_normalizer_window_size_50() {
@@ -170,7 +171,7 @@ static void test_normalizer_welford_vs_naive() {
     double mu = std::accumulate(vals.begin(), vals.end(), 0.0) / W;
     double var = 0.0;
     for (double v : vals) var += (v - mu) * (v - mu);
-    var /= W;
+    var /= (W - 1);  // sample variance, matching CoordinateNormalizer::sigma()
     STREAM_CHECK_NEAR(n.mean(), mu, 1e-9);
     STREAM_CHECK_NEAR(n.sigma() * n.sigma(), var, 1e-6);
 }

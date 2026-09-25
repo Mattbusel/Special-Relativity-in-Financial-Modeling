@@ -59,7 +59,7 @@ LorentzTransform::applyMomentumCorrection(double raw_signal,
                                            BetaVelocity beta,
                                            double effective_mass) noexcept {
     // Effective mass is a liquidity proxy — must be strictly positive.
-    if (effective_mass <= 0.0) {
+    if (!std::isfinite(effective_mass) || effective_mass <= 0.0) {
         return std::nullopt;
     }
 
@@ -153,7 +153,7 @@ std::optional<double>
 LorentzTransform::totalEnergy(BetaVelocity beta,
                                double effective_mass,
                                double c_market) noexcept {
-    if (effective_mass <= 0.0) {
+    if (!std::isfinite(effective_mass) || effective_mass <= 0.0) {
         return std::nullopt;
     }
 

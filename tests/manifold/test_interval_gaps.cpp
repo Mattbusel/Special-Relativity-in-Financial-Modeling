@@ -87,13 +87,21 @@ TEST(NumericalStability, VeryLargePriceDisplacement) {
 }
 
 TEST(NumericalStability, VerySmallPriceDisplacement) {
-    // ΔP = 1e-12, Δt = 0 => still Spacelike (positive)
+    // ΔP = 1e-12, Δt = 0 => ds2 = 1e-24: positive, but inside the documented
+    // FLOAT_EPSILON lightlike band of classify(), so it is Lightlike.
     SpacetimeEvent a{0.0, 0.0,     0.0, 0.0};
     SpacetimeEvent b{0.0, 1.0e-12, 0.0, 0.0};
 
     auto result = SpacetimeInterval::compute(a, b);
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(SpacetimeInterval::classify(*result), IntervalType::Spacelike);
+    EXPECT_GT(*result, 0.0);
+    EXPECT_EQ(SpacetimeInterval::classify(*result), IntervalType::Lightlike);
+
+    // A displacement whose ds2 clears the band is Spacelike.
+    SpacetimeEvent c{0.0, 1.0e-3, 0.0, 0.0};
+    auto wider = SpacetimeInterval::compute(a, c);
+    ASSERT_TRUE(wider.has_value());
+    EXPECT_EQ(SpacetimeInterval::classify(*wider), IntervalType::Spacelike);
 }
 
 TEST(NumericalStability, LargeTimeWithSmallPriceShouldBeTimelike) {
