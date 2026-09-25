@@ -21,7 +21,7 @@ jobs:
             test: ctest --test-dir build --output-on-failure --timeout 120
           - name: Windows, MSVC
             os: windows-latest
-            configure: cmake -B build -G "Visual Studio 17 2022" -A x64
+            configure: cmake -B build -A x64
             build: cmake --build build --config Release --parallel
             test: ctest --test-dir build -C Release --output-on-failure --timeout 120
     steps:
@@ -60,6 +60,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          rustflags: ''
       - name: Install egui system deps
         run: sudo apt-get update -qq && sudo apt-get install -y libxkbcommon-dev libgtk-3-dev
       - name: cargo check (all features)

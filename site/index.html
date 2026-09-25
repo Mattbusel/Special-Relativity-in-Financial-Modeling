@@ -194,7 +194,7 @@ ctest --test-dir build --output-on-failure --timeout 120
 ./build/regime_validator --input validation/data/SPY_1m.csv --output spy_regime.csv --ticker SPY</pre></div>
   <div class="code" data-panel="win" hidden><button class="copy" type="button">Copy</button><pre>git clone https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling C:\src\srfm
 cd C:\src\srfm
-cmake -B build -G "Visual Studio 17 2022" -A x64
+cmake -B build -A x64
 cmake --build build --config Release --parallel
 ctest --test-dir build -C Release --output-on-failure --timeout 120
 build\Release\regime_validator.exe --input validation\data\SPY_1m.csv --output spy_regime.csv --ticker SPY</pre></div>
