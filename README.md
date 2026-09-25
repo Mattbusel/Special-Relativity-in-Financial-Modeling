@@ -39,7 +39,7 @@ ctest --test-dir build --output-on-failure --timeout 120
 
 **Windows (Visual Studio 2022 or newer)**
 
-```powershell
+```bat
 git clone https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling C:\src\srfm
 cd C:\src\srfm
 cmake -B build -A x64
@@ -82,7 +82,7 @@ Columns: `ticker, bar_index, interval_type, next_bar_abs_return, next_bar_return
 
 ## What the core computes
 
-| | |
+| Piece | What it does |
 |---|---|
 | **β and γ** | `lorentz::BetaCalculator` turns a window of prices into a velocity against `c`; `lorentz::LorentzTransform::gamma` returns γ = 1/√(1 − β²), with β clamped below `BETA_MAX_SAFE = 0.9999`. |
 | **Interval class** | `manifold::MarketManifold::process` z-scores price, volume and momentum over a rolling window (`CoordinateNormalizer`, window 20), computes ds² = −c²dt² + dP² + dV² + dM² to the previous bar and classifies it as timelike, lightlike or spacelike. |
