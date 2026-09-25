@@ -1,4 +1,3 @@
 # CTest suites that currently fail and are skipped in CI (one name per line).
 # They built but were never green on main; remove a line once its suite passes.
-GeodesicSolverBranchTests
 test_geodesic_n
