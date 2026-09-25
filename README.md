@@ -173,7 +173,7 @@ python scripts/figures/make_figures.py --results out --q1 q1 --out figs   # HTML
 
 All 41 CTest suites pass (`100% tests passed, 0 tests failed out of 41`, MSVC Release, 2026-09-25), and CI runs them on Linux GCC and Windows MSVC for every push. Suites that ever regress can be parked in [`ci/known-failing-tests.txt`](ci/known-failing-tests.txt), which is empty today. The Python validation tests and the Rust unit tests run in CI too, minus the few listed in `ci/known-failing-pytest.txt` and `ci/known-failing-rust-tests.txt`.
 
-- **C++20 core** (`include/`, `src/`, `cmake/`): the part this README documents. Builds warning-clean enough to pass CI on GCC and MSVC; `-DSRFM_WARNINGS_AS_ERRORS=ON` turns warnings into errors.
+- **C++20 core** (`include/`, `src/`, `cmake/`): the part this README documents. Built in CI with GCC and MSVC at `-Wall -Wextra -Wpedantic` / `/W4`; `-DSRFM_WARNINGS_AS_ERRORS=ON` turns warnings into errors.
 - **Python layer**: `validation/` (data fetch, statistical tests, optimizer and dashboard demos) and `python/` (pure-Python fallback API and optional pybind11 bindings).
 - **Rust layer** at the repository root: an experimental crate (`tokio-prompt-orchestrator`) holding an LLM orchestration service and exploratory physics-analogy modules. It is not needed for the C++ library. `cargo test --lib` runs its unit tests; the integration tests under `tests/*.rs` target modules that were removed and do not compile.
 - **Paper**: `paper/` (LaTeX) and `Paper 1.1.pdf`.
