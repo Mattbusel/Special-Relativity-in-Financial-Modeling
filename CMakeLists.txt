@@ -10,17 +10,35 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Warnings as errors (matches the existing build_momentum.* scripts)
+# Warnings: always on. Promote to errors with -DSRFM_WARNINGS_AS_ERRORS=ON.
+option(SRFM_WARNINGS_AS_ERRORS "Promote compiler warnings to errors" OFF)
 if(MSVC)
-    add_compile_options(/W4 /WX /permissive-)
+    add_compile_options(/W4 /permissive- /utf-8 /bigobj)
+    if(SRFM_WARNINGS_AS_ERRORS)
+        add_compile_options(/WX)
+    endif()
 else()
-    add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wno-unused-parameter)
+    add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter)
+    if(SRFM_WARNINGS_AS_ERRORS)
+        add_compile_options(-Werror)
+    endif()
 endif()
 
 # ── Optional dependencies ─────────────────────────────────────────────────────
 find_package(RapidCheck CONFIG QUIET)
 find_package(Eigen3 QUIET)
 find_package(fmt QUIET)
+if(NOT (fmt_FOUND OR TARGET fmt::fmt))
+    # fmt is required by the backtest library; fetch it when not installed.
+    include(FetchContent)
+    FetchContent_Declare(
+        fmt
+        GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+        GIT_TAG        10.2.1
+        GIT_SHALLOW    TRUE
+    )
+    FetchContent_MakeAvailable(fmt)
+endif()
 find_package(spdlog QUIET)
 
 # If Eigen3 was not found via find_package, fall back to the vendored copy.
@@ -94,11 +112,11 @@ include(CMakePackageConfigHelpers)
 
 # Patch include dirs on core targets to use generator expressions so that
 # the same target works both in the build tree and after installation.
-foreach(_tgt srfm_momentum srfm_beta_calculator srfm_manifold srfm_geodesic srfm_engine srfm_portfolio srfm_geodesic_path)
+foreach(_tgt srfm_momentum srfm_beta_calculator srfm_manifold srfm_geodesic srfm_tensor srfm_engine srfm_portfolio srfm_geodesic_path)
     get_target_property(_cur_incs ${_tgt} INTERFACE_INCLUDE_DIRECTORIES)
     set_target_properties(${_tgt} PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES
-            "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>;$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+            "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>;$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>;$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>;$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/srfm>"
     )
 endforeach()
 
@@ -107,6 +125,7 @@ install(TARGETS
         srfm_beta_calculator
         srfm_manifold
         srfm_geodesic
+        srfm_tensor
         srfm_engine
         srfm_portfolio
         srfm_geodesic_path

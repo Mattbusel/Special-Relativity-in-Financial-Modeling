@@ -27,8 +27,6 @@ endif()
 add_library(srfm_engine STATIC
     src/engine/engine.cpp
     src/engine/n_asset_engine.cpp
-    src/validation/backtest_runner.cpp
-    src/validation/regime_validator.cpp
 )
 target_include_directories(srfm_engine PUBLIC src include)
 target_link_libraries(srfm_engine PUBLIC
@@ -93,3 +91,23 @@ add_library(srfm_geodesic_path STATIC
 )
 target_include_directories(srfm_geodesic_path PUBLIC include src)
 target_link_libraries(srfm_geodesic_path PUBLIC srfm_manifold)
+
+# ── Core pipeline (srfm::core::Engine, DataLoader) and the srfm CLI ───────────
+# Engine wires OHLCV bars through BetaCalculator, the interval classifier and
+# the Backtester; DataLoader parses and validates OHLCV CSV files.
+add_library(srfm_core STATIC
+    src/core/engine.cpp
+    src/core/data_loader.cpp
+)
+target_include_directories(srfm_core PUBLIC src include)
+target_link_libraries(srfm_core PUBLIC srfm_backtest srfm_lorentz srfm_manifold)
+
+add_executable(srfm src/main.cpp)
+target_link_libraries(srfm PRIVATE srfm_core fmt::fmt)
+
+# ── Validation binaries (feed the Python analysis in validation/) ─────────────
+add_executable(regime_validator src/validation/regime_validator.cpp)
+target_link_libraries(regime_validator PRIVATE srfm_engine srfm_tensor)
+
+add_executable(backtest_runner src/validation/backtest_runner.cpp)
+target_link_libraries(backtest_runner PRIVATE srfm_backtest srfm_tensor)

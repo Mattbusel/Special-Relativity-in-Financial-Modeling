@@ -641,7 +641,7 @@ impl PortfolioManifoldViewer {
         }
 
         // Handle scroll → zoom.
-        let scroll = ui.input(|i| i.scroll_delta.y);
+        let scroll = ui.input(|i| i.smooth_scroll_delta.y);
         self.zoom *= 1.0 + scroll as f64 * 0.001;
         self.zoom = self.zoom.clamp(0.1, 20.0);
 
