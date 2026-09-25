@@ -64,18 +64,23 @@ TEST(PerformanceCalc_Precision, MaxDrawdown_Bounded) {
     EXPECT_LE(*mdd, 1.0);
 }
 
-// Sortino must equal Sharpe when all returns are below r_f (all downside)
+// Sortino is defined when every return is below r_f (all downside).
+// sigma_down is the RMS shortfall from the target (not from the mean), so it
+// is at least the standard deviation and |Sortino| <= |Sharpe|.
 TEST(PerformanceCalc_Precision, Sortino_AllBelowRiskFree_Defined) {
-    // All returns are negative → all below r_f=0 → σ_down = σ → Sortino ≈ Sharpe
     std::vector<double> neg = {-0.01, -0.02, -0.015, -0.005, -0.025,
                                 -0.008, -0.012, -0.003, -0.018, -0.022};
     auto sh = PerformanceCalculator::sharpe(neg,  0.0, 1.0);
     auto so = PerformanceCalculator::sortino(neg, 0.0, 1.0);
     ASSERT_TRUE(sh.has_value());
     ASSERT_TRUE(so.has_value());
-    // When all returns < threshold, σ_down uses n-1 denom and equals σ
-    // within small numerical error
-    EXPECT_NEAR(*sh, *so, 0.1);  // coarse tolerance: Bessel corrections differ
+    double mu = 0.0, sq = 0.0;
+    for (double x : neg) { mu += x; sq += x * x; }
+    mu /= static_cast<double>(neg.size());
+    const double expected = mu / std::sqrt(sq / static_cast<double>(neg.size()));
+    EXPECT_NEAR(*so, expected, 1e-12);
+    EXPECT_LT(*so, 0.0);
+    EXPECT_LE(std::abs(*so), std::abs(*sh));
 }
 
 // Gamma IR: linearity in mean active return
@@ -181,7 +186,10 @@ TEST(Backtester_Config, RiskFreeRate_ShiftsSharpe) {
     std::vector<double>  rets(N);
     for (std::size_t i = 0; i < N; ++i) {
         bars[i] = {(i % 2 == 0 ? 1.0 : -1.0), BetaVelocity{0.0}, 0.0};
-        rets[i] = (i % 2 == 0 ? 0.005 : -0.005);
+        // Mostly winning, with varying size and an occasional loss, so the
+        // strategy P&L has variance and downside (otherwise Sharpe is undefined).
+        const double mag = 0.005 * (1.0 + 0.5 * std::sin(0.37 * static_cast<double>(i)));
+        rets[i] = (i % 2 == 0 ? mag : -mag) * (i % 5 == 4 ? -1.0 : 1.0);
     }
 
     Backtester bt0(cfg0), bt_rf(cfg_rf);

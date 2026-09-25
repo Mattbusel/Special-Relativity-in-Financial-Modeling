@@ -2,11 +2,6 @@
 # They built but were never green on main; remove a line once its suite passes.
 EdgeCaseBoundaryTests
 LorentzTransformTests
-BacktesterTests
-PerformanceMetricsTests
-GammaSizingTests
-MetricsPrecisionTests
-FullPipelineIntegrationTests
 ErrorHandlingIntegrationTests
 GeodesicSolverBranchTests
 test_geodesic_n
