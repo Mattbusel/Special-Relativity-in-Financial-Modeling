@@ -38,8 +38,7 @@ jobs:
         run: |
           # Suites listed in ci/known-failing-tests.txt fail on main today and
           # are tracked there; everything else must pass.
-          skip=$(tr -d '
-' < ci/known-failing-tests.txt | grep -v '^#' | grep -v '^\s*$' | paste -sd'|' -)
+          skip=$(tr -d '\r' < ci/known-failing-tests.txt | grep -v '^#' | grep -v '^\s*$' | paste -sd'|' -)
           if [ -n "$skip" ]; then
             ${{ matrix.test }} -E "^(${skip})$"
           else
@@ -71,6 +70,5 @@ jobs:
           while read -r t; do
             case "$t" in ''|\#*) continue;; esac
             args+=(--skip "$t")
-          done < <(tr -d '
-' < ci/known-failing-rust-tests.txt)
+          done < <(tr -d '\r' < ci/known-failing-rust-tests.txt)
           cargo test --lib --all-features -- "${args[@]}"
