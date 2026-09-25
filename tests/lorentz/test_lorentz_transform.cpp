@@ -97,8 +97,9 @@ TEST(LorentzGamma, Beta08_ExactValue) {
 }
 
 TEST(LorentzGamma, Beta09999_VeryLarge) {
-    // β = 0.9999 → γ ≈ 70.7
-    auto result = LorentzTransform::gamma(BetaVelocity{0.9999});
+    // β just inside BETA_MAX_SAFE (0.9999 itself is excluded, see
+    // isValidBeta tests above) → γ ≈ 70.7
+    auto result = LorentzTransform::gamma(BetaVelocity{BETA_MAX_SAFE - 1e-7});
     ASSERT_TRUE(result.has_value());
     EXPECT_GT(result->value, 70.0);
     EXPECT_LT(result->value, 1000.0);

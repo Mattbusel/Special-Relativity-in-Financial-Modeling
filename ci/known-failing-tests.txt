@@ -1,11 +1,6 @@
 # CTest suites that currently fail and are skipped in CI (one name per line).
 # They built but were never green on main; remove a line once its suite passes.
-EdgeCaseBoundaryTests
-LorentzTransformTests
 GeodesicSolverBranchTests
 test_geodesic_n
 stream_test_coordinate_normalizer
 stream_test_signal_chain
-IntervalGapTests
-PortfolioManifoldTests
-GeodesicPathTests

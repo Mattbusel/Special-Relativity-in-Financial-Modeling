@@ -468,10 +468,11 @@ static void test_compose_near_luminal() {
     SRFM_HAS_VALUE(b_high_a);
     SRFM_HAS_VALUE(b_high_b);
 
+    // Parallel near-luminal: the exact sum is about 0.99999999, above
+    // BETA_MAX_SAFE, so compose_velocities must refuse it (documented contract:
+    // nullopt when the composed result would be >= BETA_MAX_SAFE).
     auto composed = compose_velocities(*b_high_a, *b_high_b);
-    SRFM_HAS_VALUE(composed);
-    SRFM_CHECK(std::abs(composed->value()) < 1.0);   // subluminal
-    SRFM_CHECK(std::isfinite(composed->value()));
+    SRFM_NO_VALUE(composed);
 
     // Anti-parallel near-luminal: result should be small
     auto b_pos = BetaVelocity::make(BETA_MAX_SAFE - 1e-5).value();
