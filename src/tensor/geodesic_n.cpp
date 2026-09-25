@@ -43,13 +43,19 @@ GeodesicSolverN::rhs(const GeodesicState& s) const noexcept {
     // du^λ/dτ = -Σ_{μν} Γ^λ_μν u^μ u^ν.
     Eigen::VectorXd du = Eigen::VectorXd::Zero(D);
 
+    // Evaluate the whole Christoffel tensor once per right-hand side. Calling
+    // symbol() per (lambda, mu, nu) recomputed the inverse metric and 3*D
+    // finite differences for each of the D^3 entries, O(D^6) metric
+    // evaluations per step, which never finished for D = 51.
+    auto gamma_opt = christoffel_.all_symbols(s.x);
+    if (!gamma_opt) { return std::nullopt; }
+    const auto& gamma = *gamma_opt;
+
     for (int lambda = 0; lambda < D; ++lambda) {
         double acc = 0.0;
         for (int mu = 0; mu < D; ++mu) {
             for (int nu = 0; nu < D; ++nu) {
-                auto gamma_opt = christoffel_.symbol(lambda, mu, nu, s.x);
-                if (!gamma_opt) { return std::nullopt; }
-                acc += (*gamma_opt) * s.u(mu) * s.u(nu);
+                acc += gamma[lambda][mu][nu] * s.u(mu) * s.u(nu);
             }
         }
         du(lambda) = -acc;
