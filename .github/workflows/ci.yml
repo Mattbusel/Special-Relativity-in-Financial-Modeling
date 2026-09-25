@@ -44,13 +44,14 @@ jobs:
           else
             ${{ matrix.test }}
           fi
-      - name: Run the regime validator on committed SPY data
+      - name: Run the example and the regime validator on committed SPY data
         shell: bash
         run: |
           dir=build; [ -d build/Release ] && dir=build/Release
           "$dir/srfm" --help
+          "$dir/lorentz_basics"
           "$dir/regime_validator" --input validation/data/SPY_1m.csv --output spy_regime.csv --ticker SPY
-          head -5 spy_regime.csv
+          tail -3 spy_regime.csv
 
   # Experimental Rust layer: must compile; library unit tests must pass.
   rust:

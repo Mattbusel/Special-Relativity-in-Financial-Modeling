@@ -111,3 +111,7 @@ target_link_libraries(regime_validator PRIVATE srfm_engine srfm_tensor)
 
 add_executable(backtest_runner src/validation/backtest_runner.cpp)
 target_link_libraries(backtest_runner PRIVATE srfm_backtest srfm_tensor)
+
+# ── Examples ──────────────────────────────────────────────────────────────────
+add_executable(lorentz_basics examples/lorentz_basics.cpp)
+target_link_libraries(lorentz_basics PRIVATE srfm_manifold srfm_lorentz)
