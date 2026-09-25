@@ -29,7 +29,10 @@ add_library(srfm_engine STATIC
     src/engine/n_asset_engine.cpp
 )
 target_include_directories(srfm_engine PUBLIC src include)
+# n_asset_engine.cpp uses srfm::tensor::NAssetManifold; srfm_tensor is defined
+# later (cmake/tensor.cmake), which CMake allows for link dependencies.
 target_link_libraries(srfm_engine PUBLIC
+    srfm_tensor
     srfm_beta_calculator
     srfm_manifold
     srfm_geodesic
