@@ -17,7 +17,7 @@ jobs:
           - name: Linux, GCC, Ninja
             os: ubuntu-latest
             configure: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
-            build: cmake --build build --parallel
+            build: cmake --build build --parallel -- -k 0
             test: ctest --test-dir build --output-on-failure --timeout 120
           - name: Windows, MSVC
             os: windows-latest
