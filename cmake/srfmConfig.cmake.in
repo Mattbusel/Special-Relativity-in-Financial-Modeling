@@ -1,5 +1,9 @@
 @PACKAGE_INIT@
 
+include(CMakeFindDependencyMacro)
+# The exported libraries link Eigen3::Eigen; consumers need Eigen 3.4 installed.
+find_dependency(Eigen3 3.4 NO_MODULE)
+
 include("${CMAKE_CURRENT_LIST_DIR}/srfmTargets.cmake")
 
 check_required_components(srfm)

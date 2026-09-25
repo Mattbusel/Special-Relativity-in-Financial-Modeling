@@ -323,7 +323,7 @@ static void test_signal_consumer_write_one_json_format() {
     // Write to a temp file, read it back, and check the JSON content.
     const char* tmp_path = "srfm_json_test_tmp.txt";
 
-#ifdef _CRT_SECURE_NO_WARNINGS
+#if !defined(_MSC_VER) || defined(_CRT_SECURE_NO_WARNINGS)
     FILE* f = std::fopen(tmp_path, "w");
 #else
     FILE* f = nullptr;
@@ -350,7 +350,7 @@ static void test_signal_consumer_write_one_json_format() {
 
     // Read the file back.
     char buf[512] = {};
-#ifdef _CRT_SECURE_NO_WARNINGS
+#if !defined(_MSC_VER) || defined(_CRT_SECURE_NO_WARNINGS)
     FILE* r = std::fopen(tmp_path, "r");
 #else
     FILE* r = nullptr;

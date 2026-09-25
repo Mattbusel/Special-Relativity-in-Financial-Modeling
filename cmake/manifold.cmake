@@ -115,3 +115,5 @@ target_link_libraries(backtest_runner PRIVATE srfm_backtest srfm_tensor)
 # ── Examples ──────────────────────────────────────────────────────────────────
 add_executable(lorentz_basics examples/lorentz_basics.cpp)
 target_link_libraries(lorentz_basics PRIVATE srfm_manifold srfm_lorentz)
+add_executable(stream_and_simd examples/stream_and_simd.cpp)
+target_link_libraries(stream_and_simd PRIVATE srfm_stream srfm_simd_dispatch)
