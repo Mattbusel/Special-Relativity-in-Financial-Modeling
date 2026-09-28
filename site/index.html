@@ -3,11 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SRFM C++ Core</title>
-<meta name="description" content="A C++20 library that gives every OHLCV bar a price velocity, a Lorentz factor and a spacetime interval, then labels it timelike or spacelike. Research code, not financial advice.">
-<meta property="og:title" content="SRFM C++ core: every bar is an event in spacetime">
-<meta property="og:description" content="C++20 research library: beta, gamma, spacetime-interval regime labels, Christoffel symbols and geodesic deviation on OHLCV bars.">
-<meta property="og:image" content="https://mattbusel.github.io/Special-Relativity-in-Financial-Modeling/assets/social-preview.png">
+<title>SRFM: Special Relativity for Price Bars (C++ tools)</title>
+<meta name="description" content="Label stock and crypto price bars timelike or spacelike with special relativity maths: beta, Lorentz factor, spacetime interval. C++ tools, Windows download.">
+<link rel="canonical" href="https://mattbusel.github.io/Special-Relativity-in-Financial-Modeling/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mattbusel.github.io/Special-Relativity-in-Financial-Modeling/">
+<meta property="og:title" content="SRFM: Special Relativity for Price Bars (C++ tools)">
+<meta property="og:description" content="Label stock and crypto price bars timelike or spacelike with special relativity maths: beta, Lorentz factor, spacetime interval. C++ tools, Windows download.">
+<meta property="og:image" content="https://mattbusel.github.io/Special-Relativity-in-Financial-Modeling/assets/og-1200x630.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SPY daily closes coloured timelike and spacelike by the SRFM regime_validator tool">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SRFM: Special Relativity for Price Bars (C++ tools)">
+<meta name="twitter:description" content="Label stock and crypto price bars timelike or spacelike with special relativity maths: beta, Lorentz factor, spacetime interval. C++ tools, Windows download.">
+<meta name="twitter:image" content="https://mattbusel.github.io/Special-Relativity-in-Financial-Modeling/assets/og-1200x630.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Special Relativity in Financial Modeling (SRFM)", "description": "Label stock and crypto price bars timelike or spacelike with special relativity maths: beta, Lorentz factor, spacetime interval. C++ tools, Windows download.", "url": "https://mattbusel.github.io/Special-Relativity-in-Financial-Modeling/", "codeRepository": "https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling", "programmingLanguage": "C++", "license": "https://opensource.org/licenses/MIT", "author": {"@type": "Person", "name": "Matthew Busel"}, "applicationCategory": "FinanceApplication", "operatingSystem": "Windows, Linux, macOS (build from source)", "downloadUrl": "https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling/releases/latest/download/srfm-windows-x64.zip", "softwareVersion": "1.2.0", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 16 L4 4 L28 4 Z M16 16 L4 28 L28 28 Z' fill='%2300809A' fill-opacity='.35' stroke='%2300809A' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23D0402A'/%3E%3C/svg%3E">
 <style>
 :root{
@@ -116,6 +127,10 @@ footer{border-top:1px solid var(--rule);margin-top:56px;padding:22px 0 40px;font
   th,td{padding:5px 4px;font-size:12px}
   .hide-xs{display:none}
 }
+.fig{display:block;width:100%;height:auto;margin:18px 0;border-radius:10px}
+.only-dark{display:none}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .only-dark{display:block}:root:not([data-theme="light"]) .only-light{display:none}}
+:root[data-theme="dark"] .only-dark{display:block}:root[data-theme="dark"] .only-light{display:none}
 </style>
 </head>
 <body>
@@ -123,7 +138,8 @@ footer{border-top:1px solid var(--rule);margin-top:56px;padding:22px 0 40px;font
 <nav>
   <a class="brand" href="#top"><svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 16 L4 4 L28 4 Z M16 16 L4 28 L28 28 Z" fill="var(--time)" fill-opacity=".3" stroke="var(--time)" stroke-width="2"/><circle cx="16" cy="16" r="3" fill="var(--space)"/></svg>SRFM<span class="full">&nbsp;C++ core</span></a>
   <div class="links">
-    <a href="#quickstart">Quick start</a>
+    <a href="#how">How it works</a>
+    <a class="hide-sm" href="#quickstart">Quick start</a>
     <a class="hide-sm" href="#core">The core</a>
     <a class="hide-sm" href="#results">Results</a>
     <a class="hide-sm" href="api/">API docs</a>
@@ -140,9 +156,11 @@ footer{border-top:1px solid var(--rule);margin-top:56px;padding:22px 0 40px;font
   </div>
   <div>
     <div class="cta">
-      <a class="btn primary" href="#quickstart">Build it in two minutes</a>
-      <a class="btn" href="https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling">View on GitHub</a>
-    </div>
+      <a class="btn primary" href="https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling/releases/latest/download/srfm-windows-x64.zip">Download for Windows (.zip)</a>
+      <a class="btn" href="https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling/releases/latest/download/srfm-linux-x64.tar.gz">Linux (.tar.gz)</a>
+      <a class="btn" href="#quickstart">Build from source</a>
+      </div>
+    <p class="note">The zip holds four .exe tools, ten tickers of sample data and <code>demo.bat</code>: unzip and double-click it.</p>
     <p class="note">Research code, not financial advice. The chart below is the real output of <code>regime_validator</code> on the SPY daily bars committed in the repo.</p>
   </div>
 </header>
@@ -177,6 +195,21 @@ footer{border-top:1px solid var(--rule);margin-top:56px;padding:22px 0 40px;font
   </div>
 </div>
 <p class="caption">Labels come from <code>build/regime_validator --input validation/data/SPY_1m.csv</code> (rolling z-score normaliser, window 20). Dates 2021-03 to 2026-02.</p>
+
+<section id="how">
+  <div class="eyebrow">How it works</div>
+  <h2>From a price bar to a label, in four steps.</h2>
+  <p style="color:var(--ink2);max-width:42em">No physics needed. Each figure is recomputed from the C++ formulas on the bundled SPY data, and every label matches the <code>regime_validator</code> output.</p>
+  <img class="fig only-light" src="assets/how-it-works-light.svg" width="900" height="730" loading="lazy" alt="Four steps: take one bar; rescale close, volume and momentum to standard deviations from the last 20 bars; measure the step from the previous bar; compare it to the speed limit c = 1. Under it is timelike, over it is spacelike.">
+  <img class="fig only-dark" src="assets/how-it-works-dark.svg" width="900" height="730" loading="lazy" alt="Four steps: take one bar; rescale close, volume and momentum to standard deviations from the last 20 bars; measure the step from the previous bar; compare it to the speed limit c = 1. Under it is timelike, over it is spacelike.">
+  <h3>The Lorentz factor &gamma;</h3>
+  <p style="color:var(--ink2);max-width:42em">&beta; is the step as a fraction of the speed limit. &gamma; = 1/&radic;(1 &minus; &beta;&sup2;) stays near 1 for calm bars and shoots up near the limit. <code>srfm --backtest</code> sizes positions by &gamma;, clamped to 1x to 3x.</p>
+  <img class="fig only-light" src="assets/lorentz-factor-light.svg" width="900" height="600" loading="lazy" alt="Gamma against beta: flat near 1, 2.29 at beta 0.9, 7.09 at beta 0.99, with ticks for the 295 timelike SPY bars.">
+  <img class="fig only-dark" src="assets/lorentz-factor-dark.svg" width="900" height="600" loading="lazy" alt="Gamma against beta: flat near 1, 2.29 at beta 0.9, 7.09 at beta 0.99, with ticks for the 295 timelike SPY bars.">
+  <h3>The spacetime interval on real bars</h3>
+  <img class="fig only-light" src="assets/spy-last-60-light.svg" width="900" height="484" loading="lazy" alt="The last 60 SPY daily bars: 18 under the speed limit (timelike), 42 over it (spacelike).">
+  <img class="fig only-dark" src="assets/spy-last-60-dark.svg" width="900" height="484" loading="lazy" alt="The last 60 SPY daily bars: 18 under the speed limit (timelike), 42 over it (spacelike).">
+</section>
 
 <section id="quickstart">
   <div class="eyebrow">Quick start</div>

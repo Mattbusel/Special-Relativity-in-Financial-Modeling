@@ -105,7 +105,8 @@ static std::optional<std::vector<OhlcvBar>> load_csv(const std::string& path,
                                                       std::string& err) {
     std::ifstream file(path);
     if (!file.is_open()) {
-        err = "Cannot open input file: " + path;
+        err = "Cannot open input file: " + path +
+              " (check the path; sample data is in validation/data/)";
         return std::nullopt;
     }
 
@@ -199,7 +200,7 @@ static std::vector<ClassifiedBar> classify_bars(
 {
     const std::size_t n = bars.size();
     if (n < 3) {
-        std::cerr << "[" << ticker << "] Too few bars (" << n << ") — need at least 3\n";
+        std::cerr << "[" << ticker << "] Too few bars (" << n << "): need at least 3\n";
         return {};
     }
 
@@ -371,11 +372,31 @@ static std::optional<Args> parse_args(int argc, char* argv[]) {
 
 // ─── main ─────────────────────────────────────────────────────────────────────
 
+static void print_usage(std::ostream& os) {
+    os << "regime_validator: label every OHLCV bar timelike, spacelike or lightlike.\n"
+          "\n"
+          "Usage:\n"
+          "  regime_validator --input <ohlcv.csv> --output <labels.csv> [--ticker <name>]\n"
+          "\n"
+          "The input CSV needs a header with at least 'close' and 'volume' columns\n"
+          "(timestamp,open,high,low,close,volume is typical).\n"
+          "\n"
+          "Example (sample data ships in validation/data/, in the repo and in the release zip):\n"
+          "  regime_validator --input validation/data/SPY_1m.csv --output spy_regime.csv --ticker SPY\n";
+}
+
 int main(int argc, char* argv[]) {
+    for (int i = 1; i < argc; ++i) {
+        const std::string a(argv[i]);
+        if (a == "--help" || a == "-h") {
+            print_usage(std::cout);
+            return 0;
+        }
+    }
     auto maybe_args = parse_args(argc, argv);
     if (!maybe_args.has_value()) {
-        std::cerr << "Usage: regime_validator --input <csv> --output <csv> "
-                     "[--ticker <name>]\n";
+        std::cerr << "Error: --input and --output are both required.\n\n";
+        print_usage(std::cerr);
         return 1;
     }
 
@@ -401,7 +422,7 @@ int main(int argc, char* argv[]) {
     auto classified = classify_bars(bars, args.ticker);
 
     if (classified.empty()) {
-        std::cerr << "[FATAL] No bars classified — check data quality\n";
+        std::cerr << "[FATAL] No bars classified. Add more rows: the rolling z-score needs a warm-up of about a dozen valid bars (close > 0, volume >= 0)\n";
         return 1;
     }
 

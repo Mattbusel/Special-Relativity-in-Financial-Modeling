@@ -260,11 +260,29 @@ static std::optional<Args> parse_args(int argc, char* argv[]) {
 
 // ─── main ─────────────────────────────────────────────────────────────────────
 
+static void print_usage(std::ostream& os) {
+    os << "backtest_runner: geodesic-deviation strategy over a regime_validator output file.\n"
+          "\n"
+          "Usage:\n"
+          "  backtest_runner --input <regime.csv> --output-dir <dir> [--ticker <name>]\n"
+          "\n"
+          "Example (make the input with regime_validator first):\n"
+          "  regime_validator --input validation/data/SPY_1m.csv --output spy_regime.csv --ticker SPY\n"
+          "  backtest_runner  --input spy_regime.csv --output-dir out --ticker SPY\n";
+}
+
 int main(int argc, char* argv[]) {
+    for (int i = 1; i < argc; ++i) {
+        const std::string a(argv[i]);
+        if (a == "--help" || a == "-h") {
+            print_usage(std::cout);
+            return 0;
+        }
+    }
     auto maybe_args = parse_args(argc, argv);
     if (!maybe_args.has_value()) {
-        std::cerr << "Usage: backtest_runner --input <regime_csv> "
-                     "--output-dir <dir> [--ticker <name>]\n";
+        std::cerr << "Error: --input and --output-dir are both required.\n\n";
+        print_usage(std::cerr);
         return 1;
     }
     const Args& args = *maybe_args;
@@ -282,7 +300,7 @@ int main(int argc, char* argv[]) {
 
     if (rows.size() < static_cast<std::size_t>(srfm::constants::MIN_RETURN_SERIES_LENGTH)) {
         std::cerr << "[FATAL] Too few rows (" << rows.size()
-                  << ") — need at least " << srfm::constants::MIN_RETURN_SERIES_LENGTH << "\n";
+                  << "): need at least " << srfm::constants::MIN_RETURN_SERIES_LENGTH << "\n";
         return 1;
     }
 
@@ -298,7 +316,7 @@ int main(int argc, char* argv[]) {
     auto maybe_result = backtester.run_triple(bars, asset_returns, args.ticker);
     if (!maybe_result.has_value()) {
         std::cerr << "[FATAL] Backtest failed for " << args.ticker
-                  << " — check data quality and minimum series length\n";
+                  << ": check data quality and minimum series length\n";
         return 1;
     }
 

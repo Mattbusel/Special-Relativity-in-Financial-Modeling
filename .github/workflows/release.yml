@@ -1,21 +1,130 @@
 name: release
+
+# Tag vX.Y.Z to build the command-line tools for Windows and Linux and attach
+# them, with the sample data and a one-click demo, to the GitHub release.
+# Asset names carry no version so that
+#   https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling/releases/latest/download/<asset>
+# always points at the newest build.
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to (re)build and upload assets for'
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  TOOLS: srfm regime_validator backtest_runner lorentz_basics
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows x64
+            os: windows-latest
+            asset: srfm-windows-x64.zip
+          - name: Linux x64
+            os: ubuntu-latest
+            asset: srfm-linux-x64.tar.gz
     steps:
       - uses: actions/checkout@v4
-      - name: Extract version from tag
-        id: version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-      - name: Create GitHub Release
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: Configure and build (Windows, static runtime)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          cmake -B build -A x64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
+          cmake --build build --config Release --parallel --target $TOOLS
+
+      - name: Configure and build (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y ninja-build
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel --target $TOOLS
+
+      - name: Assemble the package
+        shell: bash
+        run: |
+          set -euo pipefail
+          bin=build; ext=""
+          if [ "$RUNNER_OS" = "Windows" ]; then bin=build/Release; ext=.exe; fi
+          pkg=dist/srfm
+          mkdir -p "$pkg/validation/data"
+          for t in $TOOLS; do cp "$bin/$t$ext" "$pkg/"; done
+          cp validation/data/*.csv "$pkg/validation/data/"
+          cp LICENSE "$pkg/"
+          cp packaging/README.txt "$pkg/"
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            cp packaging/demo.bat "$pkg/"
+          else
+            cp packaging/demo.sh "$pkg/"; chmod +x "$pkg/demo.sh" "$pkg"/srfm "$pkg"/regime_validator
+          fi
+
+      - name: Smoke-test the packaged tools
+        shell: bash
+        working-directory: dist/srfm
+        run: |
+          set -euo pipefail
+          ext=""; [ "$RUNNER_OS" = "Windows" ] && ext=.exe
+          ./srfm$ext --help
+          ./regime_validator$ext --help
+          ./regime_validator$ext --input validation/data/SPY_1m.csv --output spy_regime.csv --ticker SPY
+          ./lorentz_basics$ext
+          rm spy_regime.csv
+
+      - name: Archive
+        shell: bash
+        working-directory: dist
+        run: |
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            7z a -tzip "${{ matrix.asset }}" srfm > /dev/null
+          else
+            tar czf "${{ matrix.asset }}" srfm
+          fi
+          ls -l "${{ matrix.asset }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: dist/${{ matrix.asset }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Publish the GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          name: Release ${{ steps.version.outputs.VERSION }}
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          name: ${{ inputs.tag || github.ref_name }}
+          files: dist/*
           body: |
-            See [CHANGELOG.md](CHANGELOG.md) for details.
-          draft: false
-          prerelease: false
+            Command-line tools for the SRFM C++ core, with the sample data from `validation/data/`.
+
+            **Windows:** download `srfm-windows-x64.zip`, unzip, double-click `demo.bat`.
+            **Linux:** download `srfm-linux-x64.tar.gz`, `tar xzf`, run `./srfm/demo.sh`.
+            **macOS:** build from source (see the README quick start).
+
+            | Tool | What it does |
+            |---|---|
+            | `regime_validator` | Labels every OHLCV bar timelike, spacelike or lightlike and writes a CSV |
+            | `backtest_runner` | Geodesic-deviation strategy over a `regime_validator` output file |
+            | `srfm` | `--backtest <csv>` or `--stream` (stdin) over `srfm::core::Engine` |
+            | `lorentz_basics` | Prints beta, gamma and two interval labels (the library example) |
+
+            Research code, not financial advice. See [CHANGELOG.md](https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling/blob/main/CHANGELOG.md).

@@ -26,6 +26,9 @@ void print_usage() {
         "\n"
         "CSV format (header required):\n"
         "  timestamp,open,high,low,close,volume\n"
+        "\n"
+        "Example (sample data ships in validation/data/, in the repo and in the release zip):\n"
+        "  srfm --backtest validation/data/SPY_1m.csv\n"
     );
 }
 
@@ -34,7 +37,7 @@ void print_usage() {
 int run_backtest(const std::string& filepath) {
     auto bars = srfm::core::DataLoader::load_csv(filepath);
     if (!bars) {
-        fmt::print(stderr, "Error: cannot open file '{}'\n", filepath);
+        fmt::print(stderr, "Error: cannot open file '{}'. Check the path; sample data is in validation/data/.\n", filepath);
         return 1;
     }
 
@@ -50,7 +53,7 @@ int run_backtest(const std::string& filepath) {
 
     if (!result) {
         fmt::print(stderr,
-            "Error: backtest failed — too few bars ({} loaded, {} required)\n",
+            "Error: backtest failed: too few bars ({} loaded, {} required)\n",
             bars->size(), srfm::constants::MIN_RETURN_SERIES_LENGTH);
         return 1;
     }
@@ -70,7 +73,7 @@ int run_stream() {
     std::size_t bar_count = 0;
 
     fmt::print("SRFM streaming mode. Enter OHLCV rows (timestamp,open,high,low,close,volume).\n");
-    fmt::print("First line: header. Ctrl-D to finish.\n");
+    fmt::print("First line: header. Ctrl-D (Ctrl-Z then Enter on Windows) to finish.\n");
 
     while (std::getline(std::cin, line)) {
         // Trim carriage return for Windows-style line endings.

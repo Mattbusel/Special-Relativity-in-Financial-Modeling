@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 730" width="900" height="730" role="img" aria-labelledby="t d">
+<title id="t">How SRFM labels a price bar timelike or spacelike</title>
+<desc id="d">Four steps: take a bar, rescale price, volume and momentum to standard deviations, measure the step from the previous bar, and compare it to a speed limit of one per bar. Under the limit is timelike, over it is spacelike.</desc>
+<rect width="900" height="730" rx="14" fill="#F5F2EA"/>
+<text x="44.0" y="58.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="28" fill="#1A1D24" text-anchor="start" font-weight="700">How a price bar becomes timelike or spacelike</text>
+<text x="44.0" y="90.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="18" fill="#4A4B50" text-anchor="start" font-weight="400">The four steps regime_validator runs on every bar. No physics needed.</text>
+<rect x="44" y="118" width="396" height="228" rx="10" fill="#FBF9F4" stroke="#C9C2B1"/>
+<circle cx="76" cy="152" r="17" fill="#00809A"/>
+<text x="76.0" y="158.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="18" fill="#FBF9F4" text-anchor="middle" font-weight="700">1</text>
+<text x="104.0" y="159.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="21" fill="#1A1D24" text-anchor="start" font-weight="700">Take one bar</text>
+<text x="64.0" y="198.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" fill="#4A4B50" text-anchor="start" font-weight="400">A day&#x27;s close, its volume and its</text>
+<text x="64.0" y="222.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" fill="#4A4B50" text-anchor="start" font-weight="400">momentum (the day&#x27;s % change).</text>
+<text x="64.0" y="260.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="17" fill="#1A1D24" text-anchor="start" font-weight="400" xml:space="preserve">event = (time, price,</text>
+<text x="64.0" y="284.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="17" fill="#1A1D24" text-anchor="start" font-weight="400" xml:space="preserve">         volume, momentum)</text>
+<text x="64.0" y="326.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="15" fill="#6F6C64" text-anchor="start" font-weight="400">SpacetimeEvent</text>
+<rect x="460" y="118" width="396" height="228" rx="10" fill="#FBF9F4" stroke="#C9C2B1"/>
+<circle cx="492" cy="152" r="17" fill="#00809A"/>
+<text x="492.0" y="158.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="18" fill="#FBF9F4" text-anchor="middle" font-weight="700">2</text>
+<text x="520.0" y="159.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="21" fill="#1A1D24" text-anchor="start" font-weight="700">Put it on one scale</text>
+<text x="480.0" y="198.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" fill="#4A4B50" text-anchor="start" font-weight="400">Rescale each number to &quot;standard</text>
+<text x="480.0" y="222.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" fill="#4A4B50" text-anchor="start" font-weight="400">deviations from the last 20 bars&quot;,</text>
+<text x="480.0" y="246.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" fill="#4A4B50" text-anchor="start" font-weight="400">so dollars and shares compare.</text>
+<text x="480.0" y="284.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="17" fill="#1A1D24" text-anchor="start" font-weight="400" xml:space="preserve">z = (value - mean) / std dev</text>
+<text x="480.0" y="326.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="15" fill="#6F6C64" text-anchor="start" font-weight="400">CoordinateNormalizer(20)</text>
+<rect x="44" y="366" width="396" height="228" rx="10" fill="#FBF9F4" stroke="#C9C2B1"/>
+<circle cx="76" cy="400" r="17" fill="#00809A"/>
+<text x="76.0" y="406.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="18" fill="#FBF9F4" text-anchor="middle" font-weight="700">3</text>
+<text x="104.0" y="407.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="21" fill="#1A1D24" text-anchor="start" font-weight="700">Measure the step</text>
+<text x="64.0" y="446.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" fill="#4A4B50" text-anchor="start" font-weight="400">How far did the bar move from the</text>
+<text x="64.0" y="470.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" fill="#4A4B50" text-anchor="start" font-weight="400">one before, in all three at once?</text>
+<text x="64.0" y="508.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="17" fill="#1A1D24" text-anchor="start" font-weight="400" xml:space="preserve">step = √(ΔP² + ΔV² + ΔM²)</text>
+<text x="64.0" y="532.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="17" fill="#1A1D24" text-anchor="start" font-weight="400" xml:space="preserve">ds²  = step² − (c·Δt)²</text>
+<text x="64.0" y="574.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="15" fill="#6F6C64" text-anchor="start" font-weight="400">SpacetimeInterval::compute</text>
+<rect x="460" y="366" width="396" height="228" rx="10" fill="#FBF9F4" stroke="#C9C2B1"/>
+<circle cx="492" cy="400" r="17" fill="#00809A"/>
+<text x="492.0" y="406.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="18" fill="#FBF9F4" text-anchor="middle" font-weight="700">4</text>
+<text x="520.0" y="407.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="21" fill="#1A1D24" text-anchor="start" font-weight="700">Compare to the speed limit</text>
+<text x="480.0" y="446.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" fill="#4A4B50" text-anchor="start" font-weight="400">c = 1 standard deviation per bar.</text>
+<text x="480.0" y="484.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="19" fill="#00809A" text-anchor="start" font-weight="700">step &lt; 1</text>
+<text x="480.0" y="508.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" fill="#00809A" text-anchor="start" font-weight="700">timelike</text>
+<text x="480.0" y="548.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="19" fill="#D0402A" text-anchor="start" font-weight="700">step &gt; 1</text>
+<text x="480.0" y="572.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" fill="#D0402A" text-anchor="start" font-weight="700">spacelike</text>
+<path d="M722.0,570 L814.0,478 L630.0,478 Z" fill="#00809A" fill-opacity="0.192" stroke="#00809A" stroke-opacity="0.6"/>
+<line x1="722.0" y1="570.0" x2="700.0" y2="490.0" stroke="#00809A" stroke-width="3.2" stroke-linecap="round"/><path d="M707.0,498.5 L700.0,490.0 L698.3,500.9" fill="none" stroke="#00809A" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="722.0" y1="570.0" x2="840.0" y2="524.0" stroke="#D0402A" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="7 5"/><path d="M832.3,531.8 L840.0,524.0 L829.0,523.5" fill="none" stroke="#D0402A" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="722.0" cy="570" r="5" fill="#1A1D24"/>
+<text x="710.0" y="574.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="15" fill="#6F6C64" text-anchor="end" font-weight="400">now</text>
+<text x="722.0" y="470.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="15" fill="#6F6C64" text-anchor="middle" font-weight="400">light cone</text>
+<line x1="442.0" y1="152.0" x2="458.0" y2="152.0" stroke="#4A4B50" stroke-width="2" stroke-linecap="round"/><path d="M448.0,156.5 L458.0,152.0 L448.0,147.5" fill="none" stroke="#4A4B50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="442.0" y1="400.0" x2="458.0" y2="400.0" stroke="#4A4B50" stroke-width="2" stroke-linecap="round"/><path d="M448.0,404.5 L458.0,400.0 L448.0,395.5" fill="none" stroke="#4A4B50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="44.0" y="638.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" text-anchor="start" xml:space="preserve"><tspan fill="#00809A" font-weight="700">Timelike</tspan><tspan fill="#4A4B50" font-weight="400"> (inside the cone): the bar moved less than the speed limit. An ordinary step.</tspan></text>
+<text x="44.0" y="668.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" text-anchor="start" xml:space="preserve"><tspan fill="#D0402A" font-weight="700">Spacelike</tspan><tspan fill="#4A4B50" font-weight="400"> (outside the cone): it moved further than c allows in one bar. A jump.</tspan></text>
+<text x="44.0" y="698.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" fill="#6F6C64" text-anchor="start" font-weight="400">In the code c is SPEED_OF_INFORMATION = 1 and Δt is one bar, so the test is step &lt; 1.</text>
+</svg>

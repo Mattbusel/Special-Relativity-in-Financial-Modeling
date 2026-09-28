@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 484" width="900" height="484" role="img" aria-labelledby="t d">
+<title id="t">The last 60 SPY daily bars, labelled</title>
+<desc id="d">Bar chart of each bar&#x27;s step size against the speed limit of 1. 18 of 60 bars stay under it and are timelike; the rest are spacelike.</desc>
+<rect width="900" height="484" rx="14" fill="#F5F2EA"/>
+<text x="44.0" y="50.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="24" fill="#1A1D24" text-anchor="start" font-weight="700">Real data: the last 60 SPY daily bars</text>
+<text x="44.0" y="78.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" fill="#4A4B50" text-anchor="start" font-weight="400">Bar height = the step from step 3. 18 of 60 stay under the speed limit.</text>
+<rect x="44" y="98" width="17" height="17" rx="2" fill="#00809A"/>
+<text x="68.0" y="112.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="16" fill="#1A1D24" text-anchor="start" font-weight="400">timelike</text>
+<rect x="156" y="98" width="17" height="17" rx="2" fill="#D0402A"/>
+<text x="180.0" y="112.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="16" fill="#1A1D24" text-anchor="start" font-weight="400">spacelike</text>
+<line x1="282" x2="322" y1="107" y2="107" stroke="#1A1D24" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="330.0" y="112.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="16" fill="#1A1D24" text-anchor="start" font-weight="400">speed limit c = 1</text>
+<line x1="84" x2="864" y1="400.0" y2="400.0" stroke="#DDD7C9"/>
+<text x="72.0" y="405.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="15" fill="#6F6C64" text-anchor="end" font-weight="400">0</text>
+<line x1="84" x2="864" y1="356.7" y2="356.7" stroke="#DDD7C9"/>
+<text x="72.0" y="361.7" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="15" fill="#6F6C64" text-anchor="end" font-weight="400">1</text>
+<line x1="84" x2="864" y1="313.3" y2="313.3" stroke="#DDD7C9"/>
+<text x="72.0" y="318.3" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="15" fill="#6F6C64" text-anchor="end" font-weight="400">2</text>
+<line x1="84" x2="864" y1="270.0" y2="270.0" stroke="#DDD7C9"/>
+<text x="72.0" y="275.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="15" fill="#6F6C64" text-anchor="end" font-weight="400">3</text>
+<line x1="84" x2="864" y1="226.7" y2="226.7" stroke="#DDD7C9"/>
+<text x="72.0" y="231.7" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="15" fill="#6F6C64" text-anchor="end" font-weight="400">4</text>
+<line x1="84" x2="864" y1="183.3" y2="183.3" stroke="#DDD7C9"/>
+<text x="72.0" y="188.3" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="15" fill="#6F6C64" text-anchor="end" font-weight="400">5</text>
+<line x1="84" x2="864" y1="140.0" y2="140.0" stroke="#DDD7C9"/>
+<text x="72.0" y="145.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="15" fill="#6F6C64" text-anchor="end" font-weight="400">6</text>
+<rect x="86.1" y="347.7" width="8.8" height="52.3" rx="1.5" fill="#D0402A"><title>2025-12-01: step 1.21, spacelike</title></rect>
+<rect x="99.1" y="373.3" width="8.8" height="26.7" rx="1.5" fill="#00809A"><title>2025-12-02: step 0.62, timelike</title></rect>
+<rect x="112.1" y="392.7" width="8.8" height="7.3" rx="1.5" fill="#00809A"><title>2025-12-03: step 0.17, timelike</title></rect>
+<rect x="125.1" y="384.0" width="8.8" height="16.0" rx="1.5" fill="#00809A"><title>2025-12-04: step 0.37, timelike</title></rect>
+<rect x="138.1" y="372.7" width="8.8" height="27.3" rx="1.5" fill="#00809A"><title>2025-12-05: step 0.63, timelike</title></rect>
+<rect x="151.1" y="338.5" width="8.8" height="61.5" rx="1.5" fill="#D0402A"><title>2025-12-08: step 1.42, spacelike</title></rect>
+<rect x="164.1" y="373.9" width="8.8" height="26.1" rx="1.5" fill="#00809A"><title>2025-12-09: step 0.60, timelike</title></rect>
+<rect x="177.1" y="248.4" width="8.8" height="151.6" rx="1.5" fill="#D0402A"><title>2025-12-10: step 3.50, spacelike</title></rect>
+<rect x="190.1" y="351.4" width="8.8" height="48.6" rx="1.5" fill="#D0402A"><title>2025-12-11: step 1.12, spacelike</title></rect>
+<rect x="203.1" y="215.7" width="8.8" height="184.3" rx="1.5" fill="#D0402A"><title>2025-12-12: step 4.25, spacelike</title></rect>
+<rect x="216.1" y="297.8" width="8.8" height="102.2" rx="1.5" fill="#D0402A"><title>2025-12-15: step 2.36, spacelike</title></rect>
+<rect x="229.1" y="340.9" width="8.8" height="59.1" rx="1.5" fill="#D0402A"><title>2025-12-16: step 1.36, spacelike</title></rect>
+<rect x="242.1" y="313.6" width="8.8" height="86.4" rx="1.5" fill="#D0402A"><title>2025-12-17: step 1.99, spacelike</title></rect>
+<rect x="255.1" y="249.5" width="8.8" height="150.5" rx="1.5" fill="#D0402A"><title>2025-12-18: step 3.47, spacelike</title></rect>
+<rect x="268.1" y="345.7" width="8.8" height="54.3" rx="1.5" fill="#D0402A"><title>2025-12-19: step 1.25, spacelike</title></rect>
+<rect x="281.1" y="318.6" width="8.8" height="81.4" rx="1.5" fill="#D0402A"><title>2025-12-22: step 1.88, spacelike</title></rect>
+<rect x="294.1" y="373.6" width="8.8" height="26.4" rx="1.5" fill="#00809A"><title>2025-12-23: step 0.61, timelike</title></rect>
+<rect x="307.1" y="364.6" width="8.8" height="35.4" rx="1.5" fill="#00809A"><title>2025-12-24: step 0.82, timelike</title></rect>
+<rect x="320.1" y="373.8" width="8.8" height="26.2" rx="1.5" fill="#00809A"><title>2025-12-26: step 0.61, timelike</title></rect>
+<rect x="333.1" y="353.2" width="8.8" height="46.8" rx="1.5" fill="#D0402A"><title>2025-12-29: step 1.08, spacelike</title></rect>
+<rect x="346.1" y="373.9" width="8.8" height="26.1" rx="1.5" fill="#00809A"><title>2025-12-30: step 0.60, timelike</title></rect>
+<rect x="359.1" y="333.1" width="8.8" height="66.9" rx="1.5" fill="#D0402A"><title>2025-12-31: step 1.54, spacelike</title></rect>
+<rect x="372.1" y="335.4" width="8.8" height="64.6" rx="1.5" fill="#D0402A"><title>2026-01-02: step 1.49, spacelike</title></rect>
+<rect x="385.1" y="336.7" width="8.8" height="63.3" rx="1.5" fill="#D0402A"><title>2026-01-05: step 1.46, spacelike</title></rect>
+<rect x="398.1" y="352.7" width="8.8" height="47.3" rx="1.5" fill="#D0402A"><title>2026-01-06: step 1.09, spacelike</title></rect>
+<rect x="411.1" y="308.9" width="8.8" height="91.1" rx="1.5" fill="#D0402A"><title>2026-01-07: step 2.10, spacelike</title></rect>
+<rect x="424.1" y="354.7" width="8.8" height="45.3" rx="1.5" fill="#D0402A"><title>2026-01-08: step 1.05, spacelike</title></rect>
+<rect x="437.1" y="306.6" width="8.8" height="93.4" rx="1.5" fill="#D0402A"><title>2026-01-09: step 2.15, spacelike</title></rect>
+<rect x="450.1" y="327.2" width="8.8" height="72.8" rx="1.5" fill="#D0402A"><title>2026-01-12: step 1.68, spacelike</title></rect>
+<rect x="463.1" y="334.2" width="8.8" height="65.8" rx="1.5" fill="#D0402A"><title>2026-01-13: step 1.52, spacelike</title></rect>
+<rect x="476.1" y="328.3" width="8.8" height="71.7" rx="1.5" fill="#D0402A"><title>2026-01-14: step 1.65, spacelike</title></rect>
+<rect x="489.1" y="298.9" width="8.8" height="101.1" rx="1.5" fill="#D0402A"><title>2026-01-15: step 2.33, spacelike</title></rect>
+<rect x="502.1" y="360.2" width="8.8" height="39.8" rx="1.5" fill="#00809A"><title>2026-01-16: step 0.92, timelike</title></rect>
+<rect x="515.1" y="176.5" width="8.8" height="223.5" rx="1.5" fill="#D0402A"><title>2026-01-20: step 5.16, spacelike</title></rect>
+<rect x="528.1" y="203.6" width="8.8" height="196.4" rx="1.5" fill="#D0402A"><title>2026-01-21: step 4.53, spacelike</title></rect>
+<rect x="541.1" y="279.5" width="8.8" height="120.5" rx="1.5" fill="#D0402A"><title>2026-01-22: step 2.78, spacelike</title></rect>
+<rect x="554.1" y="360.2" width="8.8" height="39.8" rx="1.5" fill="#00809A"><title>2026-01-23: step 0.92, timelike</title></rect>
+<rect x="567.1" y="360.1" width="8.8" height="39.9" rx="1.5" fill="#00809A"><title>2026-01-26: step 0.92, timelike</title></rect>
+<rect x="580.1" y="374.0" width="8.8" height="26.0" rx="1.5" fill="#00809A"><title>2026-01-27: step 0.60, timelike</title></rect>
+<rect x="593.1" y="374.2" width="8.8" height="25.8" rx="1.5" fill="#00809A"><title>2026-01-28: step 0.60, timelike</title></rect>
+<rect x="606.1" y="330.5" width="8.8" height="69.5" rx="1.5" fill="#D0402A"><title>2026-01-29: step 1.60, spacelike</title></rect>
+<rect x="619.1" y="382.0" width="8.8" height="18.0" rx="1.5" fill="#00809A"><title>2026-01-30: step 0.41, timelike</title></rect>
+<rect x="632.1" y="337.3" width="8.8" height="62.7" rx="1.5" fill="#D0402A"><title>2026-02-02: step 1.45, spacelike</title></rect>
+<rect x="645.1" y="288.9" width="8.8" height="111.1" rx="1.5" fill="#D0402A"><title>2026-02-03: step 2.56, spacelike</title></rect>
+<rect x="658.1" y="344.2" width="8.8" height="55.8" rx="1.5" fill="#D0402A"><title>2026-02-04: step 1.29, spacelike</title></rect>
+<rect x="671.1" y="324.8" width="8.8" height="75.2" rx="1.5" fill="#D0402A"><title>2026-02-05: step 1.74, spacelike</title></rect>
+<rect x="684.1" y="168.7" width="8.8" height="231.3" rx="1.5" fill="#D0402A"><title>2026-02-06: step 5.34, spacelike</title></rect>
+<rect x="697.1" y="315.9" width="8.8" height="84.1" rx="1.5" fill="#D0402A"><title>2026-02-09: step 1.94, spacelike</title></rect>
+<rect x="710.1" y="355.6" width="8.8" height="44.4" rx="1.5" fill="#D0402A"><title>2026-02-10: step 1.03, spacelike</title></rect>
+<rect x="723.1" y="373.9" width="8.8" height="26.1" rx="1.5" fill="#00809A"><title>2026-02-11: step 0.60, timelike</title></rect>
+<rect x="736.1" y="248.6" width="8.8" height="151.4" rx="1.5" fill="#D0402A"><title>2026-02-12: step 3.49, spacelike</title></rect>
+<rect x="749.1" y="310.5" width="8.8" height="89.5" rx="1.5" fill="#D0402A"><title>2026-02-13: step 2.06, spacelike</title></rect>
+<rect x="762.1" y="361.6" width="8.8" height="38.4" rx="1.5" fill="#00809A"><title>2026-02-17: step 0.89, timelike</title></rect>
+<rect x="775.1" y="365.7" width="8.8" height="34.3" rx="1.5" fill="#00809A"><title>2026-02-18: step 0.79, timelike</title></rect>
+<rect x="788.1" y="352.8" width="8.8" height="47.2" rx="1.5" fill="#D0402A"><title>2026-02-19: step 1.09, spacelike</title></rect>
+<rect x="801.1" y="288.9" width="8.8" height="111.1" rx="1.5" fill="#D0402A"><title>2026-02-20: step 2.56, spacelike</title></rect>
+<rect x="814.1" y="291.9" width="8.8" height="108.1" rx="1.5" fill="#D0402A"><title>2026-02-23: step 2.49, spacelike</title></rect>
+<rect x="827.1" y="273.7" width="8.8" height="126.3" rx="1.5" fill="#D0402A"><title>2026-02-24: step 2.92, spacelike</title></rect>
+<rect x="840.1" y="327.5" width="8.8" height="72.5" rx="1.5" fill="#D0402A"><title>2026-02-25: step 1.67, spacelike</title></rect>
+<rect x="853.1" y="306.8" width="8.8" height="93.2" rx="1.5" fill="#D0402A"><title>2026-02-26: step 2.15, spacelike</title></rect>
+<line x1="84" x2="864" y1="356.7" y2="356.7" stroke="#1A1D24" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="90.5" y="424.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="14" fill="#6F6C64" text-anchor="middle" font-weight="400">2025-12-01</text>
+<text x="285.5" y="424.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="14" fill="#6F6C64" text-anchor="middle" font-weight="400">2025-12-22</text>
+<text x="480.5" y="424.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="14" fill="#6F6C64" text-anchor="middle" font-weight="400">2026-01-14</text>
+<text x="675.5" y="424.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="14" fill="#6F6C64" text-anchor="middle" font-weight="400">2026-02-05</text>
+<line x1="571.5" y1="356.1" x2="571.5" y2="120.0" stroke="#00809A" stroke-width="1.2" stroke-dasharray="2 3"/>
+<text x="574.0" y="112.0" font-family="ui-monospace,SFMono-Regular,'Cascadia Mono',Consolas,'DejaVu Sans Mono',Menlo,monospace" font-size="15" fill="#00809A" text-anchor="start" font-weight="400">2026-01-26: β 0.92, γ 2.55</text>
+<text x="44.0" y="460.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" fill="#6F6C64" text-anchor="start" font-weight="400">validation/data/SPY_1m.csv. Recomputed from the C++ formulas; labels match regime_validator on all 1,245 bars.</text>
+</svg>

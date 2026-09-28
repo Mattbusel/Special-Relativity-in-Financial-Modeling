@@ -29,7 +29,7 @@ namespace srfm::backtest {
 std::string ExtendedBacktester::TripleComparison::to_string() const {
     std::ostringstream os;
     os << "══════════════════════════════════════════════════════════════\n";
-    os << "  SRFM Strategy Comparison — Ticker: " << ticker << "\n";
+    os << "  SRFM Strategy Comparison, ticker: " << ticker << "\n";
     os << "══════════════════════════════════════════════════════════════\n";
     os << "  Strategy            Sharpe   Sortino      MDD    γ-IR\n";
     os << "──────────────────────────────────────────────────────────────\n";

@@ -4,7 +4,7 @@ name: Pages
 on:
   push:
     branches: [main]
-    paths: ['site/**', 'include/**', 'src/**', 'Doxyfile', 'README.md', '.github/workflows/pages.yml']
+    paths: ['site/**', 'assets/**', 'include/**', 'src/**', 'Doxyfile', 'README.md', '.github/workflows/pages.yml']
   pull_request:
     paths: ['site/**', 'Doxyfile', '.github/workflows/pages.yml']
   workflow_dispatch:
@@ -29,6 +29,7 @@ jobs:
         run: |
           mkdir -p _site
           cp -r site/. _site/
+          cp assets/how-it-works-*.svg assets/lorentz-factor-*.svg assets/spy-last-60-*.svg _site/assets/
           doxygen Doxyfile > doxygen.log 2>&1 || { tail -20 doxygen.log; exit 1; }
           cp -r docs/api/html _site/api
           touch _site/.nojekyll

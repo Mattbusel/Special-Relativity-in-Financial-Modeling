@@ -37,6 +37,18 @@ tag name as the release title.
 
 ---
 
+## [1.2.0] - 2026-09-28
+
+### Added
+- Release workflow builds the command-line tools (`srfm`, `regime_validator`, `backtest_runner`, `lorentz_basics`) for Windows x64 and Linux x64 and attaches them, with the sample data and a one-click `demo.bat` / `demo.sh`, as `srfm-windows-x64.zip` and `srfm-linux-x64.tar.gz`.
+- `regime_validator --help` and `backtest_runner --help` with a copy-paste example; errors say which argument is missing and where the sample data lives.
+- `scripts/figures/make_explainer.py`: the README's "How it works", Lorentz factor and last-60-bars figures, recomputed from the C++ formulas and checked against `regime_validator` output.
+
+### Changed
+- README shortened to a front page; the full reference moved to `docs/REFERENCE.md` unchanged.
+
+---
+
 ## [1.1.0] - 2026-03-18
 
 ### Added

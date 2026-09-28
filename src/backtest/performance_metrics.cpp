@@ -241,7 +241,7 @@ double BacktestComparison::ir_lift() const noexcept {
 std::string BacktestComparison::to_string() const {
     return fmt::format(
         "┌─────────────────────────────────────────────────────────┐\n"
-        "│         Relativistic Backtester — Side-by-Side          │\n"
+        "│         Relativistic Backtester: side by side           │\n"
         "├──────────────────┬──────────────┬──────────────┬────────┤\n"
         "│ Metric           │     Raw      │ Relativistic │  Lift  │\n"
         "├──────────────────┼──────────────┼──────────────┼────────┤\n"
