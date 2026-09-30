@@ -86,7 +86,7 @@ setup(
     long_description_content_type="text/markdown",
     author="Matthew Busel",
     license="MIT",
-    url="https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling",
+    url="https://gitlab.com/mattbusel/Special-Relativity-in-Financial-Modeling",
     packages=find_packages(where=str(_here)),
     package_dir={"": str(_here)},
     ext_modules=extensions,

@@ -23,4 +23,4 @@ Every tool prints its options with --help. Your own data works too: any CSV
 with a header row and at least "close" and "volume" columns.
 
 Source, docs and the paper:
-  https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling
+  https://gitlab.com/mattbusel/Special-Relativity-in-Financial-Modeling

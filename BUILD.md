@@ -19,7 +19,7 @@ Set the `VCPKG_ROOT` environment variable to your vcpkg installation directory.
 ## Build (Linux / macOS)
 
 ```bash
-git clone https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling
+git clone https://gitlab.com/mattbusel/Special-Relativity-in-Financial-Modeling
 cd Special-Relativity-in-Financial-Modeling
 
 # Configure (Release)

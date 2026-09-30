@@ -159,7 +159,7 @@ code{{font-family:{MONO};font-size:.86em}}
 {svg}
 </div>
 <div class="legend"><span><span class="sw" style="border-top:3px solid {t['time']}"></span>timelike, ds&sup2; &lt; 0</span><span><span class="sw" style="border-top:2px dashed {t['space']}"></span>spacelike, ds&sup2; &gt; 0</span><span><span class="sw" style="height:10px;width:14px;background:{t['time']};opacity:.25;border:1px solid {t['time']}"></span>light cone</span></div>
-{'<div class="url">github.com/Mattbusel/Special-Relativity-in-Financial-Modeling &middot; research code, not financial advice</div>' if social else ''}
+{'<div class="url">gitlab.com/mattbusel/Special-Relativity-in-Financial-Modeling &middot; research code, not financial advice</div>' if social else ''}
 </div></body></html>"""
 
 

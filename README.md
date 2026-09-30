@@ -4,7 +4,7 @@
 </picture>
 
 <p align="center">
-  <a href="https://mattbusel.github.io/Special-Relativity-in-Financial-Modeling/"><b>Project site</b></a> &middot;
+  <a href="https://special-relativity-finance.vercel.app/"><b>Project site</b></a> &middot;
   <a href="#download">Download</a> &middot;
   <a href="#how-it-works">How it works</a> &middot;
   <a href="#examples">Examples</a> &middot;
@@ -23,12 +23,12 @@ For quants, students and curious traders who want to explore a physics analogy o
 
 ## Download
 
-<a href="https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling/releases/latest/download/srfm-windows-x64.zip"><b>Download for Windows (.zip with .exe tools)</b></a>: unzip, double-click `demo.bat`.
+<a href="https://gitlab.com/mattbusel/Special-Relativity-in-Financial-Modeling/-/releases/permalink/latest/downloads/srfm-windows-x64.zip"><b>Download for Windows (.zip with .exe tools)</b></a>: unzip, double-click `demo.bat`.
 
 | Platform | Get it |
 |---|---|
-| Windows x64 | [`srfm-windows-x64.zip`](https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling/releases/latest/download/srfm-windows-x64.zip): four `.exe` tools, the sample data and `demo.bat` |
-| Linux x64 | [`srfm-linux-x64.tar.gz`](https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling/releases/latest/download/srfm-linux-x64.tar.gz): `tar xzf srfm-linux-x64.tar.gz && ./srfm/demo.sh` |
+| Windows x64 | [`srfm-windows-x64.zip`](https://gitlab.com/mattbusel/Special-Relativity-in-Financial-Modeling/-/releases/permalink/latest/downloads/srfm-windows-x64.zip): four `.exe` tools, the sample data and `demo.bat` |
+| Linux x64 | [`srfm-linux-x64.tar.gz`](https://gitlab.com/mattbusel/Special-Relativity-in-Financial-Modeling/-/releases): `tar xzf srfm-linux-x64.tar.gz && ./srfm/demo.sh` |
 | macOS, or the C++ library | Build from source with CMake: [three commands](docs/REFERENCE.md#build-from-source) |
 
 The download holds `regime_validator` (labels bars), `backtest_runner`, `srfm` and `lorentz_basics`, plus ten sample tickers of daily bars (SPY, QQQ, AAPL, NVDA, BTC-USD and more). Every tool prints its options and an example with `--help`.
@@ -126,9 +126,9 @@ The hypothesis: a spacelike bar is followed by more return variance than a timel
 | Repository | What it is |
 |---|---|
 | **Special-Relativity-in-Financial-Modeling** (this repo) | C++20 core: β, γ, interval labels, Christoffel symbols and geodesic deviation on OHLCV bars, plus Python validation scripts |
-| [srfm-lab](https://github.com/Mattbusel/srfm-lab) ([site](https://mattbusel.github.io/srfm-lab/)) | Multi-language research lab built on the idea: the black-hole signal, Monte Carlo backtests, a paper trader and an idea engine |
-| [srfm-python](https://github.com/Mattbusel/srfm-python) | Pure-Python SDK: a pandas `df.srfm` accessor and a Polars wrapper for the Lorentz-factor pipeline |
-| [srfm-paper-impl](https://github.com/Mattbusel/srfm-paper-impl) | The paper (PDF), scripts and a notebook that regenerate its figures, and a small Rust reference of the core formulas |
+| [srfm-lab](https://gitlab.com/mattbusel/srfm-lab) ([site](https://srfm-lab.vercel.app/)) | Multi-language research lab built on the idea: the black-hole signal, Monte Carlo backtests, a paper trader and an idea engine |
+| [srfm-python](https://gitlab.com/mattbusel/srfm-python) | Pure-Python SDK: a pandas `df.srfm` accessor and a Polars wrapper for the Lorentz-factor pipeline |
+| [srfm-paper-impl](https://gitlab.com/mattbusel/srfm-paper-impl) | The paper (PDF), scripts and a notebook that regenerate its figures, and a small Rust reference of the core formulas |
 
 ## License and citation
 
@@ -139,6 +139,6 @@ MIT, see [LICENSE](LICENSE).
   author = {Busel, Matthew},
   title  = {Special Relativity in Financial Modeling},
   year   = {2025},
-  url    = {https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling}
+  url    = {https://gitlab.com/mattbusel/Special-Relativity-in-Financial-Modeling}
 }
 ```

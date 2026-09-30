@@ -21,7 +21,7 @@ CMake 3.25+ and a C++20 compiler (GCC 12+, Clang 17+ or MSVC 19.38+). Eigen is v
 **Linux / macOS**
 
 ```bash
-git clone https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling srfm
+git clone https://gitlab.com/mattbusel/Special-Relativity-in-Financial-Modeling srfm
 cd srfm
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release   # or drop -G Ninja for Makefiles
 cmake --build build --parallel
@@ -32,7 +32,7 @@ ctest --test-dir build --output-on-failure --timeout 120
 **Windows (Visual Studio 2022 or newer)**
 
 ```bat
-git clone https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling C:\src\srfm
+git clone https://gitlab.com/mattbusel/Special-Relativity-in-Financial-Modeling C:\src\srfm
 cd C:\src\srfm
 cmake -B build -A x64
 cmake --build build --config Release --parallel
@@ -1336,7 +1336,7 @@ A: Build with `--features viz` and embed `SpacetimePlotter` in an eframe app; th
 The LaTeX source is in `paper/` (`main.tex`, `sections/01_abstract.tex` to
 `sections/08_conclusion.tex`, `bibliography.bib`); a built copy is `paper/main.pdf`.
 The standalone paper repository with figure scripts is
-[srfm-paper-impl](https://github.com/Mattbusel/srfm-paper-impl).
+[srfm-paper-impl](https://gitlab.com/mattbusel/srfm-paper-impl).
 
 Build the paper:
 

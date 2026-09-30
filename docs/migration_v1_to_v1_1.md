@@ -110,7 +110,7 @@ If you vendor SRFM or pin it to a tag, update to `v1.1.0`:
 
 ```bash
 # git submodule
-git submodule set-url <path> https://github.com/mattbusel/Special-Relativity-in-Financial-Modeling
+git submodule set-url <path> https://gitlab.com/mattbusel/Special-Relativity-in-Financial-Modeling
 git submodule update --remote
 
 # direct clone
