@@ -12,7 +12,6 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-00809A.svg"></a>
 </p>
 
