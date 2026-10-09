@@ -17,6 +17,8 @@
 
 # Special Relativity in Financial Modeling
 
+English | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
+
 **A C++ library and command-line tools that borrow the maths of special relativity to label every stock or crypto price bar as an ordinary move (timelike) or a jump (spacelike).** Each bar gets a speed β against a market "speed limit", a Lorentz factor γ and a spacetime interval ds², computed from its price, volume and momentum.
 
 For quants, students and curious traders who want to explore a physics analogy on real OHLCV data. **Research code, not financial advice:** it does not claim markets obey relativity, and nothing here is a tested trading strategy.
