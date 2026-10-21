@@ -17,6 +17,14 @@
 
 # Special Relativity in Financial Modeling
 
+<!-- outcome-block -->
+**Weight fast markets differently from slow ones: a C++20 library that applies Lorentz transforms to price signals, backed by 7,977 lines of tests and an arXiv-ready paper.**
+
+**Why this over the alternatives:** Classical models treat every price move the same regardless of market speed. In the slow-market limit every transform reduces to its classical version, so it only changes what it should.
+
+**Guarantee:** if it doesn't do what this README says, [open an issue](https://github.com/Mattbusel/Special-Relativity-in-Financial-Modeling/issues) and I'll fix it.
+<!-- outcome-block -->
+
 English | [简体中文](README.zh-CN.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
 **A C++ library and command-line tools that borrow the maths of special relativity to label every stock or crypto price bar as an ordinary move (timelike) or a jump (spacelike).** Each bar gets a speed β against a market "speed limit", a Lorentz factor γ and a spacetime interval ds², computed from its price, volume and momentum.
